@@ -2,6 +2,9 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\Auth\Register;
+use App\Filament\Resources\StaffResource;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -16,7 +19,11 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Str;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationGroup;
+use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -27,6 +34,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->registration(Register::class)
+            ->passwordReset()
+            ->emailVerification()
+            ->profile(EditProfile::class)
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -53,6 +64,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Staff')
+                    ->url(fn (): string => StaffResource::getUrl())
+                    ->icon('heroicon-o-cog-6-tooth'),
+            ])
+            ->navigationGroups([
+                NavigationGroup::make()
+                    ->label('Settings')
+            ])
+            ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
+            ->sidebarCollapsibleOnDesktop();
     }
 }
