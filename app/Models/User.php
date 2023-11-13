@@ -21,6 +21,8 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin;
 
     public static string $TEACHER_ROLE = 'Teacher';
+    public static string $STUDENT_ROLE = 'Student';
+    public static string $PARENT_ROLE = 'Parent';
     public static string $ADMIN_ROLE = 'Admin';
     public static string $ACCOUNTANT_ROLE = 'Accountant';
     public static string $PRINCIPAL_ROLE = 'Principal';
