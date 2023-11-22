@@ -24,6 +24,7 @@ use Filament\Tables\Table;
 use Filament\Infolists;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
+use Spatie\Permission\Models\Role;
 
 class StaffResource extends Resource
 {
@@ -58,7 +59,7 @@ class StaffResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(User::query())
+            ->query(User::role(User::staff()))
             ->columns([
                 TextColumn::make('firstname')
                     ->searchable(),

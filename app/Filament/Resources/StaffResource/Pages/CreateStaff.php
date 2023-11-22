@@ -30,14 +30,8 @@ class CreateStaff extends CreateRecord
         return parent::form($form)
             ->schema([
                 FileUpload::make('picture')
-                    ->imagePreviewHeight('2')
-                    ->loadingIndicatorPosition('left')
-                    ->panelAspectRatio('16:2')
-                    ->panelLayout('integrated')
-                    ->removeUploadedFileButtonPosition('right')
-                    ->uploadButtonPosition('left')
-                    ->uploadProgressIndicatorPosition('left')
-                    ->columnSpanFull(),
+                    ->avatar()
+                    ->image(),
                 TextInput::make('firstname')
                     ->required(),
                 TextInput::make('lastname')
