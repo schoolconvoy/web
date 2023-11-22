@@ -100,7 +100,9 @@ class RoleManagementTable extends Component
             'Teacher',
             'Accountant',
             'Librarian',
-            'Receptionist'
+            'Receptionist',
+            'Student',
+            'Parent'
         ];
 
         foreach ($roles as $role)

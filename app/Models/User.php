@@ -12,15 +12,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
+use App\Filament\Resources\StudentResource;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
     use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin;
 
     public static string $TEACHER_ROLE = 'Teacher';
+    public static string $STUDENT_ROLE = 'Student';
+    public static string $PARENT_ROLE = 'Parent';
     public static string $ADMIN_ROLE = 'Admin';
     public static string $ACCOUNTANT_ROLE = 'Accountant';
     public static string $PRINCIPAL_ROLE = 'Principal';
@@ -66,14 +70,30 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->belongsTo(School::class);
     }
 
-    public function teachers(): BelongsToMany
+    public function meta(): HasMany
     {
-        return $this->roles()->where('name', self::$TEACHER_ROLE);
+        return $this->hasMany(UserMeta::class);
     }
 
-    public function nonTeachers(): BelongsToMany
+    public function students()
     {
-        return $this->roles()->where('name', '!=', self::$TEACHER_ROLE);
+        return $this->role(self::$STUDENT_ROLE)->get();
+    }
+
+    /**
+     * A simple method to list only administrative roles
+     */
+    public static function staff()
+    {
+        return [
+            User::$TEACHER_ROLE,
+            User::$ADMIN_ROLE,
+            User::$ACCOUNTANT_ROLE,
+            User::$PRINCIPAL_ROLE,
+            User::$LIBRARIAN_ROLE,
+            User::$RECEPTIONIST_ROLE,
+            User::$SUPER_ADMIN_ROLE
+        ];
     }
 
     public function canAccessPanel(Panel $panel): bool

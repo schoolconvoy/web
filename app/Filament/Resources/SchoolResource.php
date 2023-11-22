@@ -45,14 +45,14 @@ class SchoolResource extends Resource
                 ]),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -60,5 +60,5 @@ class SchoolResource extends Resource
             'create' => Pages\CreateSchool::route('/create'),
             'edit' => Pages\EditSchool::route('/{record}/edit'),
         ];
-    }    
+    }
 }
