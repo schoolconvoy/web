@@ -33,6 +33,50 @@ class CreateParent extends CreateRecord
     protected function getSteps(): array
     {
         return [
+            Wizard\Step::make('Bio data')
+            ->icon('heroicon-s-user-circle')
+            ->description('Capture personal information about parent')
+            ->schema([
+                Grid::make([
+                        'sm' => 2,
+                        'xl' => 2,
+                        '2xl' => 2,
+                    ])
+                    ->schema([
+                        FileUpload::make('picture')
+                            ->label('Upload a picture')
+                            ->avatar()
+                            ->inlineLabel()
+                            ->columns()
+                            ->image(),
+                        Radio::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female'
+                            ])
+                            ->required()
+                        ,
+                        TextInput::make('firstname')
+                            ->required(),
+                        TextInput::make('lastname')
+                            ->required(),
+                        TextInput::make('email')
+                            ->required()
+                            ->email(),
+                        TextInput::make('phone')
+                            ->required()
+                            ->tel(),
+                        // TODO: Add country, state, lga
+                        Textarea::make('address')
+                            ->required()
+                            ->maxLength(200)
+                     ])
+                     ,
+            ])
+            ->live()
+            ->afterStateUpdated(function($operation, $state, Set $set) {
+                $this->review['bio'] = $state;
+            }),
             Wizard\Step::make('Link with a student')
                 ->icon('heroicon-s-user-circle')
                 ->description('Attach parent with a student')
@@ -42,9 +86,7 @@ class CreateParent extends CreateRecord
                     ])->schema([
                             Select::make('student')
                                 ->options(function() {
-                                    return User::role(User::$STUDENT_ROLE)
-                                                ->get()
-                                                ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+                                    return User::studentsDropdown();
                                 })
                                 ->columns(1)
                                 ->searchable()
@@ -109,50 +151,6 @@ class CreateParent extends CreateRecord
                     View::make('reviews')
                         ->view('filament.form.review', ['review' => $this->review])
                 ]),
-            Wizard\Step::make('Bio data')
-                ->icon('heroicon-s-user-circle')
-                ->description('Capture personal information about parent')
-                ->schema([
-                    Grid::make([
-                            'sm' => 2,
-                            'xl' => 2,
-                            '2xl' => 2,
-                        ])
-                        ->schema([
-                            FileUpload::make('picture')
-                                ->label('Upload a picture')
-                                ->avatar()
-                                ->inlineLabel()
-                                ->columns()
-                                ->image(),
-                            Radio::make('gender')
-                                ->options([
-                                    'male' => 'Male',
-                                    'female' => 'Female'
-                                ])
-                                ->required()
-                            ,
-                            TextInput::make('firstname')
-                                ->required(),
-                            TextInput::make('lastname')
-                                ->required(),
-                            TextInput::make('email')
-                                ->required()
-                                ->email(),
-                            TextInput::make('phone')
-                                ->required()
-                                ->tel(),
-                            // TODO: Add country, state, lga
-                            Textarea::make('address')
-                                ->required()
-                                ->maxLength(200)
-                         ])
-                         ,
-                ])
-                ->live()
-                ->afterStateUpdated(function($operation, $state, Set $set) {
-                    $this->review['bio'] = $state;
-                }),
         ];
     }
 

@@ -2,21 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SchoolResource\Pages;
-use App\Filament\Resources\SchoolResource\RelationManagers;
-use App\Models\School;
+use App\Filament\Resources\SubjectResource\Pages;
+use App\Filament\Resources\SubjectResource\RelationManagers;
+use App\Models\Subject;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SchoolResource extends Resource
+class SubjectResource extends Resource
 {
-    protected static ?string $model = School::class;
-    protected static bool $shouldRegisterNavigation = false;
+    protected static ?string $model = Subject::class;
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -31,7 +32,9 @@ class SchoolResource extends Resource
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('name')
+                            ->sortable(),
+                TextColumn::make('code')
             ])
             ->filters([
                 //
@@ -56,9 +59,9 @@ class SchoolResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSchools::route('/'),
-            'create' => Pages\CreateSchool::route('/create'),
-            'edit' => Pages\EditSchool::route('/{record}/edit'),
+            'index' => Pages\ListSubjects::route('/'),
+            'create' => Pages\CreateSubject::route('/create'),
+            'edit' => Pages\EditSubject::route('/{record}/edit'),
         ];
     }
 }

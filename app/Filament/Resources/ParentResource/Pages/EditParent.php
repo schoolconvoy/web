@@ -149,11 +149,11 @@ class EditParent extends EditRecord
 
     public function getParentStudents()
     {
-        $parent_relationships = User::find($this->record->id)->meta()->where('key', ParentResource::PARENT_STUDENT_RELATIONSHIP)->get()->pluck('value');
+        $parent_relationships = $this->record->meta()->where('key', ParentResource::PARENT_STUDENT_RELATIONSHIP)->get()->pluck('value');
 
-        Log::debug('parent_relationship -- ' . print_r($parent_relationships[0], true));
+        Log::debug('parent_relationship -- ' . print_r($parent_relationships, true));
 
-        return $parent_relationships[0];
+        return $parent_relationships[0] || [];
     }
 
 }

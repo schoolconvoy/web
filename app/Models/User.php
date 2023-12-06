@@ -17,6 +17,7 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
@@ -80,6 +81,28 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->role(self::$STUDENT_ROLE)->get();
     }
 
+    public function class()
+    {
+        return $this->belongsTo(Classes::class);
+    }
+
+    public static function studentsDropdown()
+    {
+        return self::role(self::$STUDENT_ROLE)
+                    ->get()
+                    ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+    }
+
+    public function fees()
+    {
+        return $this->belongsToMany(Fee::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->attributes['fullname'] = $this->firstname . ' ' . $this->lastname;
+    }
+
     /**
      * A simple method to list only administrative roles
      */
@@ -98,14 +121,18 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($panel->getId() === 'admin') return true;
-
+        return ($panel->getId() === 'admin');
         return true;
     }
 
     public function getFilamentName(): string
     {
         return $this->firstname . " " . $this->lastname;
+    }
+
+    public function attendance()
+    {
+        return $this->hasMany(Attendance::class, 'student_id', 'id');
     }
 
 //    public function roles(): BelongsToMany

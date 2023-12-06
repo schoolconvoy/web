@@ -50,16 +50,16 @@ class StudentResource extends Resource
             ->query(User::role(User::$STUDENT_ROLE))
             ->columns([
                 // TODO: Select a meta value we want
-                TextColumn::make('meta.key')
-                    ->label('Admission no.'),
-                TextColumn::make('class'),
+                // TextColumn::make('meta.key')
+                //     ->label('Admission no.'),
+                TextColumn::make('class.name'),
                 TextColumn::make('firstname')
                     ->searchable(),
                 TextColumn::make('lastname')
                     ->searchable(),
                 TextColumn::make('dob')
                     ->dateTime('Y-m-d'),
-                TextColumn::make('phone')
+                TextColumn::make('gender')
             ])
             ->filters([
             ])
