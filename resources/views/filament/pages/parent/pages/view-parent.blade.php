@@ -4,16 +4,10 @@
         <img src="{{asset('/storage/'. $record->picture)}}" alt="{{ $record->firstname }}">
     </div>
     <div class="flex gap-3 items-center py-3">
-        <div class="flex flex-row gap-x-2.5">
+        <div class="flex flex-row gap-x-2.5" title="wards">
             <x-heroicon-m-users class="h-5" />
             <h1 class="text-sm font-bold text-gray-800">
-                {{ $record->admission_no }}
-            </h1>
-        </div>
-        <div class="flex flex-row gap-x-2.5">
-            <x-heroicon-s-academic-cap class="h-5" />
-            <h1 class="text-sm font-bold text-gray-800">
-                {{ $record->class->name ?? '' }}
+                {{ $record->wards()->count() }} ward(s)
             </h1>
         </div>
     </div>

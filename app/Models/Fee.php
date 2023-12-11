@@ -18,4 +18,9 @@ class Fee extends Model
     {
         return $this->belongsTo(FeeCategory::class, 'fee_category', 'id');
     }
+
+    public function payments()
+    {
+        return $this->belongsToMany(Fee::class, 'fee_payments');
+    }
 }

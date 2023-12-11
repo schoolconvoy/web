@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Events\PaymentReceived;
+use App\Listeners\SendPaymentReceipt;
 use App\Events\StudentCreatedEvent;
 use App\Listeners\SendWelcomeNotification;
 use App\Models\User;
@@ -22,9 +24,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        StudentCreatedEvent::class => [
-            SendWelcomeNotification::class,
-        ],
+        PaymentReceived::class => [
+            SendPaymentReceipt::class
+        ]
+        // StudentCreatedEvent::class => [
+        //     SendWelcomeNotification::class,
+        // ],
     ];
 
     /**

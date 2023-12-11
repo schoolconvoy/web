@@ -78,7 +78,10 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function students()
     {
-        return $this->role(self::$STUDENT_ROLE)->get();
+        // return $this->role(self::$STUDENT_ROLE)->get();
+
+        return $this->belongsToMany(User::class, 'user_student', 'user_id', 'student_id')
+                    ->withTimestamps();
     }
 
     public function class()
@@ -122,7 +125,11 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function canAccessPanel(Panel $panel): bool
     {
         return ($panel->getId() === 'admin');
-        return true;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super-admin');
     }
 
     public function getFilamentName(): string
@@ -133,6 +140,23 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function attendance()
     {
         return $this->hasMany(Attendance::class, 'student_id', 'id');
+    }
+
+    /**
+     * Get all wards belong to a parent
+     */
+    public function wards()
+    {
+        return $this->belongsToMany(User::class, 'ward_parent', 'parent_id', 'ward_id', 'id', 'id')
+                    ->withPivot(['relationship', 'created_at', 'updated_at'])
+                    ->withTimestamps();
+    }
+
+    public function parent()
+    {
+        return $this->belongsToMany(User::class, 'ward_parent', 'ward_id', 'parent_id', 'id', 'id')
+                    ->withPivot(['relationship', 'created_at', 'updated_at'])
+                    ->withTimestamps();
     }
 
 //    public function roles(): BelongsToMany

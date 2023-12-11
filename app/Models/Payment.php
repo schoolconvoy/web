@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     use HasFactory;
+
+    public function fees()
+    {
+        return $this->belongsToMany(Fee::class, 'fee_payments');
+    }
 }
