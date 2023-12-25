@@ -77,17 +77,18 @@ class Attendance extends Model
     /**
      * Dispatch events when attendance is updated
      */
-    protected static function booted(): void
-    {
-        static::updated(function (Attendance $attendance) {
-            if ($attendance->status === self::LATE)
-            {
-                StudentIsLate::dispatch($attendance);
-            }
-            else if ($attendance->status === self::ABSENT)
-            {
-                StudentIsAbsent::dispatch($attendance);
-            }
-        });
-    }
+    // protected static function booted(): void
+    // {
+    //     static::updated(function (Attendance $attendance) {
+    //         if ($attendance->status === self::LATE)
+    //         {
+    //             Log::debug('student is late ' . print_r($attendance, true));
+    //             StudentIsLate::dispatch($attendance);
+    //         }
+    //         else if ($attendance->status === self::ABSENT)
+    //         {
+    //             StudentIsAbsent::dispatch($attendance);
+    //         }
+    //     });
+    // }
 }

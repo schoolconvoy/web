@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StudentResource\Pages;
 
+use App\Events\CreatedUser;
 use App\Events\StudentCreatedEvent;
 use App\Events\StudentIsLate;
 use App\Filament\Resources\StudentResource;
@@ -108,8 +109,8 @@ class CreateStudent extends CreateRecord
 
             $user->save();
 
-            // Dispatch event
-            StudentCreatedEvent::dispatch($user);
+            Log::debug('Successfully saved user: ' . print_r($user, true));
+
         } catch (\Throwable $th) {
             Log::debug('An error has occurred when saving user ' . print_r($th, true));
             throw $th;

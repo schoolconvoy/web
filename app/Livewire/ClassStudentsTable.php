@@ -39,7 +39,7 @@ class ClassStudentsTable extends IRelationalEntityTable
                 TextColumn::make('fullname')
                     ->label('Students')
                     ->searchable()
-                    ->description(fn (User $record): string => $record->meta()->where('key', 'admission_no')->first()->value ?? ''),
+                    ->description(fn (User $record): string => $record->admission_no ?? ''),
             ])
             ->filters([
 

@@ -2,11 +2,17 @@
 
 namespace App\Providers;
 
+use App\Events\CreatedUser;
 use App\Events\PaymentReceived;
 use App\Listeners\SendPaymentReceipt;
 use App\Events\StudentCreatedEvent;
+use App\Events\StudentAttendance;
+use App\Events\StudentIsLate;
 use App\Listeners\SendWelcomeNotification;
+use App\Listeners\StudentAttendanceListener;
+use App\Models\Attendance;
 use App\Models\User;
+use App\Observers\AttendanceObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -26,10 +32,13 @@ class EventServiceProvider extends ServiceProvider
         ],
         PaymentReceived::class => [
             SendPaymentReceipt::class
-        ]
-        // StudentCreatedEvent::class => [
-        //     SendWelcomeNotification::class,
-        // ],
+        ],
+        StudentAttendance::class => [
+            StudentAttendanceListener::class
+        ],
+        CreatedUser::class => [
+            SendWelcomeNotification::class,
+        ],
     ];
 
     /**
@@ -38,6 +47,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         User::observe(UserObserver::class);
+        Attendance::observe(AttendanceObserver::class);
     }
 
     /**

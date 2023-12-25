@@ -127,27 +127,15 @@ class ClassSubjectsTable extends IRelationalEntityTable
 
     public function assignSubjects()
     {
-        $didAttach = Classes::find($this->classId)->level->subjects()->attach($this->subjects);
+        Classes::find($this->classId)->level->subjects()->attach($this->subjects);
 
-        if ($didAttach)
-        {
-            Notification::make()
-                ->success()
-                ->title('Subjects assigned to class')
-                ->body('The selected subjects were assigned successfully.')
-                ->send();
+        Notification::make()
+            ->success()
+            ->title('Subjects assigned to class')
+            ->body('The selected subjects were assigned successfully.')
+            ->send();
 
-            $this->dispatch('close-modal', id: 'add-subjects');
-        }
-        else
-        {
-            Notification::make()
-                ->danger()
-                ->title('Failed to assigned subjects to class')
-                ->body('The selected subjects were not assigned.')
-                ->send();
-        }
-
+        $this->dispatch('close-modal', id: 'add-subjects');
     }
 
     public function assignTeacher()
@@ -180,16 +168,13 @@ class ClassSubjectsTable extends IRelationalEntityTable
 
     public function removeSubject($subjectId)
     {
-        $didDetach = Classes::find($this->classId)->level->subjects()->detach($subjectId);
+        Classes::find($this->classId)->level->subjects()->detach($subjectId);
 
-        if ($didDetach)
-        {
-            Notification::make()
-                ->success()
-                ->title('Subject removed from class')
-                ->body('Selected subject has been removed successfully')
-                ->send();
-        }
+        Notification::make()
+            ->success()
+            ->title('Subject removed from class')
+            ->body('Selected subject has been removed successfully')
+            ->send();
     }
 
     public function mount($classId = null, $students = [])

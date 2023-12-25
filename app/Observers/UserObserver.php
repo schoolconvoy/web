@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use App\Events\CreatedUser;
 
 class UserObserver
 {
@@ -26,7 +27,8 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        //
+        // Dispatch event
+        CreatedUser::dispatch($user);
     }
 
     /**

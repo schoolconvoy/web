@@ -13,11 +13,16 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
 use App\Filament\Resources\StudentResource;
+use App\Notifications\UserRegistered;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Notifications\Welcome;
+use Filament\Facades\Filament as FacadesFilament;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Filament\Facades\Filament;
 
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
@@ -159,14 +164,14 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                     ->withTimestamps();
     }
 
-//    public function roles(): BelongsToMany
-//    {
-//        return $this->roles()->where('name', '!=', 'super-admin');
-//    }
+    public function sendWelcomeNotification($email)
+    {
+        $user = User::where('email', $email)->first();
 
-    /**
-     * The "booted" method of the model.
-     */
+        $token = app('auth.password.broker')->createToken($user);
 
+        $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
 
+        return $this->notify(new UserRegistered($notificationUrl, $user));
+    }
 }

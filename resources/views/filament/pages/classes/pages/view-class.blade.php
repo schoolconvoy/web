@@ -50,10 +50,10 @@
                 <h2>Timetable</h2>
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="reports" role="tabpanel" aria-labelledby="reports-tab">
-                <h2>Reports here</h2>
+                <h2>Reports</h2>
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="results" role="tabpanel" aria-labelledby="results-tab">
-                <h2>Results here</h2>
+                <h2>Results</h2>
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
                 <livewire:class-teacher-table lazy :classId="$this->record->id" />

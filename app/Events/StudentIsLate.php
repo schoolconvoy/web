@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Attendance;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -9,6 +10,8 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class StudentIsLate
 {
@@ -17,9 +20,11 @@ class StudentIsLate
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(
+        public User $student, public Attendance $attendance
+    )
     {
-        //
+        Log::debug('Dispatched student is late event');
     }
 
     /**

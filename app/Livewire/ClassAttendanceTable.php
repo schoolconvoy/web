@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Events\StudentIsLate;
 use App\Events\StudentPromoted;
 use App\Models\Classes;
 use App\Models\User;
@@ -44,7 +45,7 @@ class ClassAttendanceTable extends IRelationalEntityTable
                 TextColumn::make('students.fullname')
                     ->label('Students')
                     ->searchable()
-                    ->description(fn (Attendance $record): string => UserMeta::where('user_id', $record->student_id)->where('key', 'admission_no')->first()->value ?? ''),
+                    ->description(fn (Attendance $record): string => $record->students->admission_no ?? ''),
                 SelectColumn::make('status')
                     ->options([
                         1 => 'Present',

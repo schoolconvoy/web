@@ -51,8 +51,10 @@ class StudentResource extends Resource
             ->query(User::role(User::$STUDENT_ROLE))
             ->columns([
                 TextColumn::make('admission_no')
-                    ->label('Admission no.'),
-                TextColumn::make('class.name'),
+                    ->label('Admission no.')
+                    ->sortable(),
+                TextColumn::make('class.name')
+                    ->sortable(),
                 TextColumn::make('firstname')
                     ->searchable(),
                 TextColumn::make('lastname')
@@ -64,14 +66,21 @@ class StudentResource extends Resource
             ->filters([
                 // filter by class
                 SelectFilter::make('class')
-                            ->relationship('class', 'name')
+                            ->relationship('class', 'name'),
+                SelectFilter::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female'
+                            ])
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 

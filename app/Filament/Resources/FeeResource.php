@@ -33,7 +33,7 @@ class FeeResource extends Resource
 {
     protected static ?string $model = Fee::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     public static function form(Form $form): Form
     {
@@ -85,9 +85,12 @@ class FeeResource extends Resource
                 TextColumn::make('amount')
                             ->numeric(2)
                             ->money('NGN')
-                            ->summarize(Summarizer::make()
-                            ->label('Total')
-                            ->using(fn (QueryBuilder $query): string => $query->sum('amount'))->money('NGN')),
+                            ->summarize(
+                                Summarizer::make()
+                                        ->label('Total')
+                                        ->using(fn (QueryBuilder $query): string => $query->sum('amount'))->money('NGN')
+                            )
+                            ->visible(auth()->user()->hasRole(User::$PARENT_ROLE)),
                 TextColumn::make('category.name'),
 
             ])
@@ -103,6 +106,7 @@ class FeeResource extends Resource
                                         ->action(function () {
                                             return redirect(route('pay'));
                                         })
+                                        ->visible(auth()->user()->hasRole(User::$PARENT_ROLE))
             ])
             // ->actions([
             //     Tables\Actions\Action::make('pay')
@@ -120,15 +124,15 @@ class FeeResource extends Resource
             ;
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return auth()->user()->hasRole(User::$PARENT_ROLE);
-    }
+    // public static function shouldRegisterNavigation(): bool
+    // {
+    //     // return auth()->user()->hasRole(User::$PARENT_ROLE);
+    // }
 
-    public function mount(): void
-    {
-        abort_unless(auth()->user()->hasRole(User::$PARENT_ROLE) || auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE), 403);
-    }
+    // public function mount(): void
+    // {
+    //     // abort_unless(auth()->user()->hasRole(User::$PARENT_ROLE) || auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE), 403);
+    // }
 
     public static function getRelations(): array
     {
