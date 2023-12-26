@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('classes_users', function (Blueprint $table) {
-            // Schema::rename('classes_users', 'classes_session');
+            Schema::rename('classes_users', 'classes_session');
         });
     }
 
