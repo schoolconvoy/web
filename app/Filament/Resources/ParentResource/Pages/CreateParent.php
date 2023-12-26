@@ -29,10 +29,55 @@ class CreateParent extends CreateRecord
     protected static string $resource = ParentResource::class;
     public array $review = [];
     public array $parentStudent = [];
+    public $userData = [];
 
     protected function getSteps(): array
     {
         return [
+            Wizard\Step::make('Bio data')
+            ->icon('heroicon-s-user-circle')
+            ->description('Capture personal information about parent')
+            ->schema([
+                Grid::make([
+                        'sm' => 2,
+                        'xl' => 2,
+                        '2xl' => 2,
+                    ])
+                    ->schema([
+                        FileUpload::make('picture')
+                            ->label('Upload a picture')
+                            ->avatar()
+                            ->inlineLabel()
+                            ->columns()
+                            ->image(),
+                        Radio::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female'
+                            ])
+                            ->required()
+                        ,
+                        TextInput::make('firstname')
+                            ->required(),
+                        TextInput::make('lastname')
+                            ->required(),
+                        TextInput::make('email')
+                           ->required()
+                            ->email(),
+                        TextInput::make('phone')
+                            ->required()
+                            ->tel(),
+                        // TODO: Add country, state, lga
+                        Textarea::make('address')
+                            ->required()
+                            ->maxLength(200)
+                     ])
+                     ,
+            ])
+            ->live(onBlur: true)
+            ->afterStateUpdated(function($operation, $state, Set $set) {
+                $this->review['bio'] = $state;
+            }),
             Wizard\Step::make('Link with a student')
                 ->icon('heroicon-s-user-circle')
                 ->description('Attach parent with a student')
@@ -42,9 +87,7 @@ class CreateParent extends CreateRecord
                     ])->schema([
                             Select::make('student')
                                 ->options(function() {
-                                    return User::role(User::$STUDENT_ROLE)
-                                                ->get()
-                                                ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+                                    return User::studentsDropdown();
                                 })
                                 ->columns(1)
                                 ->searchable()
@@ -61,29 +104,20 @@ class CreateParent extends CreateRecord
                                         ->icon('heroicon-o-user-plus')
                                         ->requiresConfirmation()
                                         ->action(function (Set $set, Get $get, $state) {
-
                                             // TODO: Make sure unique is working. Do not repeat items already added
                                             $unique = array_filter($this->parentStudent, function($link) use ($get) {
-                                                return $link['student']['id'] === $get('student');
+                                                return $link['student'] === $get('student');
                                             });
 
-
                                             if (count($unique) === 0) {
-                                                $student = User::find($get('student'));
-                                                $admission = $student->meta()->first()->getMeta(StudentResource::STUDENT_ADMISSION_NO);
-
                                                 array_push($this->parentStudent, array(
-                                                    'student' => [
-                                                        'id' => $student->id,
-                                                        'firstname' => $student->firstname,
-                                                        'lastname' => $student->lastname,
-                                                        'admission_no' => $admission,
-                                                    ],
+                                                    'student' => $get('student'),
                                                     'relationship' => $get('relationship'),
                                                 ));
                                             }
 
-                                            $set('parent_relationship', $this->parentStudent);
+                                            // Set review here first
+                                            $this->review['student'] = $this->parentStudent;
 
                                             // TODO: Figure out how to safely empty the data once it's added
                                             // $set('student', '');
@@ -96,63 +130,15 @@ class CreateParent extends CreateRecord
                                 ->columns(3)
                                 ->view('filament.form.parent-students', ['students' => $this->parentStudent]),
                         ])
-                ])->live()
+                ])->live(onBlur: true)
                 ->afterStateUpdated(function($operation, $state, Set $set, Get $get) {
-                    Log::debug('state ==> ' . print_r($state, true) .
-                                ' parentStudent ==> ' . print_r($this->parentStudent, true) .
-                                ' parent-student from state ' . print_r($get('parent_relationship'))
-                            );
                     $this->review['student'] = $this->parentStudent;
                 }),
             Wizard\Step::make('Review and Confirm')
                 ->schema([
                     View::make('reviews')
-                        ->view('filament.form.review', ['review' => $this->review])
+                        ->view('filament.form.parent-review', ['review' => $this->review])
                 ]),
-            Wizard\Step::make('Bio data')
-                ->icon('heroicon-s-user-circle')
-                ->description('Capture personal information about parent')
-                ->schema([
-                    Grid::make([
-                            'sm' => 2,
-                            'xl' => 2,
-                            '2xl' => 2,
-                        ])
-                        ->schema([
-                            FileUpload::make('picture')
-                                ->label('Upload a picture')
-                                ->avatar()
-                                ->inlineLabel()
-                                ->columns()
-                                ->image(),
-                            Radio::make('gender')
-                                ->options([
-                                    'male' => 'Male',
-                                    'female' => 'Female'
-                                ])
-                                ->required()
-                            ,
-                            TextInput::make('firstname')
-                                ->required(),
-                            TextInput::make('lastname')
-                                ->required(),
-                            TextInput::make('email')
-                                ->required()
-                                ->email(),
-                            TextInput::make('phone')
-                                ->required()
-                                ->tel(),
-                            // TODO: Add country, state, lga
-                            Textarea::make('address')
-                                ->required()
-                                ->maxLength(200)
-                         ])
-                         ,
-                ])
-                ->live()
-                ->afterStateUpdated(function($operation, $state, Set $set) {
-                    $this->review['bio'] = $state;
-                }),
         ];
     }
 
@@ -166,36 +152,44 @@ class CreateParent extends CreateRecord
         return $this->review;
     }
 
+    public function removeWard($id)
+    {
+        $removalCandidate = array_filter($this->parentStudent, function ($ward) use ($id) {
+            return $ward['student'] == $id;
+        });
+
+        $index = array_keys($removalCandidate)[0];
+
+        unset($this->parentStudent[$index]);
+
+        // Update review
+        $this->review['student'] = $this->parentStudent;
+    }
+
     protected function handleRecordCreation(array $data): Model
     {
-        $studentLink = $this->parentStudent;
-
         unset($data['student']);
         unset($data['relationship']);
 
-        $user = static::getModel()::create($data);
+        $parent = static::getModel()::create($data);
+
+        foreach($this->parentStudent as $relationship)
+        {
+            $parent->wards()->attach($relationship['student'], ['relationship' => $relationship['relationship']]);
+        }
 
         // Automatically assign the student role
-        $user->assignRole(User::$PARENT_ROLE);
+        $parent->assignRole(User::$PARENT_ROLE);
 
-        // TODO: Allow it to be customized
         $parent_no = 'ITGA-PARENT-' . static::getModel()::count() + 10000;
 
-        // Save meta data to user_meta
-        $user->meta()->saveMany([
-            new UserMeta([
-                'key' => 'parent_student',
-                'value' => $studentLink
-            ]),
-            new UserMeta([
-                'key' => 'parent_no',
-                'value' => $parent_no
-            ]),
-        ]);
+        $parent->parent_no = $parent_no;
+
+        $parent->save();
 
         // Dispatch event
-        ParentCreated::dispatch($user, $studentLink);
+        ParentCreated::dispatch($parent);
 
-        return $user;
+        return $parent;
     }
 }

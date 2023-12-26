@@ -2,10 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Filament\Support\Assets\Js;
+use Filament\Support\Facades\FilamentView;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +31,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        FilamentView::registerRenderHook(
+            'panels::user-menu.after',
+            fn (): string => auth()->user()->hasRole(User::$PARENT_ROLE) ? Blade::render('@livewire(\'ward-switcher\')') : '',
+        );
+
         FilamentAsset::register([
             Js::make('schoolconvoy', __DIR__ . '/../../resources/js/schoolconvoy.js'),
         ]);

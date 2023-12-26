@@ -13,10 +13,16 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
 use App\Filament\Resources\StudentResource;
+use App\Notifications\UserRegistered;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Notifications\Welcome;
+use Filament\Facades\Filament as FacadesFilament;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
+use Filament\Facades\Filament;
 
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
@@ -77,7 +83,32 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function students()
     {
-        return $this->role(self::$STUDENT_ROLE)->get();
+        // return $this->role(self::$STUDENT_ROLE)->get();
+
+        return $this->belongsToMany(User::class, 'user_student', 'user_id', 'student_id')
+                    ->withTimestamps();
+    }
+
+    public function class()
+    {
+        return $this->belongsTo(Classes::class);
+    }
+
+    public static function studentsDropdown()
+    {
+        return self::role(self::$STUDENT_ROLE)
+                    ->get()
+                    ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+    }
+
+    public function fees()
+    {
+        return $this->belongsToMany(Fee::class);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return $this->attributes['fullname'] = $this->firstname . ' ' . $this->lastname;
     }
 
     /**
@@ -98,9 +129,12 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function canAccessPanel(Panel $panel): bool
     {
-        if ($panel->getId() === 'admin') return true;
+        return ($panel->getId() === 'admin');
+    }
 
-        return true;
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole('super-admin');
     }
 
     public function getFilamentName(): string
@@ -108,14 +142,36 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->firstname . " " . $this->lastname;
     }
 
-//    public function roles(): BelongsToMany
-//    {
-//        return $this->roles()->where('name', '!=', 'super-admin');
-//    }
+    public function attendance()
+    {
+        return $this->hasMany(Attendance::class, 'student_id', 'id');
+    }
 
     /**
-     * The "booted" method of the model.
+     * Get all wards belong to a parent
      */
+    public function wards()
+    {
+        return $this->belongsToMany(User::class, 'ward_parent', 'parent_id', 'ward_id', 'id', 'id')
+                    ->withPivot(['relationship', 'created_at', 'updated_at'])
+                    ->withTimestamps();
+    }
 
+    public function parent()
+    {
+        return $this->belongsToMany(User::class, 'ward_parent', 'ward_id', 'parent_id', 'id', 'id')
+                    ->withPivot(['relationship', 'created_at', 'updated_at'])
+                    ->withTimestamps();
+    }
 
+    public function sendWelcomeNotification($email)
+    {
+        $user = User::where('email', $email)->first();
+
+        $token = app('auth.password.broker')->createToken($user);
+
+        $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
+
+        return $this->notify(new UserRegistered($notificationUrl, $user));
+    }
 }

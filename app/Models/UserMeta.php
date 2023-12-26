@@ -11,6 +11,11 @@ class UserMeta extends Model
 {
     use HasFactory;
 
+    public const STUDENT_ADMISSION_DATE = 'admission_date';
+    public const STUDENT_ADMISSION_NO = 'admission_no';
+    public const STUDENT_MEDICAL_RECORD = 'medical';
+    public const PARENT_STUDENT_RELATIONSHIP = 'parent_student';
+
     protected $casts = [
         'value' => 'json',
     ];

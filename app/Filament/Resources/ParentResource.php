@@ -9,6 +9,15 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists;
+use Filament\Infolists\Infolist;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Filters\SelectFilter;
+
 
 class ParentResource extends Resource
 {
@@ -42,7 +51,35 @@ class ParentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-            ]);
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
+            ;
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                Infolists\Components\TextEntry::make('firstname')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('lastname')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('email')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('dob')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('address')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
+        ]);
     }
 
     public static function getRelations(): array

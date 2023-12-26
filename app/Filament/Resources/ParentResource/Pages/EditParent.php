@@ -30,6 +30,7 @@ class EditParent extends EditRecord
     protected static string $resource = ParentResource::class;
     public array $review = [];
     public array $parentStudent = [];
+    public $userData = [];
 
     protected function getHeaderActions(): array
     {
@@ -42,49 +43,49 @@ class EditParent extends EditRecord
     {
         return [
             Wizard\Step::make('Bio data')
-                ->icon('heroicon-s-user-circle')
-                ->description('Capture personal information about parent')
-                ->schema([
-                    Grid::make([
-                            'sm' => 2,
-                            'xl' => 2,
-                            '2xl' => 2,
-                        ])
-                        ->schema([
-                            FileUpload::make('picture')
-                                ->label('Upload a picture')
-                                ->avatar()
-                                ->inlineLabel()
-                                ->columns()
-                                ->image(),
-                            Radio::make('gender')
-                                ->options([
-                                    'male' => 'Male',
-                                    'female' => 'Female'
-                                ])
-                                ->required()
-                            ,
-                            TextInput::make('firstname')
-                                ->required(),
-                            TextInput::make('lastname')
-                                ->required(),
-                            TextInput::make('email')
-                                ->required()
-                                ->email(),
-                            TextInput::make('phone')
-                                ->required()
-                                ->tel(),
-                            // TODO: Add country, state, lga
-                            Textarea::make('address')
-                                ->required()
-                                ->maxLength(200)
-                         ])
-                         ,
-                ])
-                ->live()
-                ->afterStateUpdated(function($operation, $state, Set $set) {
-                    $this->review['bio'] = $state;
-                }),
+            ->icon('heroicon-s-user-circle')
+            ->description('Capture personal information about parent')
+            ->schema([
+                Grid::make([
+                        'sm' => 2,
+                        'xl' => 2,
+                        '2xl' => 2,
+                    ])
+                    ->schema([
+                        FileUpload::make('picture')
+                            ->label('Upload a picture')
+                            ->avatar()
+                            ->inlineLabel()
+                            ->columns()
+                            ->image(),
+                        Radio::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female'
+                            ])
+                            ->required()
+                        ,
+                        TextInput::make('firstname')
+                            ->required(),
+                        TextInput::make('lastname')
+                            ->required(),
+                        TextInput::make('email')
+                           ->required()
+                            ->email(),
+                        TextInput::make('phone')
+                            ->required()
+                            ->tel(),
+                        // TODO: Add country, state, lga
+                        Textarea::make('address')
+                            ->required()
+                            ->maxLength(200)
+                     ])
+                     ,
+            ])
+            ->live(onBlur: true)
+            ->afterStateUpdated(function($operation, $state, Set $set) {
+                $this->review['bio'] = $state;
+            }),
             Wizard\Step::make('Link with a student')
                 ->icon('heroicon-s-user-circle')
                 ->description('Attach parent with a student')
@@ -94,66 +95,81 @@ class EditParent extends EditRecord
                     ])->schema([
                             Select::make('student')
                                 ->options(function() {
-                                    return User::role(User::$STUDENT_ROLE)->get()->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+                                    return User::studentsDropdown();
                                 })
                                 ->columns(1)
-                                ->searchable(),
+                                ->searchable()
+                                ->required(),
                             Select::make('relationship')
                                 ->options([
                                     'father' => 'Father',
                                     'mother' => 'Mother',
                                     'guardian' => 'Guardian',
                                 ])
+                                ->required()
                                 ->suffixAction(
                                     Action::make('Add link')
                                         ->icon('heroicon-o-user-plus')
                                         ->requiresConfirmation()
                                         ->action(function (Set $set, Get $get, $state) {
+                                            Log::debug('Parent-student relationship is ' . print_r($this->record->wards()->get()->toArray(), true));
 
-                                            // TODO: Make sure unique is working. Do not repeat items already added
-                                            $unique = array_filter($this->parentStudent, function($link) use ($get) {
-                                                return $link['student']->id === $get('student');
-                                            });
+                                            array_push($this->parentStudent, array(
+                                                'student' => User::find($get('student')),
+                                                'relationship' => $get('relationship'),
+                                            ));
 
+                                            // Set review here first
+                                            $this->review['student'] = $this->mergeData();
 
-                                            if (count($unique) === 0) {
-                                                Log::debug('Items that are not unique are ' . count($unique));
-                                                array_push($this->parentStudent, array(
-                                                    'student' => User::find($get('student')),
-                                                    'relationship' => $get('relationship'),
-                                                ));
-                                            }
-
-                                            // TODO: Figure out how to safely empty the data once it's added
-                                            $set('student', '');
-                                            $set('relationship', '');
-
-                                            Log::debug('Parent-student relationship is ' . print_r($this->parentStudent, true));
+                                            Log::debug('Parent-student relationship is ' . print_r($this->review['student'], true));
                                         })
                                 ),
                             View::make('students')
                                 ->columns(3)
-                                ->view('filament.form.parent-students', ['students' => $this->getParentStudents()]),
+                                ->view('filament.form.parent-students-edit', ['students' => $this->mergeData()]),
                         ])
-                ])->live()
-                ->afterStateUpdated(function($operation, $state, Set $set) {
-                    $this->review['student'] = $state;
+                ])->live(onBlur: true)
+                ->afterStateUpdated(function($operation, $state, Set $set, Get $get) {
+                    $this->review['student'] = $this->mergeData();
                 }),
             Wizard\Step::make('Review and Confirm')
                 ->schema([
                     View::make('reviews')
-                        ->view('filament.form.review', ['review' => ['student' => $this->getParentStudents(), 'bio' => $this->record]])
+                        ->view('filament.form.parent-review', ['review' => $this->review])
                 ]),
         ];
     }
 
+    public function removeWard($id)
+    {
+        $removalCandidate = array_filter($this->parentStudent, function ($ward) use ($id) {
+            return $ward['student']['id'] == $id;
+        });
+
+        $index = array_keys($removalCandidate)[0];
+
+        unset($this->parentStudent[$index]);
+
+        // Update review
+        $this->review['student'] = $this->parentStudent;
+    }
+
+    public function mergeData()
+    {
+        return array_merge(
+            $this->parentStudent,
+            $this->record->wards()->get()->toArray()->mapWithKeys(fn ($user) => ['student' => $user, 'relationship' => $user->pivot->relationship])
+        );
+    }
+
     public function getParentStudents()
     {
-        $parent_relationships = User::find($this->record->id)->meta()->where('key', ParentResource::PARENT_STUDENT_RELATIONSHIP)->get()->pluck('value');
+        $parent_relationships = $this->record->meta()->where('key', ParentResource::PARENT_STUDENT_RELATIONSHIP)->get()->pluck('value');
 
-        Log::debug('parent_relationship -- ' . print_r($parent_relationships[0], true));
+        Log::debug('parent_relationship -- ' . print_r($parent_relationships, true));
 
-        return $parent_relationships[0];
+        return $parent_relationships[0] || [];
     }
 
 }

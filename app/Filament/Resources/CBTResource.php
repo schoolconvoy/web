@@ -1,0 +1,150 @@
+<?php
+
+namespace App\Filament\Resources;
+
+use App\Filament\Resources\CBTResource\Pages;
+use App\Filament\Resources\CBTResource\RelationManagers;
+use App\Models\CBT;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Infolists\Infolist;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Table;
+use Harishdurga\LaravelQuiz\Models\Quiz;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Infolists\Components\Tabs;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Support\Enums\FontWeight;
+use Carbon\Carbon;
+use App\Actions\Star;
+use App\Actions\ResetStars;
+use App\Filament\Resources\CBTResource\Pages\Attempt;
+use App\Filament\Resources\CBTResource\Pages\ViewAttempt;
+use App\Filament\Resources\CBTResource\Pages\ViewRevision;
+use DOTNET;
+use Filament\Infolists\Components\Actions;
+use Filament\Infolists\Components\Actions\Action;
+use Illuminate\Support\Facades\Log;
+
+class CBTResource extends Resource
+{
+    protected static ?string $model = Quiz::class;
+    protected static ?string $navigationLabel = 'CBT';
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function form(Form $form): Form
+    {
+        return $form
+            ->schema([
+                //
+            ]);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('name'),
+                TextColumn::make('pass_marks')
+                            ->label('Pass mark'),
+                TextColumn::make('total_marks'),
+                TextColumn::make('max_attempts'),
+                TextColumn::make('questions_count')
+                            ->counts('questions')
+                            ->label('Questions'),
+            ])
+            ->filters([
+                Filter::make('upcoming')
+                        ->query(fn (Builder $query): Builder => $query->where('valid_from', '=', now())),
+                Tables\Filters\TrashedFilter::make(),
+            ])
+            ->actions([
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
+                ]),
+            ]);
+    }
+
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist
+            ->schema([
+                    TextEntry::make('name')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('valid_from')
+                        ->dateTime('l, jS F, Y')
+                        ->label('Starts from')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('valid_upto')
+                        ->dateTime('l, jS F, Y')
+                        ->label('Ends on')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('duration')
+                        ->time('i:s')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('max_attempts')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('time_between_attempts')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('pass_marks')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    TextEntry::make('total_marks')
+                        ->size(TextEntry\TextEntrySize::Large)
+                        ->weight(FontWeight::Bold),
+                    Actions::make([
+                        Action::make('start')
+                            ->icon('heroicon-m-play-circle')
+                            ->color('success')
+                            ->requiresConfirmation()
+                            ->action(function () {
+                                // redirect to /attempt
+                                // return redirect()->route();
+                            })
+                            ,
+                    ]),
+        ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListCBTS::route('/'),
+            'view' => Pages\ViewCBT::route('/{record}'),
+            'attempt' => ViewAttempt::route('/{record}/attempt'),
+            'revision' => ViewRevision::route('/{record}/revision'),
+        ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
+}

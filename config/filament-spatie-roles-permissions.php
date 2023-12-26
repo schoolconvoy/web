@@ -36,7 +36,7 @@ return [
 
     'model_filter_key' => 'return \'%\'.$key;', // Eg: 'return \'%\'.$key.'\%\';'
 
-    'user_name_column' => 'name',
+    'user_name_column' => 'firstname',
 
     'generator' => [
 

@@ -18,6 +18,7 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Filters\SelectFilter;
 
 class StudentResource extends Resource
 {
@@ -49,26 +50,37 @@ class StudentResource extends Resource
         return $table
             ->query(User::role(User::$STUDENT_ROLE))
             ->columns([
-                // TODO: Select a meta value we want
-                TextColumn::make('meta.key')
-                    ->label('Admission no.'),
-                TextColumn::make('class'),
+                TextColumn::make('admission_no')
+                    ->label('Admission no.')
+                    ->sortable(),
+                TextColumn::make('class.name')
+                    ->sortable(),
                 TextColumn::make('firstname')
                     ->searchable(),
                 TextColumn::make('lastname')
                     ->searchable(),
                 TextColumn::make('dob')
                     ->dateTime('Y-m-d'),
-                TextColumn::make('phone')
+                TextColumn::make('gender')
             ])
             ->filters([
+                // filter by class
+                SelectFilter::make('class')
+                            ->relationship('class', 'name'),
+                SelectFilter::make('gender')
+                            ->options([
+                                'male' => 'Male',
+                                'female' => 'Female'
+                            ])
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
@@ -81,7 +93,6 @@ class StudentResource extends Resource
 
     public static function infolist(Infolist $infolist): Infolist
     {
-
         return $infolist
             ->schema([
                 Infolists\Components\TextEntry::make('firstname')
@@ -99,11 +110,11 @@ class StudentResource extends Resource
                 Infolists\Components\TextEntry::make('address')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
-                Infolists\Components\TextEntry::make('meta.key.medical')
+                Infolists\Components\TextEntry::make('height')
                     ->label('Height (cm)')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
-                Infolists\Components\TextEntry::make('meta.key.medical')
+                Infolists\Components\TextEntry::make('weight')
                     ->label('Weight (kg)')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),

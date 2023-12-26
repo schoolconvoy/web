@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources\StudentResource\Pages;
 
+use App\Events\CreatedUser;
 use App\Events\StudentCreatedEvent;
+use App\Events\StudentIsLate;
 use App\Filament\Resources\StudentResource;
 use App\Models\User;
 use App\Models\UserMeta;
@@ -19,12 +21,16 @@ use Filament\Forms\Form;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Forms\Components\Wizard;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Forms\Set;
+use Filament\Forms\Components\View;
+use Illuminate\Support\Facades\Log;
 
 class CreateStudent extends CreateRecord
 {
     use CreateRecord\Concerns\HasWizard;
 
     protected static string $resource = StudentResource::class;
+    public array $review = [];
 
     protected function getSteps(): array
     {
@@ -44,11 +50,12 @@ class CreateStudent extends CreateRecord
                                 ->avatar()
                                 ->inlineLabel()
                                 ->columns()
+                                ->maxFiles(1)
                                 ->image(),
                             Radio::make('gender')
                                 ->options([
-                                    'male' => 'Male',
-                                    'female' => 'Female'
+                                    'Male' => 'Male',
+                                    'Female' => 'Female'
                                 ])
                                 ->required()
                             ,
@@ -72,48 +79,42 @@ class CreateStudent extends CreateRecord
                             Textarea::make('address')
                                 ->required()
                                 ->maxLength(200)
-                         ]),
-                ]),
+                         ])
+                         ,
+                ])->live(onBlur: true, debounce: 500)
+                ->afterStateUpdated(function ($state) {
+                    $this->review['bio'] = $state;
+                }),
             Wizard\Step::make('Confirm details')
                         ->schema([
-                            // ...
+                            View::make('reviews')
+                                ->view('filament.form.student-review', ['review' => $this->review])
                         ]),
         ];
     }
 
     protected function handleRecordCreation(array $data): Model
     {
-        $height = $data['height'];
-        $weight = $data['weight'];
+        Log::debug('data to be saved: ' . print_r($data, true));
 
-        unset($data['height']);
-        unset($data['weight']);
+        try {
+            $user = static::getModel()::create($data);
 
-        $user = static::getModel()::create($data);
+            // Automatically assign the student role
+            $user->assignRole(User::$STUDENT_ROLE);
 
-        // Automatically assign the student role
-        $user->assignRole(User::$STUDENT_ROLE);
+            $admission_no = 'ITGA-' . static::getModel()::count() + 10000;
 
-        // TODO: Allow it to be customized
-        $admission_no = 'ITGA-' . static::getModel()::count() + 10000;
+            $user->admission_no = $admission_no;
 
-        // Save meta data to user_meta
-        $user->meta()->saveMany([
-            new UserMeta([
-                'key' => StudentResource::STUDENT_MEDICAL_RECORD,
-                'value' => [
-                    'height' => $height,
-                    'weight' => $weight
-                ]
-            ]),
-            new UserMeta([
-                'key' => StudentResource::STUDENT_ADMISSION_NO,
-                'value' => $admission_no
-            ]),
-        ]);
+            $user->save();
 
-        // Dispatch event
-        StudentCreatedEvent::dispatch($user);
+            Log::debug('Successfully saved user: ' . print_r($user, true));
+
+        } catch (\Throwable $th) {
+            Log::debug('An error has occurred when saving user ' . print_r($th, true));
+            throw $th;
+        }
 
         return $user;
     }
