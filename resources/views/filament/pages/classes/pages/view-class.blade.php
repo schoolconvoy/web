@@ -23,6 +23,12 @@
                     <a href="#subjects" class="inline-block p-4 border-b-2 rounded-t-lg" id="subjects-tab" data-tabs-target="#subjects" type="button" role="tab" aria-controls="subjects" aria-selected="false">Subjects</a>
                 </li>
                 <li class="mr-2" role="presentation">
+                    <a href="#google-classroom" class="inline-block p-4 border-b-2 rounded-t-lg" id="google-classroom-tab" data-tabs-target="#google-classroom" type="button" role="tab" aria-controls="google-classroom" aria-selected="false">Google Classroom</a>
+                </li>
+                <li class="mr-2" role="presentation">
+                    <a href="#teacher" class="inline-block p-4 border-b-2 rounded-t-lg" id="teacher-tab" data-tabs-target="#teacher" type="button" role="tab" aria-controls="teacher" aria-selected="false">Teacher</a>
+                </li>
+                <li class="mr-2" role="presentation">
                     <a href="#timetable" class="inline-block p-4 border-b-2 rounded-t-lg" id="timetable-tab" data-tabs-target="#timetable" type="button" role="tab" aria-controls="timetable" aria-selected="false">Timetable</a>
                 </li>
                 <li class="mr-2" role="presentation">
@@ -30,9 +36,6 @@
                 </li>
                 <li class="mr-2" role="presentation">
                     <a href="#results" class="inline-block p-4 border-b-2 rounded-t-lg" id="results-tab" data-tabs-target="#results" type="button" role="tab" aria-controls="results" aria-selected="false">Results</a>
-                </li>
-                <li class="mr-2" role="presentation">
-                    <a href="#teacher" class="inline-block p-4 border-b-2 rounded-t-lg" id="teacher-tab" data-tabs-target="#teacher" type="button" role="tab" aria-controls="teacher" aria-selected="false">Teacher</a>
                 </li>
             </ul>
         </div>
@@ -46,6 +49,12 @@
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="subjects" role="tabpanel" aria-labelledby="subjects-tab">
                 <livewire:class-subjects-table lazy :students="$this->record->students" :classId="$this->record->id" />
             </div>
+            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="google-classroom" role="tabpanel" aria-labelledby="google-classroom-tab">
+                <livewire:class-google-classroom lazy :classId="$this->record->id" />
+            </div>
+            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
+                <livewire:class-teacher-table lazy :classId="$this->record->id" />
+            </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="timetable" role="tabpanel" aria-labelledby="timetable-tab">
                 <h2>Timetable</h2>
             </div>
@@ -54,9 +63,6 @@
             </div>
             <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="results" role="tabpanel" aria-labelledby="results-tab">
                 <h2>Results</h2>
-            </div>
-            <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="teacher" role="tabpanel" aria-labelledby="teacher-tab">
-                <livewire:class-teacher-table lazy :classId="$this->record->id" />
             </div>
         </div>
 

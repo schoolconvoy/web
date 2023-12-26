@@ -44,7 +44,17 @@ class ViewAttempt extends ViewRecord
             );
         }
 
-        Log::debug('Score calculated is ' . print_r($this->attempt->calculate_score(), true));
+        $this->attempt->score = $this->attempt->calculate_score();
+
+        $this->attempt->save();
+
+        Log::debug('Score calculated is ' . print_r([$this->attempt, $this->attempt->calculate_score()], true));
+
+        return redirect()->route('filament.admin.resources.c-b-t-s.revision', [
+            'record' => $this->record->slug,
+            'attempt' => $this->attempt->id,
+            'score' => $this->attempt->score,
+        ]);
     }
 
     public function mount(int | string $record): void

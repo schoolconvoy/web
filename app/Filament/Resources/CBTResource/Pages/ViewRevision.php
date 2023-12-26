@@ -16,6 +16,7 @@ class ViewRevision extends ViewRecord
     protected static string $view = 'filament.resources.c-b-t-resource.pages.review';
 
     public $attempt;
+    public $score;
     public $answers = [];
 
     public function getTitle(): string | Htmlable
@@ -28,24 +29,16 @@ class ViewRevision extends ViewRecord
         return $this->record->name;
     }
 
-    public function handleSubmission()
-    {
-        foreach ($this->answers as $question_id => $question_option_id) {
-            QuizAttemptAnswer::create(
-                [
-                    'quiz_attempt_id' => $this->attempt->id,
-                    'quiz_question_id' => $question_id,
-                    'question_option_id' => $question_option_id,
-                ]
-            );
-        }
-
-        Log::debug('Score calculated is ' . print_r($this->attempt->calculate_score(), true));
-    }
-
     public function mount(int | string $record): void
     {
         $this->record = $this->resolveRecord($record);
+
+        $attemptId = request()->get('attempt');
+
+        $this->attempt = QuizAttempt::find($attemptId);
+        $this->score = request()->get('score');
+
+        Log::debug('Attempt is ' . print_r($this->attempt, true));
 
         $this->record->load(['topics', 'questions.question']);
 
@@ -54,21 +47,5 @@ class ViewRevision extends ViewRecord
         if (! $this->hasInfolist()) {
             $this->fillForm();
         }
-
-        $attempts = $this->record->attempts()
-                                ->where('participant_id', auth()->user()->id)
-                                ->where('participant_type', get_class(auth()->user()))
-                                ->count();
-        $max_attempts = $this->record->max_attempts;
-
-        // abort_unless($attempts < $max_attempts, 403);
-
-        $attempt = QuizAttempt::create([
-            'quiz_id' => $this->record->id,
-            'participant_id' => auth()->user()->id,
-            'participant_type' => get_class(auth()->user()),
-        ]);
-
-        $this->attempt = $attempt;
     }
 }
