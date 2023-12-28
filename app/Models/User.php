@@ -127,6 +127,21 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         ];
     }
 
+    public static function getRoles()
+    {
+        return [
+            User::$TEACHER_ROLE,
+            User::$STUDENT_ROLE,
+            User::$PARENT_ROLE,
+            User::$ADMIN_ROLE,
+            User::$ACCOUNTANT_ROLE,
+            User::$PRINCIPAL_ROLE,
+            User::$LIBRARIAN_ROLE,
+            User::$RECEPTIONIST_ROLE,
+            User::$SUPER_ADMIN_ROLE
+        ];
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         return ($panel->getId() === 'admin');
