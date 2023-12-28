@@ -107,16 +107,11 @@ abstract class IRelationalEntityTable extends Component implements HasForms, Has
             ]);
     }
 
-    public function placeholder()
+    public function placeholder(array $params = [])
     {
-        return <<<'HTML'
-        <div>
-            <!-- Loading spinner... -->
-            <svg>...</svg>
-        </div>
-        HTML;
+        return view('components.livewire.placeholders.spinner', $params);
     }
-    
+
     public function render()
     {
         Log::debug('Rendering view: ' . $this->viewPath);
