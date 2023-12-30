@@ -12,9 +12,25 @@ class Attendance extends Model
 {
     use HasFactory;
 
+    const UNRECORDED = 0;
     const PRESENT = 1;
     const ABSENT = 2;
     const LATE = 3;
+
+    public static function status(int $status)
+    {
+        switch($status)
+        {
+            case self::PRESENT:
+                return 'Present';
+            case self::ABSENT:
+                return 'Absent';
+            case self::LATE:
+                return 'Late';
+            default:
+                return 'Unrecorded';
+        }
+    }
 
     public function class()
     {
@@ -72,6 +88,21 @@ class Attendance extends Model
 
         return self::where('class_id', $class->id)
                 ->whereRaw('date(created_at) = ?', [date('Y-m-d')]);
+    }
+
+    public static function statusColor($status)
+    {
+        switch($status)
+        {
+            case self::PRESENT:
+                return '#008000';
+            case self::ABSENT:
+                return '#ff0000';
+            case self::LATE:
+                return '#ffff00';
+            default:
+                return 'gray';
+        }
     }
 
     /**
