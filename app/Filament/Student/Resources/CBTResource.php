@@ -1,12 +1,9 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Student\Resources;
 
-use App\Filament\Resources\CBTResource\Pages;
-use App\Filament\Resources\CBTResource\RelationManagers;
-use App\Models\CBT;
-use Filament\Forms;
-use Filament\Forms\Form;
+use App\Filament\Student\Resources\CBTResource\Pages\ListCBTS;
+use App\Filament\Student\Resources\CBTResource\Pages\ViewCBT;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -16,19 +13,12 @@ use Filament\Tables\Table;
 use Harishdurga\LaravelQuiz\Models\Quiz;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
-use Carbon\Carbon;
-use App\Actions\Star;
-use App\Actions\ResetStars;
-use App\Filament\Resources\CBTResource\Pages\Attempt;
-use App\Filament\Resources\CBTResource\Pages\ViewAttempt;
-use App\Filament\Resources\CBTResource\Pages\ViewRevision;
-use DOTNET;
+use App\Filament\Student\Resources\CBTResource\Pages\ViewAttempt;
+use App\Filament\Student\Resources\CBTResource\Pages\ViewRevision;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
-use Illuminate\Support\Facades\Log;
 
 class CBTResource extends Resource
 {
@@ -36,14 +26,6 @@ class CBTResource extends Resource
     protected static ?string $navigationLabel = 'CBT';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-    public static function form(Form $form): Form
-    {
-        return $form
-            ->schema([
-                //
-            ]);
-    }
 
     public static function table(Table $table): Table
     {
@@ -133,8 +115,8 @@ class CBTResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCBTS::route('/'),
-            'view' => Pages\ViewCBT::route('/{record}'),
+            'index' => ListCBTS::route('/'),
+            'view' => ViewCBT::route('/{record}'),
             'attempt' => ViewAttempt::route('/{record}/attempt'),
             'revision' => ViewRevision::route('/{record}/revision'),
         ];

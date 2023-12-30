@@ -111,10 +111,13 @@ class StaffResource extends Resource
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
                 Infolists\Components\TextEntry::make('status')
+                    ->formatStateUsing(function (string $state): string {
+                        return "1" === $state ? __("Active") : __("Inactive");
+                    })
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
                 Infolists\Components\TextEntry::make('roles.name')
-                    ->label('role')
+                    ->label('Role')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
         ]);

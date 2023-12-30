@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\CBTResource\Pages;
+namespace App\Filament\Student\Resources\CBTResource\Pages;
 
-use App\Filament\Resources\CBTResource;
+use App\Filament\Student\Resources\CBTResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 

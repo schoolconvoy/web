@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\QuestionResource\Pages;
 use App\Filament\Resources\QuestionResource\RelationManagers;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -124,5 +125,10 @@ class QuestionResource extends Resource
             'view' => Pages\ViewQuestion::route('/{record}'),
             'edit' => Pages\EditQuestion::route('/{record}/edit'),
         ];
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE);
     }
 }

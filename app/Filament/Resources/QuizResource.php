@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\QuizResource\Pages;
 use App\Filament\Resources\QuizResource\RelationManagers;
 use App\Models\Quiz;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -174,4 +175,11 @@ class QuizResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
+
+    public function mount(): void
+    {
+        abort_unless(auth()->user()->hasRole(User::$STUDENT_ROLE)
+        || auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE), 403);
+    }
+
 }
