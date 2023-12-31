@@ -19,6 +19,7 @@ use App\Filament\Student\Resources\CBTResource\Pages\ViewAttempt;
 use App\Filament\Student\Resources\CBTResource\Pages\ViewRevision;
 use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Actions\Action;
+use Illuminate\Support\Facades\Log;
 
 class CBTResource extends Resource
 {
@@ -96,11 +97,12 @@ class CBTResource extends Resource
                             ->icon('heroicon-m-play-circle')
                             ->color('success')
                             ->requiresConfirmation()
-                            ->action(function () {
-                                // redirect to /attempt
-                                // return redirect()->route();
-                            })
-                            ,
+                            ->action( function () use ($infolist) {
+                                    return redirect()->route('filament.student.resources.c-b-t-s.attempt', [
+                                        'record' => $infolist->getState()->slug
+                                    ]);
+                                }
+                            ),
                     ]),
         ]);
     }
