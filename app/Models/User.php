@@ -148,8 +148,35 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
      */
     public function canAccessPanel(Panel $panel): bool
     {
+        if ($panel->getId() === 'admin') {
+            return $this->hasAnyRole([
+                User::$ADMIN_ROLE,
+                User::$SUPER_ADMIN_ROLE,
+                User::$TEACHER_ROLE,
+                User::$PRINCIPAL_ROLE,
+                User::$RECEPTIONIST_ROLE,
+            ]);
+        }
+        else if ($panel->getId() === 'parent')
+        {
+            return $this->hasAnyRole([
+                User::$PARENT_ROLE,
+                User::$SUPER_ADMIN_ROLE,
+                User::$ADMIN_ROLE,
+            ]);
+        }
+        else if ($panel->getId() === 'student')
+        {
+            return $this->hasAnyRole([
+                User::$STUDENT_ROLE,
+                User::$SUPER_ADMIN_ROLE,
+                User::$ADMIN_ROLE,
+            ]);
+        }
+
+        Log::debug('Allowing a user without any matching role access ' . $panel->getId());
+
         return true;
-        return ($panel->getId() === 'admin');
     }
 
     public function isSuperAdmin(): bool
@@ -191,15 +218,6 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         $token = app('auth.password.broker')->createToken($user);
 
         $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
-
-        if ($user->hasRole(User::$STUDENT_ROLE))
-        {
-            $notificationUrl = str_replace('/admin', '/student', $notificationUrl);
-        }
-        else if ($user->hasRole(User::$PARENT_ROLE))
-        {
-            $notificationUrl = str_replace('/admin', '/parent', $notificationUrl);
-        }
 
         Log::debug('Notification URL is ' . $notificationUrl);
 

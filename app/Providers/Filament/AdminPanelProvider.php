@@ -28,6 +28,7 @@ use App\Filament\Resources\FeeResource\Widgets\IncomeChart;
 use App\Filament\Resources\FeeResource\Widgets\IncomeStatsOverview;
 use App\Filament\Student\Resources\StudentResource\Widgets\PopulationStatsOverview;
 use App\Filament\Widgets\AttendanceOverview;
+use App\Http\Middleware\RedirectToPanel;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 
@@ -71,10 +72,11 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                RedirectToPanel::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
-                // 'role:Admin|super-admin|Teacher|Principal|Accountant|Librarian|Receptionist'
+                'role:Admin|super-admin|Teacher|Principal|Accountant|Librarian|Receptionist'
             ])
             ->userMenuItems([
                 MenuItem::make()
