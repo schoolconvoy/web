@@ -3,6 +3,7 @@
 namespace App\Filament\Parent\Resources\FeeResource\Pages;
 
 use App\Filament\Parent\Resources\FeeResource;
+use App\Filament\Parent\Resources\FeeResource\Widgets\FeeStatsOverview;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
@@ -14,6 +15,13 @@ class ListFees extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+        ];
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            FeeStatsOverview::class,
         ];
     }
 }

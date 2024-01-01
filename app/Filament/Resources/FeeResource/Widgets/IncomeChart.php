@@ -1,31 +1,31 @@
 <?php
 
-namespace App\Filament\Widgets;
+namespace App\Filament\Resources\FeeResource\Widgets;
 
-use App\Models\Attendance;
 use Filament\Widgets\ChartWidget;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
+use App\Models\Fee;
+use App\Models\Payment;
 
-class AttendanceOverview extends ChartWidget
+class IncomeChart extends ChartWidget
 {
-    protected static ?string $heading = 'Attendance Chart';
-    protected static ?int $sort = 2;
+    protected static ?string $heading = 'Income chart';
+    protected static ?int $sort = 3;
 
     protected function getData(): array
     {
-        $data = Trend::model(Attendance::class)
+        $data = Trend::model(Payment::class)
                         ->between(
-                            start: now()->startOfYear(),
-                            end: now()->endOfYear(),
+                            start: now()->startOfMonth(),
+                            end: now()->endOfMonth(),
                         )
-                        ->perMonth()
-                        ->count();
-
+                        ->perDay()
+                        ->sum('amount');
         return [
             'datasets' => [
                 [
-                    'label' => 'Attendance',
+                    'label' => 'Payments receieved',
                     'data' => $data->map(fn (TrendValue $value) => $value->aggregate),
                 ],
             ],
@@ -35,6 +35,6 @@ class AttendanceOverview extends ChartWidget
 
     protected function getType(): string
     {
-        return 'bubble';
+        return 'bar';
     }
 }

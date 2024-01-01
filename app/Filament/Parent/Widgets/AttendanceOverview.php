@@ -18,7 +18,7 @@ class AttendanceOverview extends BaseWidget
                                 ->where('student_id', Cache::get('ward'))
                 )
                 ->between(
-                    start: now()->startOfYear(),
+                    start: now()->subYear(),
                     end: now()->endOfYear(),
                 )
                 ->perMonth()

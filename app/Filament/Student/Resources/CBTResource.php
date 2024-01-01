@@ -26,7 +26,7 @@ class CBTResource extends Resource
     protected static ?string $model = Quiz::class;
     protected static ?string $navigationLabel = 'CBT';
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-computer-desktop';
 
     public static function table(Table $table): Table
     {

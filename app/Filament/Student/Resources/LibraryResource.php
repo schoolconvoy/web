@@ -9,6 +9,9 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -17,7 +20,10 @@ class LibraryResource extends Resource
 {
     protected static ?string $model = Library::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-book-open';
+
+    protected static ?string $modelLabel = 'Library';
+    protected static ?string $pluralModelLabel = 'Library';
 
     public static function form(Form $form): Form
     {
@@ -31,28 +37,28 @@ class LibraryResource extends Resource
     {
         return $table
             ->columns([
-                //
+                ImageColumn::make('cover_image')
+                            ->width(70),
+                TextColumn::make('title')
+                            ->searchable(),
+                TextColumn::make('author')
+                            ->searchable(),
+                TextColumn::make('year'),
+                TextColumn::make('category.name')
             ])
             ->filters([
-                //
+                SelectFilter::make('category.name')
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ;
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -60,5 +66,5 @@ class LibraryResource extends Resource
             'create' => Pages\CreateLibrary::route('/create'),
             'edit' => Pages\EditLibrary::route('/{record}/edit'),
         ];
-    }    
+    }
 }

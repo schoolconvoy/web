@@ -3,6 +3,7 @@
 namespace App\Filament\Parent\Resources;
 
 use App\Filament\Parent\Resources\FeeResource\Pages;
+use App\Filament\Parent\Resources\FeeResource\Widgets\FeeStatsOverview;
 use App\Models\Fee;
 use App\Models\User;
 use App\Shared\FeeBase;
@@ -63,6 +64,13 @@ class FeeResource extends FeeBase
             'index' => Pages\ListFees::route('/'),
             'create' => Pages\CreateFee::route('/create'),
             'edit' => Pages\EditFee::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            FeeStatsOverview::class,
         ];
     }
 }

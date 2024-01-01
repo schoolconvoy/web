@@ -4,6 +4,7 @@ namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Register;
+use App\Filament\Parent\Resources\FeeResource\Widgets\FeeStatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -42,8 +43,7 @@ class ParentPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Parent/Widgets'), for: 'App\\Filament\\Parent\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                FeeStatsOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,
