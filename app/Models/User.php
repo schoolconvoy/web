@@ -142,8 +142,13 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         ];
     }
 
+
+    /**
+     * TODO: Grant access only if the user has the right role
+     */
     public function canAccessPanel(Panel $panel): bool
     {
+        return true;
         return ($panel->getId() === 'admin');
     }
 

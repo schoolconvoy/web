@@ -9,7 +9,8 @@ use Flowframe\Trend\TrendValue;
 
 class AttendanceOverview extends ChartWidget
 {
-    protected static ?string $heading = 'Chart';
+    protected static ?string $heading = 'Attendance Chart';
+    protected static ?int $sort = 2;
 
     protected function getData(): array
     {

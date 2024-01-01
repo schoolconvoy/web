@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Resources\CBTResource\Pages;
+namespace App\Filament\Student\Resources\CBTResource\Pages;
 
-use App\Filament\Resources\CBTResource;
+use App\Filament\Student\Resources\CBTResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Harishdurga\LaravelQuiz\Models\QuizAttempt;
@@ -50,7 +50,7 @@ class ViewAttempt extends ViewRecord
 
         Log::debug('Score calculated is ' . print_r([$this->attempt, $this->attempt->calculate_score()], true));
 
-        return redirect()->route('filament.admin.resources.c-b-t-s.revision', [
+        return redirect()->route('filament.student.resources.c-b-t-s.revision', [
             'record' => $this->record->slug,
             'attempt' => $this->attempt->id,
             'score' => $this->attempt->score,
