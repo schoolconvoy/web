@@ -192,6 +192,17 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
         $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
 
+        if ($user->hasRole(User::$STUDENT_ROLE))
+        {
+            $notificationUrl = str_replace('/admin', '/student', $notificationUrl);
+        }
+        else if ($user->hasRole(User::$PARENT_ROLE))
+        {
+            $notificationUrl = str_replace('/admin', '/parent', $notificationUrl);
+        }
+
+        Log::debug('Notification URL is ' . $notificationUrl);
+
         return $this->notify(new UserRegistered($notificationUrl, $user));
     }
 }

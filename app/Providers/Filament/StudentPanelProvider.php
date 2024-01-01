@@ -54,6 +54,7 @@ class StudentPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                'role:Admin|super-admin|Student'
             ]);
     }
 }

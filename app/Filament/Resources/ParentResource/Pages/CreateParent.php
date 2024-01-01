@@ -21,6 +21,9 @@ use Filament\Forms\Components\View;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Set;
 use Filament\Forms\Get;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class CreateParent extends CreateRecord
 {
@@ -30,6 +33,7 @@ class CreateParent extends CreateRecord
     public array $review = [];
     public array $parentStudent = [];
     public $userData = [];
+    public string $password = null;
 
     protected function getSteps(): array
     {
@@ -185,11 +189,29 @@ class CreateParent extends CreateRecord
 
         $parent->parent_no = $parent_no;
 
+        $password = Str::random(8);
+        $this->password = $password;
+
+        Log::debug('Password is ' . $password);
+
+        $data['password'] = Hash::make($this->password);
+
         $parent->save();
 
         // Dispatch event
         ParentCreated::dispatch($parent);
 
         return $parent;
+    }
+
+    protected function getCreatedNotification(): ?Notification
+    {
+        // show a notification including the temporary password
+        return Notification::make()
+            ->title('Parent created successfully! Their temporary password is ' . $this->password)
+            ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
+            ->persistent()
+            ->success()
+            ->send();
     }
 }
