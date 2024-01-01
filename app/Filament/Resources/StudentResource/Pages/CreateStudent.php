@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Forms\Set;
 use Filament\Forms\Components\View;
 use Illuminate\Support\Facades\Log;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 class CreateStudent extends CreateRecord
 {
@@ -31,6 +34,7 @@ class CreateStudent extends CreateRecord
 
     protected static string $resource = StudentResource::class;
     public array $review = [];
+    public string $password = null;
 
     protected function getSteps(): array
     {
@@ -107,6 +111,13 @@ class CreateStudent extends CreateRecord
 
             $user->admission_no = $admission_no;
 
+            $password = Str::random(8);
+            $this->password = $password;
+
+            Log::debug('Password is ' . $password);
+
+            $data['password'] = Hash::make($this->password);
+
             $user->save();
 
             Log::debug('Successfully saved user: ' . print_r($user, true));
@@ -117,5 +128,16 @@ class CreateStudent extends CreateRecord
         }
 
         return $user;
+    }
+
+    protected function getCreatedNotification(): ?Notification
+    {
+        // show a notification including the temporary password
+        return Notification::make()
+            ->title('Student created successfully! Their temporary password is ' . $this->password)
+            ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
+            ->persistent()
+            ->success()
+            ->send();
     }
 }
