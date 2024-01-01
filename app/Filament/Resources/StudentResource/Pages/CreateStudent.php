@@ -34,7 +34,7 @@ class CreateStudent extends CreateRecord
 
     protected static string $resource = StudentResource::class;
     public array $review = [];
-    public string $password = null;
+    public string $password = '';
 
     protected function getSteps(): array
     {
