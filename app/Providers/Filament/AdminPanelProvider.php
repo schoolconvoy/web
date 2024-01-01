@@ -74,7 +74,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                'role:Admin|super-admin|Teacher|Principal|Accountant|Librarian|Receptionist'
+                // 'role:Admin|super-admin|Teacher|Principal|Accountant|Librarian|Receptionist'
             ])
             ->userMenuItems([
                 MenuItem::make()

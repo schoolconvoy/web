@@ -33,7 +33,7 @@ class CreateParent extends CreateRecord
     public array $review = [];
     public array $parentStudent = [];
     public $userData = [];
-    public string $password = null;
+    public string $password = '';
 
     protected function getSteps(): array
     {
