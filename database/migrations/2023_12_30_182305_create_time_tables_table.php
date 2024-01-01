@@ -25,8 +25,8 @@ return new class extends Migration
             $table->unsignedBigInteger('subject_id');
             $table->unsignedBigInteger('timetable_id');
             $table->unsignedBigInteger('teacher_id');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
+            $table->timestamp('start_time')->default(now())->nullable();
+            $table->timestamp('end_time')->default(now())->nullable();
             $table->timestamps();
         });
     }
