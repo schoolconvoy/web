@@ -58,7 +58,7 @@ class ParentPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                // 'role:Parent|Admin|super-admin'
+                'role:Parent|Admin|super-admin'
             ])
             ->plugin(
                 FilamentFullCalendarPlugin::make()
