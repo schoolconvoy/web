@@ -217,7 +217,25 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
         $token = app('auth.password.broker')->createToken($user);
 
-        $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
+        try {
+
+            if ($user->hasAnyRole([User::$ADMIN_ROLE, User::$SUPER_ADMIN_ROLE, User::$TEACHER_ROLE, User::$PRINCIPAL_ROLE, User::$RECEPTIONIST_ROLE, User::$ACCOUNTANT_ROLE]))
+            {
+                Filament::setCurrentPanel(Filament::getPanel('admin'));
+            }
+            else if ($user->hasAnyRole([User::$PARENT_ROLE]))
+            {
+                Filament::setCurrentPanel(Filament::getPanel('parent'));
+            }
+            else if ($user->hasAnyRole([User::$STUDENT_ROLE]))
+            {
+                Filament::setCurrentPanel(Filament::getPanel('student'));
+            }
+
+            $notificationUrl = \Filament\Facades\Filament::getResetPasswordUrl($token, $user);
+        } catch (\Throwable $th) {
+            Log::debug('Error sending welcome notification ' . $th->getMessage());
+        }
 
         Log::debug('Notification URL is ' . $notificationUrl);
 

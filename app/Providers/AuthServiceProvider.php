@@ -9,7 +9,6 @@ use App\Policies\QuizPolicy;
 use Harishdurga\LaravelQuiz\Models\Quiz;
 use Illuminate\Support\Facades\Gate;
 
-
 class AuthServiceProvider extends ServiceProvider
 {
     /**
