@@ -67,6 +67,7 @@ class CreateParent extends CreateRecord
                             ->required(),
                         TextInput::make('email')
                            ->required()
+                           ->unique()
                             ->email(),
                         TextInput::make('phone')
                             ->required()

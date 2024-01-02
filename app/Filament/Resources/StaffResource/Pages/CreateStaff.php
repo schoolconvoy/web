@@ -42,6 +42,7 @@ class CreateStaff extends CreateRecord
                 DatePicker::make('dob')
                     ->label('Date of birth'),
                 TextInput::make('email')
+                    ->unique()
                     ->email()
                     ->required(),
                 TextInput::make('phone')

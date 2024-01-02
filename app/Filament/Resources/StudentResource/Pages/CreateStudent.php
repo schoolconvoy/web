@@ -68,6 +68,7 @@ class CreateStudent extends CreateRecord
                             TextInput::make('lastname')
                                 ->required(),
                             TextInput::make('email')
+                                ->unique()
                                 ->email(),
                             TextInput::make('phone')
                                 ->tel()
