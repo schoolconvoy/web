@@ -84,6 +84,6 @@ class PaymentController extends Controller
 
         PaymentReceived::dispatch($payment, $ward);
 
-        return Redirect::to(route('filament.admin.resources.fees.index'));
+        return Redirect::to(route('filament.parent.resources.fees.index'));
     }
 }
