@@ -29,13 +29,7 @@ class FeeResource extends FeeBase
                 TextColumn::make('name'),
                 TextColumn::make('amount')
                             ->numeric(2)
-                            ->money('NGN')
-                            ->summarize(
-                                Summarizer::make()
-                                        ->label('Total')
-                                        ->using(fn (QueryBuilder $query): string => $query->sum('amount'))->money('NGN')
-                            )
-                            ->visible(auth()->user()->hasRole(User::$PARENT_ROLE)),
+                            ->money('NGN'),
                 TextColumn::make('category.name'),
 
             ])
@@ -53,19 +47,11 @@ class FeeResource extends FeeBase
                                         })
                                         ->visible(auth()->user()->hasRole(User::$PARENT_ROLE))
             ])
-            // ->actions([
-            //     Tables\Actions\Action::make('pay')
-            // ])
-            // ->bulkActions([
-            //     Tables\Actions\BulkActionGroup::make([
-            //         BulkAction::make('pay')
-            //                     ->requiresConfirmation()
-            //                     ->action(function() {
-
-            //                     })
-            //         ,
-            //     ]),
-            // ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
+            ])
             ;
     }
 
