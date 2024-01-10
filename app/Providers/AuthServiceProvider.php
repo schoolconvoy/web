@@ -5,9 +5,13 @@ namespace App\Providers;
 // use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use App\Models\User;
+use App\Policies\PermissionPolicy;
 use App\Policies\QuizPolicy;
+use App\Policies\RolePolicy;
 use Harishdurga\LaravelQuiz\Models\Quiz;
 use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -18,6 +22,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Quiz::class => QuizPolicy::class,
+        Role::class => RolePolicy::class,
+        Permission::class => PermissionPolicy::class
     ];
 
     /**

@@ -2,26 +2,26 @@
 
 namespace App\Policies;
 
-use Illuminate\Auth\Access\Response;
-use Harishdurga\LaravelQuiz\Models\Quiz;
+use Spatie\Permission\Models\Permission;
 use App\Models\User;
+use Illuminate\Auth\Access\Response;
 
-class QuizPolicy
+class PermissionPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-any Quiz');
+        return $user->can('view-any Permission');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Quiz $quiz): bool
+    public function view(User $user, Permission $permission): bool
     {
-        return $user->can('view Quiz');
+        return $user->can('view Permission');
     }
 
     /**
@@ -29,38 +29,38 @@ class QuizPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create Quiz');
+        return $user->can('create Permission');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Quiz $quiz): bool
+    public function update(User $user, Permission $permission): bool
     {
-        return $user->can('update Quiz');
+        //
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Quiz $quiz): bool
+    public function delete(User $user, Permission $permission): bool
     {
-        return $user->can('delete Quiz');
+        //
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Quiz $quiz): bool
+    public function restore(User $user, Permission $permission): bool
     {
-        return $user->can('restore Quiz');
+        //
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Quiz $quiz): bool
+    public function forceDelete(User $user, Permission $permission): bool
     {
-        return $user->can('force-delete Quiz');
+        //
     }
 }

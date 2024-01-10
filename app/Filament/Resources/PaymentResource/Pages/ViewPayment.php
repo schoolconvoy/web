@@ -13,7 +13,7 @@ class ViewPayment extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make(),
         ];
     }
 }

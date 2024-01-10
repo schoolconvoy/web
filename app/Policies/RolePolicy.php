@@ -2,26 +2,26 @@
 
 namespace App\Policies;
 
-use Harishdurga\LaravelQuiz\Models\Question;
+use Spatie\Permission\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class QuestionPolicy
+class RolePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(User::$SUPER_ADMIN_ROLE);
+        return $user->can('view-any Role');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Question $question): bool
+    public function view(User $user, Role $role): bool
     {
-        //
+        return $user->can('view Role');
     }
 
     /**
@@ -29,21 +29,21 @@ class QuestionPolicy
      */
     public function create(User $user): bool
     {
-        //
+        return $user->can('create Quiz');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Question $question): bool
+    public function update(User $user, Role $role): bool
     {
-        //
+        return $user->can('update Quiz');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Question $question): bool
+    public function delete(User $user, Role $role): bool
     {
         //
     }
@@ -51,7 +51,7 @@ class QuestionPolicy
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Question $question): bool
+    public function restore(User $user, Role $role): bool
     {
         //
     }
@@ -59,7 +59,7 @@ class QuestionPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Question $question): bool
+    public function forceDelete(User $user, Role $role): bool
     {
         //
     }

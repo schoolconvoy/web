@@ -3,25 +3,25 @@
 namespace App\Policies;
 
 use Illuminate\Auth\Access\Response;
-use Harishdurga\LaravelQuiz\Models\Quiz;
+use App\Models\Timetable;
 use App\Models\User;
 
-class QuizPolicy
+class TimetablePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-any Quiz');
+        return $user->can('view-any Timetable');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Quiz $quiz): bool
+    public function view(User $user, Timetable $timetable): bool
     {
-        return $user->can('view Quiz');
+        return $user->can('view Timetable');
     }
 
     /**
@@ -29,38 +29,38 @@ class QuizPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create Quiz');
+        return $user->can('create Timetable');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Quiz $quiz): bool
+    public function update(User $user, Timetable $timetable): bool
     {
-        return $user->can('update Quiz');
+        return $user->can('update Timetable');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Quiz $quiz): bool
+    public function delete(User $user, Timetable $timetable): bool
     {
-        return $user->can('delete Quiz');
+        return $user->can('delete Timetable');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Quiz $quiz): bool
+    public function restore(User $user, Timetable $timetable): bool
     {
-        return $user->can('restore Quiz');
+        return $user->can('restore Timetable');
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Quiz $quiz): bool
+    public function forceDelete(User $user, Timetable $timetable): bool
     {
-        return $user->can('force-delete Quiz');
+        return $user->can('force-delete Timetable');
     }
 }

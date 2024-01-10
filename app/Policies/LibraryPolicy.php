@@ -2,9 +2,9 @@
 
 namespace App\Policies;
 
+use Illuminate\Auth\Access\Response;
 use App\Models\Library;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class LibraryPolicy
 {
@@ -13,7 +13,7 @@ class LibraryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('view-any Library');
     }
 
     /**
@@ -21,7 +21,7 @@ class LibraryPolicy
      */
     public function view(User $user, Library $library): bool
     {
-        return true;
+        return $user->can('view Library');
     }
 
     /**
@@ -29,7 +29,7 @@ class LibraryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasAnyRole([User::$SUPER_ADMIN_ROLE, User::$ADMIN_ROLE, User::$TEACHER_ROLE]);
+        return $user->can('create Library');
     }
 
     /**
@@ -37,7 +37,7 @@ class LibraryPolicy
      */
     public function update(User $user, Library $library): bool
     {
-        return $user->hasAnyRole([User::$SUPER_ADMIN_ROLE, User::$ADMIN_ROLE, User::$TEACHER_ROLE]);
+        return $user->can('update Library');
     }
 
     /**
@@ -45,7 +45,7 @@ class LibraryPolicy
      */
     public function delete(User $user, Library $library): bool
     {
-        return $user->hasAnyRole([User::$SUPER_ADMIN_ROLE, User::$ADMIN_ROLE, User::$TEACHER_ROLE]);
+        return $user->can('delete Library');
     }
 
     /**
@@ -53,7 +53,7 @@ class LibraryPolicy
      */
     public function restore(User $user, Library $library): bool
     {
-        return $user->hasAnyRole([User::$SUPER_ADMIN_ROLE, User::$ADMIN_ROLE, User::$TEACHER_ROLE]);
+        return $user->can('restore Library');
     }
 
     /**
@@ -61,6 +61,6 @@ class LibraryPolicy
      */
     public function forceDelete(User $user, Library $library): bool
     {
-        return $user->hasAnyRole([User::$SUPER_ADMIN_ROLE, User::$ADMIN_ROLE, User::$TEACHER_ROLE]);
+        return $user->can('force-delete Library');
     }
 }

@@ -13,7 +13,7 @@ class FeePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasRole(User::$PARENT_ROLE);
+        return $user->can('view-any Fee');
     }
 
     /**

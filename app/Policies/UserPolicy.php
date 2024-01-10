@@ -13,7 +13,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view-any User');
+        return $user->can('view-any User') || $user->hasRole(User::$ADMIN_ROLE);
     }
 
     /**
@@ -21,7 +21,7 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
-        return $user->can('view User');
+        return $user->can('view User')  || $user->hasRole(User::$ADMIN_ROLE);
     }
 
     /**
@@ -29,7 +29,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create User');
+        return $user->can('create User')  || $user->hasRole(User::$ADMIN_ROLE);
     }
 
     /**
