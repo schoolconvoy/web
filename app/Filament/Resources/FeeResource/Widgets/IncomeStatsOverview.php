@@ -13,12 +13,23 @@ use App\Models\User;
 class IncomeStatsOverview extends BaseWidget
 {
     protected static ?int $sort = 1;
+    public ?string $filter = 'today';
     protected int | string | array $columnSpan = [
         'md' => 2,
         'xl' => 2,
         'sm' => 2,
         'lg' => 2,
     ];
+
+    protected function getFilters(): ?array
+    {
+        return [
+            'today' => 'Today',
+            'week' => 'Last week',
+            'month' => 'Last month',
+            'year' => 'This year',
+        ];
+    }
 
     protected static function getTrend($query)
     {

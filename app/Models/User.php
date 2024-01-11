@@ -33,10 +33,34 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static string $PARENT_ROLE = 'Parent';
     public static string $ADMIN_ROLE = 'Admin';
     public static string $ACCOUNTANT_ROLE = 'Accountant';
-    public static string $PRINCIPAL_ROLE = 'Principal';
+    public static string $ELEM_PRINCIPAL_ROLE = 'Elementary School Principal';
+    public static string $HIGH_PRINCIPAL_ROLE = 'High School Principal';
     public static string $LIBRARIAN_ROLE = 'Librarian';
     public static string $RECEPTIONIST_ROLE = 'Receptionist';
     public static string $SUPER_ADMIN_ROLE = 'super-admin';
+
+    public static array $HIGH_SCHOOL_CLASSES = [
+        'JSS 1',
+        'JSS 2',
+        'JSS 3',
+        'SS 1',
+        'SS 2',
+        'SS 3',
+    ];
+
+    public static array $ELEMENTARY_SCHOOL_CLASSES = [
+        'CRECHE',
+        'PG 1',
+        'PG 2',
+        'PG 3',
+        'PG 4',
+        'GRADE I',
+        'GRADE II',
+        'GRADE III',
+        'GRADE IV',
+        'GRADE V',
+        'GRADE VI'
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -120,7 +144,8 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$TEACHER_ROLE,
             User::$ADMIN_ROLE,
             User::$ACCOUNTANT_ROLE,
-            User::$PRINCIPAL_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE,
             User::$LIBRARIAN_ROLE,
             User::$RECEPTIONIST_ROLE,
             User::$SUPER_ADMIN_ROLE
@@ -135,7 +160,8 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$PARENT_ROLE,
             User::$ADMIN_ROLE,
             User::$ACCOUNTANT_ROLE,
-            User::$PRINCIPAL_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE,
             User::$LIBRARIAN_ROLE,
             User::$RECEPTIONIST_ROLE,
             User::$SUPER_ADMIN_ROLE
@@ -153,7 +179,8 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                 User::$ADMIN_ROLE,
                 User::$SUPER_ADMIN_ROLE,
                 User::$TEACHER_ROLE,
-                User::$PRINCIPAL_ROLE,
+                User::$HIGH_PRINCIPAL_ROLE,
+                User::$ELEM_PRINCIPAL_ROLE,
                 User::$RECEPTIONIST_ROLE,
             ]);
         }
@@ -219,7 +246,17 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
         try {
 
-            if ($user->hasAnyRole([User::$ADMIN_ROLE, User::$SUPER_ADMIN_ROLE, User::$TEACHER_ROLE, User::$PRINCIPAL_ROLE, User::$RECEPTIONIST_ROLE, User::$ACCOUNTANT_ROLE]))
+            if ($user->hasAnyRole(
+                    [
+                        User::$ADMIN_ROLE,
+                        User::$SUPER_ADMIN_ROLE,
+                        User::$TEACHER_ROLE,
+                        User::$HIGH_PRINCIPAL_ROLE,
+                        User::$ELEM_PRINCIPAL_ROLE,
+                        User::$RECEPTIONIST_ROLE,
+                        User::$ACCOUNTANT_ROLE
+                    ]
+                ))
             {
                 Filament::setCurrentPanel(Filament::getPanel('admin'));
             }

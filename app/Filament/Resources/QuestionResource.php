@@ -127,8 +127,8 @@ class QuestionResource extends Resource
         ];
     }
 
-    public static function shouldRegisterNavigation(): bool
-    {
-        return auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE);
-    }
+    // public static function shouldRegisterNavigation(): bool
+    // {
+    //     return auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE |);
+    // }
 }

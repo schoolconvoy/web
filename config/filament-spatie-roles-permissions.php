@@ -32,7 +32,7 @@ return [
         ],
     ],
 
-    'default_guard_name' => null,
+    'default_guard_name' => 'web',
 
     'model_filter_key' => 'return \'%\'.$key;', // Eg: 'return \'%\'.$key.'\%\';'
 
@@ -81,14 +81,13 @@ return [
         /*
          * Permissions will be generated for the models associated with the respective Filament Resources
          */
-        'discover_models_through_filament_resources' => false,
+        'discover_models_through_filament_resources' => true,
 
         /*
          * Include directories which consists of models.
          */
         'model_directories' => [
             app_path('Models'),
-            //app_path('Domains/Forum')
         ],
 
         /*
