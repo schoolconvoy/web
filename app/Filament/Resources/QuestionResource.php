@@ -47,6 +47,8 @@ class QuestionResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-s-question-mark-circle';
 
+    protected static ?string $navigationLabel = 'Question bank';
+
     public static function form(Form $form): Form
     {
         return $form
