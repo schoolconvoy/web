@@ -11,6 +11,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use App\Shared\FeeBase;
+use Filament\Resources\Pages\Page;
 
 class FeeResource extends FeeBase
 {
@@ -70,5 +71,16 @@ class FeeResource extends FeeBase
             'view' => Pages\ViewFee::route('/{record}'),
             'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
+    }
+
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        return $page->generateNavigationItems([
+            Pages\ViewCustomer::class,
+            Pages\EditCustomer::class,
+            Pages\EditCustomerContact::class,
+            Pages\ManageCustomerAddresses::class,
+            Pages\ManageCustomerPayments::class,
+        ]);
     }
 }

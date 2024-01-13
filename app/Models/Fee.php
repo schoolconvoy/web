@@ -23,4 +23,10 @@ class Fee extends Model
     {
         return $this->belongsToMany(Fee::class, 'fee_payments');
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'fee_student', 'fee_id', 'student_id')
+                    ->withTimestamps();
+    }
 }

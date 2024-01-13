@@ -5,6 +5,7 @@ namespace App\Shared;
 use App\Filament\Resources\FeeResource\Pages;
 use App\Models\Classes;
 use App\Models\Fee;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -41,9 +42,9 @@ class FeeBase extends Resource
                 Textarea::make('description')
                             ->autosize(),
                 DatePicker::make('deadline'),
-                Select::make('classes')
-                            ->relationship('classes', 'name')
-                            ->options(Classes::all()->pluck('name', 'id'))
+                Select::make('students')
+                            ->relationship('students', 'lastname')
+                            ->options(User::role(User::$STUDENT_ROLE)->pluck('lastname', 'id'))
                             ->multiple()
             ]);
     }

@@ -125,11 +125,6 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                     ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
     }
 
-    public function fees()
-    {
-        return $this->belongsToMany(Fee::class);
-    }
-
     public function getFullNameAttribute()
     {
         return $this->attributes['fullname'] = $this->firstname . ' ' . $this->lastname;
@@ -277,5 +272,10 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         Log::debug('Notification URL is ' . $notificationUrl);
 
         return $this->notify(new UserRegistered($notificationUrl, $user));
+    }
+
+    public function fees()
+    {
+        return $this->belongsToMany(Fee::class, 'fee_student', 'student_id', 'fee_id');
     }
 }

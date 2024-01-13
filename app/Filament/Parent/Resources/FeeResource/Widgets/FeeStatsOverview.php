@@ -31,26 +31,26 @@ class FeeStatsOverview extends BaseWidget
         return [
             Stat::make(
                     'Total fees paid',
-                    'NGN' . number_format(User::find(Cache::get('ward'))->class->fees()->whereHas('payments')->sum('amount'), 2, '.', ',')
+                    'NGN' . number_format(User::find(Cache::get('ward'))->fees()->whereHas('payments')->sum('amount'), 2, '.', ',')
                 )
                 ->description('Total amount of fees.')
                 ->icon('heroicon-m-currency-dollar')
                 ->color('primary'),
             Stat::make(
                     'Fees pending',
-                    'NGN' . number_format(User::find(Cache::get('ward'))->class->fees()->whereDoesntHave('payments')->sum('amount'), 2, '.', ',')
+                    'NGN' . number_format(User::find(Cache::get('ward'))->fees()->whereDoesntHave('payments')->sum('amount'), 2, '.', ',')
                 )
                 ->description('Total amount of fees.')
                 ->icon('heroicon-m-currency-dollar')
                 ->color('primary'),
             Stat::make(
                     'Fees overdue',
-                    'NGN' . number_format(User::find(Cache::get('ward'))->class->fees()->whereDate('deadline', '<=', now()->toDate())->sum('amount'), 2, '.', ',')
+                    'NGN' . number_format(User::find(Cache::get('ward'))->fees()->whereDate('deadline', '<=', now()->toDate())->sum('amount'), 2, '.', ',')
                 )
                 ->description('Total amount of fees.')
                 ->icon('heroicon-m-currency-dollar')
                 ->chart(
-                    User::find(Cache::get('ward'))->class->fees()->whereDate('deadline', '<=', now()->toDate())->pluck('amount')->toArray()
+                    User::find(Cache::get('ward'))->fees()->whereDate('deadline', '<=', now()->toDate())->pluck('amount')->toArray()
                 )
                 ->color('primary'),
         ];

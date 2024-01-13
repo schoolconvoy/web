@@ -22,18 +22,13 @@ class FeeResource extends FeeBase
             ->query(function () {
                 $ward = Cache::get('ward', 0);
 
-                return User::find($ward)->class->fees()->whereDoesntHave('payments') ?? Fee::where('id', 0);
+                return User::find($ward)->fees()->whereDoesntHave('payments') ?? Fee::where('id', 0);
             })
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('amount')
-                            ->numeric(2)
-                            ->money('NGN')
-                            ->summarize(
-                                Summarizer::make()
-                                        ->label('Total')
-                                        ->using(fn (QueryBuilder $query): string => $query->sum('amount'))->money('NGN')
-                            ),
+                            ->numeric()
+                            ->money('NGN'),
                 TextColumn::make('category.name'),
             ])
             // Group summary is wrong at the moment
