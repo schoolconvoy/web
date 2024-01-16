@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class Fee extends Model
 {
     use HasFactory;
+
+    protected $appends = ['final_amount', 'discounts'];
 
     public function classes()
     {
@@ -28,5 +31,22 @@ class Fee extends Model
     {
         return $this->belongsToMany(User::class, 'fee_student', 'fee_id', 'student_id')
                     ->withTimestamps();
+    }
+
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_fee');
+    }
+
+    public function getFinalAmountAttribute()
+    {
+        // Calculate the fee with the associated discount
+        $discount = $this->discounts->where('end_date', '>=', now())->first();
+
+        $discountedPercentage = $discount->percentage ?? 0;
+
+        $discountedAmount = $this->amount - ($this->amount * $discountedPercentage / 100);
+
+        return $discountedAmount;
     }
 }

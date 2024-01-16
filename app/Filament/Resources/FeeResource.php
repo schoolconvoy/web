@@ -72,15 +72,4 @@ class FeeResource extends FeeBase
             'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
     }
-
-    public static function getRecordSubNavigation(Page $page): array
-    {
-        return $page->generateNavigationItems([
-            Pages\ViewCustomer::class,
-            Pages\EditCustomer::class,
-            Pages\EditCustomerContact::class,
-            Pages\ManageCustomerAddresses::class,
-            Pages\ManageCustomerPayments::class,
-        ]);
-    }
 }

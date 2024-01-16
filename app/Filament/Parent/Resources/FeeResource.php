@@ -29,6 +29,9 @@ class FeeResource extends FeeBase
                 TextColumn::make('amount')
                             ->numeric()
                             ->money('NGN'),
+                // TextColumn::make('discount.percentage')
+                //             ->numeric()
+                //             ->money('NGN'),
                 TextColumn::make('category.name'),
             ])
             // Group summary is wrong at the moment

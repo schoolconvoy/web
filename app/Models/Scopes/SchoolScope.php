@@ -16,9 +16,9 @@ class SchoolScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-//        if (Auth::hasUser()) {
-//            $school = Auth::user()->school;
-//            $builder->whereBelongsTo($school);
-//        }
+       if (Auth::hasUser()) {
+           $school = Auth::user()->school;
+           $builder->whereBelongsTo($school);
+       }
     }
 }

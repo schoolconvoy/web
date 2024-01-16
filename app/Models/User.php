@@ -278,4 +278,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         return $this->belongsToMany(Fee::class, 'fee_student', 'student_id', 'fee_id');
     }
+
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_student', 'student_id', 'discount_id');
+    }
 }

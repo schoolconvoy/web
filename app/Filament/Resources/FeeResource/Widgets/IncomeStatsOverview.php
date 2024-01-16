@@ -9,6 +9,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class IncomeStatsOverview extends BaseWidget
 {
@@ -47,11 +48,24 @@ class IncomeStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $paid = Payment::where('paid', 1);
-        $paid = self::getTrend($paid);
+        $paid = Trend::query($paid)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->sum('amount');
 
         $unpaid = Fee::whereDoesntHave('payments')
                     ->where('deadline', '<=', now()->toDate());
-        $unpaid = self::getTrend($unpaid);
+
+        $unpaid = Trend::query($unpaid)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->sum('amount');
 
         $student = User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent');
         $student = Trend::query($student)
@@ -88,8 +102,9 @@ class IncomeStatsOverview extends BaseWidget
                 'Unpaid fees',
                 'NGN' . number_format(Fee::
                                         whereDoesntHave('payments')
-                                    ->where('deadline', '<=', now()->toDate())
-                                    ->sum('amount'), 2, '.', ',')
+                                        ->where('deadline', '<=', now()->toDate())
+                                        ->get()
+                                        ->sum('final_amount'), 2, '.', ',')
             )
                 ->color('danger')
                 ->description('Total amount of due payment.')
