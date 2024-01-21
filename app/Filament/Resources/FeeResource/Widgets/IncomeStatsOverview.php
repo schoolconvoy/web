@@ -9,6 +9,7 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class IncomeStatsOverview extends BaseWidget
 {
@@ -46,33 +47,37 @@ class IncomeStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $paid = Payment::where('paid', 1);
-        $paid = self::getTrend($paid);
-
-        $unpaid = Fee::whereDoesntHave('payments')
-                    ->where('deadline', '<=', now()->toDate());
-        $unpaid = self::getTrend($unpaid);
-
-        $student = User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent');
-        $student = Trend::query($student)
+        $expected = Fee::whereHas('students')
+                        ->where('deadline', '<=', now()->toDate());
+        $expected = Trend::query($expected)
                         ->between(
                             start: now()->subYear(),
                             end: now()->endOfYear(),
                         )
                         ->perMonth()
-                        ->count();
+                        ->sum('amount');
+
+        $paid = Payment::where('paid', 1);
+        $paid = Trend::query($paid)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->sum('amount');
+
+        $unpaid = Fee::whereDoesntHave('payments')
+                    ->where('deadline', '<=', now()->toDate());
+
+        $unpaid = Trend::query($unpaid)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->sum('amount');
 
         return [
-            Stat::make(
-                'Students without a guardian',
-                User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent')->count()
-            )
-                ->color('warning')
-                ->description('This affects how their fees are paid.')
-                ->icon('heroicon-m-users')
-                ->chart(
-                    $student->map(fn (TrendValue $value) => $value->aggregate)->toArray()
-                ),
             Stat::make(
                 'Total fees receieved',
                 'NGN' . number_format(Payment::sum('amount'), 2, '.', ',')
@@ -88,8 +93,9 @@ class IncomeStatsOverview extends BaseWidget
                 'Unpaid fees',
                 'NGN' . number_format(Fee::
                                         whereDoesntHave('payments')
-                                    ->where('deadline', '<=', now()->toDate())
-                                    ->sum('amount'), 2, '.', ',')
+                                        ->where('deadline', '<=', now()->toDate())
+                                        ->get()
+                                        ->sum('final_amount'), 2, '.', ',')
             )
                 ->color('danger')
                 ->description('Total amount of due payment.')
@@ -97,6 +103,16 @@ class IncomeStatsOverview extends BaseWidget
                 ->chart(
                     $unpaid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
                 ),
+            Stat::make(
+                'Expected fees',
+                'NGN' . number_format(Fee::whereHas('students')->get()->sum('final_amount'), 2, '.', ',')
+            )
+                ->description('Total amount of fees expected.')
+                ->icon('heroicon-m-currency-dollar')
+                ->color('success')
+                ->chart(
+                    $paid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
+                )
         ];
     }
 }

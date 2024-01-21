@@ -11,6 +11,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\Summarizers\Summarizer;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use App\Shared\FeeBase;
+use Filament\Resources\Pages\Page;
 
 class FeeResource extends FeeBase
 {

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\FeeResource\Widgets\IncomeChart;
+use App\Filament\Resources\FeeResource\Widgets\IncomeStatsOverview;
 use App\Filament\Resources\PaymentResource\Pages;
 use App\Filament\Resources\PaymentResource\RelationManagers;
 use App\Models\Payment;
@@ -48,6 +50,7 @@ class PaymentResource extends Resource
                 TextColumn::make('fees.category.name')
                             ->sortable(),
                 TextColumn::make('provider'),
+                TextColumn::make('created_at')->label('Date'),
             ])
             ->filters([
                 SelectFilter::make('category')
@@ -106,6 +109,14 @@ class PaymentResource extends Resource
             'create' => Pages\CreatePayment::route('/create'),
             'edit' => Pages\EditPayment::route('/{record}/edit'),
             'view' => Pages\ViewPayment::route('/{record}'),
+        ];
+    }
+
+    public static function getWidgets(): array
+    {
+        return [
+            IncomeChart::class,
+            IncomeStatsOverview::class
         ];
     }
 }

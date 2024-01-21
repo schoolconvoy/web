@@ -40,26 +40,26 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static string $SUPER_ADMIN_ROLE = 'super-admin';
 
     public static array $HIGH_SCHOOL_CLASSES = [
-        'JSS 1',
-        'JSS 2',
-        'JSS 3',
-        'SS 1',
-        'SS 2',
-        'SS 3',
+        'JUNIOR SECONDARY SCHOOL ONE',
+        'JUNIOR SECONDARY SCHOOL TWO',
+        'JUNIOR SECONDARY SCHOOL THREE',
+        'SENIOR SECONDARY SCHOOL ONE',
+        'SENIOR SECONDARY SCHOOL TWO',
+        'SENIOR SECONDARY SCHOOL THREE',
     ];
 
     public static array $ELEMENTARY_SCHOOL_CLASSES = [
         'CRECHE',
-        'PG 1',
-        'PG 2',
-        'PG 3',
-        'PG 4',
-        'GRADE I',
-        'GRADE II',
-        'GRADE III',
-        'GRADE IV',
-        'GRADE V',
-        'GRADE VI'
+        'PRE-SCHOOL ONE',
+        'PRE-SCHOOL TWO',
+        'PRE-SCHOOL THREE',
+        'PRE-SCHOOL FOUR',
+        'GRADE ONE',
+        'GRADE TWO',
+        'GRADE THREE',
+        'GRADE FOUR',
+        'GRADE FIVE',
+        'GRADE SIX'
     ];
 
     /**
@@ -123,11 +123,6 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return self::role(self::$STUDENT_ROLE)
                     ->get()
                     ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
-    }
-
-    public function fees()
-    {
-        return $this->belongsToMany(Fee::class);
     }
 
     public function getFullNameAttribute()
@@ -277,5 +272,61 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         Log::debug('Notification URL is ' . $notificationUrl);
 
         return $this->notify(new UserRegistered($notificationUrl, $user));
+    }
+
+    public function fees()
+    {
+        return $this->belongsToMany(Fee::class, 'fee_student', 'student_id', 'fee_id');
+    }
+
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_student', 'student_id', 'discount_id');
+    }
+
+    public function scopeHighSchool($query)
+    {
+        return $query->whereHas('class', function ($query) {
+            $query->whereIn('name', User::$HIGH_SCHOOL_CLASSES);
+        });
+    }
+
+    public function scopeElementarySchool($query)
+    {
+        return $query->whereHas('class', function ($query) {
+            $query->whereIn('name', User::$ELEMENTARY_SCHOOL_CLASSES);
+        });
+    }
+
+    public function isHighSchool()
+    {
+        $role = $this->roles[0]->name;
+
+        if ($role === User::$TEACHER_ROLE && $this->teacher_class)
+        {
+            return in_array($this->teacher_class->name, User::$HIGH_SCHOOL_CLASSES);
+        }
+
+        if($role === User::$ELEM_PRINCIPAL_ROLE)
+        {
+            return false;
+        }
+
+        if ($role === User::$HIGH_PRINCIPAL_ROLE)
+        {
+            return true;
+        }
+
+        if ($this->class)
+        {
+            return in_array($this->class->name, User::$HIGH_SCHOOL_CLASSES);
+        }
+
+        return true;
+    }
+
+    public function teacher_class()
+    {
+        return $this->hasOne(Classes::class, 'teacher', 'id');
     }
 }

@@ -31,11 +31,17 @@ use App\Filament\Widgets\AttendanceOverview;
 use App\Http\Middleware\RedirectToPanel;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
+use App\Models\User;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+        $widgets = [
+            AttendanceOverview::class,
+            PopulationStatsOverview::class,
+        ];
+
         return $panel
             ->default()
             ->id('admin')
@@ -54,14 +60,7 @@ class AdminPanelProvider extends PanelProvider
                 Pages\Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-                IncomeStatsOverview::class,
-                AttendanceOverview::class,
-                PopulationStatsOverview::class,
-                IncomeChart::class,
-                // Widgets\AccountWidget::class,
-                // Widgets\FilamentInfoWidget::class,
-            ])
+            ->widgets($widgets)
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -76,7 +75,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                'role:Admin|super-admin|Teacher|Principal|Accountant|Librarian|Receptionist'
+                'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist'
             ])
             ->userMenuItems([
                 MenuItem::make()

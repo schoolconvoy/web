@@ -25,7 +25,7 @@ class PaymentController extends Controller
             $ward = User::find($wardId);
 
             // Fetch the (unpaid) school fees of the current ward in the cache
-            $amount = $ward->class->fees()->whereDoesntHave('payments')->sum('amount');
+            $amount = $ward->class->fees()->whereDoesntHave('payments')->get()->sum('final_amount');
             $parent = $ward->parent;
 
             // No more fees to pay
@@ -36,15 +36,17 @@ class PaymentController extends Controller
 
             $total = $amount * 100;
 
-            $ref = "ITGA-PAYMENT-" . Payment::count() + 10000 . "-" . date("ymd") . "-" . rand(1000, 9000);
+            $ref = "ITGA-PAYMENT-" . Payment::count() + 1000 . "-"  . rand(1000, 9000);
 
             $data = array(
                 "amount" => $total,
                 "reference" => $ref,
                 "email" => $parent[0]->email,
                 "currency" => "NGN",
-                "orderID" => 23456,
+                "orderID" => Payment::count() + 1000,
             );
+
+            Log::debug('[PAYSTACK] ' . print_r($data, true));
 
             return paystack()->getAuthorizationUrl($data)->redirectNow();
         }catch(\Exception $e) {

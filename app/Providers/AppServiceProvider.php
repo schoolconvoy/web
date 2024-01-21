@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Scopes\ClassScope;
 use App\Models\User;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Support\ServiceProvider;
@@ -31,6 +32,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        User::addGlobalScope(new ClassScope);
+
         FilamentView::registerRenderHook(
             'panels::user-menu.after',
             fn (): string => auth()->user()->hasRole(User::$PARENT_ROLE) ? Blade::render('@livewire(\'ward-switcher\')') : '',

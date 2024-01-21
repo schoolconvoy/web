@@ -11,6 +11,7 @@ class AttendanceOverview extends ChartWidget
 {
     protected static ?string $heading = 'Attendance Chart';
     protected static ?int $sort = 2;
+    protected int | string | array $columnSpan = 3;
 
     protected function getData(): array
     {
