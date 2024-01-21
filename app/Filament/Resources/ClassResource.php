@@ -38,6 +38,9 @@ class ClassResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(function () {
+                return auth()->user()->isHighSchool() ? Classes::highSchool() : Classes::elementarySchool();
+            })
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('level.shortname')

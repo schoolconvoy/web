@@ -12,6 +12,8 @@ class IncomeChart extends ChartWidget
 {
     protected static ?string $heading = 'Income chart';
     protected static ?int $sort = 3;
+    protected int | string | array $columnSpan = 3;
+    protected static ?string $maxHeight = '350px';
 
     protected function getData(): array
     {

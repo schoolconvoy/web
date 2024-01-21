@@ -47,6 +47,16 @@ class IncomeStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
+        $expected = Fee::whereHas('students')
+                        ->where('deadline', '<=', now()->toDate());
+        $expected = Trend::query($expected)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->sum('amount');
+
         $paid = Payment::where('paid', 1);
         $paid = Trend::query($paid)
                         ->between(
@@ -67,26 +77,7 @@ class IncomeStatsOverview extends BaseWidget
                         ->perMonth()
                         ->sum('amount');
 
-        $student = User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent');
-        $student = Trend::query($student)
-                        ->between(
-                            start: now()->subYear(),
-                            end: now()->endOfYear(),
-                        )
-                        ->perMonth()
-                        ->count();
-
         return [
-            Stat::make(
-                'Students without a guardian',
-                User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent')->count()
-            )
-                ->color('warning')
-                ->description('This affects how their fees are paid.')
-                ->icon('heroicon-m-users')
-                ->chart(
-                    $student->map(fn (TrendValue $value) => $value->aggregate)->toArray()
-                ),
             Stat::make(
                 'Total fees receieved',
                 'NGN' . number_format(Payment::sum('amount'), 2, '.', ',')
@@ -112,6 +103,16 @@ class IncomeStatsOverview extends BaseWidget
                 ->chart(
                     $unpaid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
                 ),
+            Stat::make(
+                'Expected fees',
+                'NGN' . number_format(Fee::whereHas('students')->get()->sum('final_amount'), 2, '.', ',')
+            )
+                ->description('Total amount of fees expected.')
+                ->icon('heroicon-m-currency-dollar')
+                ->color('success')
+                ->chart(
+                    $paid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
+                )
         ];
     }
 }

@@ -36,6 +36,15 @@ class PopulationStatsOverview extends BaseWidget
                         )
                         ->perMonth()
                         ->count();
+
+        $student = User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent');
+        $student = Trend::query($student)
+                        ->between(
+                            start: now()->subYear(),
+                            end: now()->endOfYear(),
+                        )
+                        ->perMonth()
+                        ->count();
         return [
             Stat::make('Total students', User::role(User::$STUDENT_ROLE)->count())
                 ->color('success')
@@ -58,6 +67,17 @@ class PopulationStatsOverview extends BaseWidget
                     $male->map(fn (TrendValue $value) => $value->aggregate)->toArray()
                 )
                 ->description('Total amount of students that are female.'),
+
+            Stat::make(
+                'Students without a guardian',
+                User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent')->count()
+            )
+                ->color('warning')
+                ->description('This affects how their fees are paid.')
+                ->icon('heroicon-m-users')
+                ->chart(
+                    $student->map(fn (TrendValue $value) => $value->aggregate)->toArray()
+                ),
         ];
     }
 }

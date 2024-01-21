@@ -10,7 +10,7 @@ class Fee extends Model
 {
     use HasFactory;
 
-    protected $appends = ['final_amount', 'discounts'];
+    protected $appends = ['final_amount'];
 
     public function classes()
     {

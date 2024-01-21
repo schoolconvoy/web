@@ -39,4 +39,14 @@ class Classes extends Model
     {
         return $this->belongsToMany(Fee::class);
     }
+
+    public static function highSchool()
+    {
+        return self::whereIn('name', User::$HIGH_SCHOOL_CLASSES);
+    }
+
+    public static function elementarySchool()
+    {
+        return self::whereIn('name', User::$ELEMENTARY_SCHOOL_CLASSES);
+    }
 }

@@ -72,8 +72,8 @@ class QuestionResource extends Resource
                 Tables\Actions\DeleteAction::make(),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('import_questions')
-                                        ->icon('heroicon-o-document-plus')
+                // Tables\Actions\Action::make('import_questions')
+                //                         ->icon('heroicon-o-document-plus')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
