@@ -7,7 +7,7 @@
         </ul>
     </div>
     <div id="default-tab-content">
-        <div class="hidden p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             {{ $this->table }}
         </div>
     </div>
