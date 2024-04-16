@@ -11,6 +11,7 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Blade;
+use Opcodes\LogViewer\Facades\LogViewer;
 use Illuminate\Support\Facades\Log;
 
 class AppServiceProvider extends ServiceProvider
@@ -33,6 +34,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         User::addGlobalScope(new ClassScope);
+
+        LogViewer::auth(function ($request) {
+            return true;
+        });
 
         FilamentView::registerRenderHook(
             'panels::user-menu.after',
