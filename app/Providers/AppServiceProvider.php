@@ -36,7 +36,10 @@ class AppServiceProvider extends ServiceProvider
         User::addGlobalScope(new ClassScope);
 
         LogViewer::auth(function ($request) {
-            return true;
+            return $request->user()
+                && in_array($request->user()->email, [
+                    'olaegbesamuel@gmail.com',
+                ]);
         });
 
         FilamentView::registerRenderHook(
