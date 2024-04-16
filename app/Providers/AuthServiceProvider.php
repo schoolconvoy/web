@@ -34,5 +34,11 @@ class AuthServiceProvider extends ServiceProvider
         Gate::before(function (User $user, string $ability) {
             return $user->isSuperAdmin() ? true: null;
         });
+
+        Gate::define('viewLogViewer', function (?User $user) {
+            // return true if the user is allowed access to the Log Viewer
+            return true;
+        });
+
     }
 }
