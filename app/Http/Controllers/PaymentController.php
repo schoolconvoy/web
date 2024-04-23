@@ -33,7 +33,7 @@ class PaymentController extends Controller
             {
                 $amount = 4000;
                 Log::debug("No amount due");
-                return Redirect::back();
+                // return Redirect::back();
             }
 
             $total = $amount * 100;
