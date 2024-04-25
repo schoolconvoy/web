@@ -25,15 +25,14 @@ class PaymentController extends Controller
             $ward = User::find($wardId);
 
             // Fetch the (unpaid) school fees of the current ward in the cache
-            $amount = $ward->class->fees()->get()->sum('final_amount');
+            $amount = $ward->fees()->whereDoesntHave('payments')->get()->sum('final_amount');
             $parent = $ward->parent;
 
             // No more fees to pay
             if ($amount === 0)
             {
-                $amount = 4000;
-                Log::debug("No amount due");
-                // return Redirect::back();
+                Log::debug("No amount due for ward: " . print_r($ward->id, true) . " and parent: " . print_r($parent[0]->id, true));
+                return Redirect::back()->with('message', ['msg'=>'No amount due', 'type'=>'error']);
             }
 
             $total = $amount * 100;

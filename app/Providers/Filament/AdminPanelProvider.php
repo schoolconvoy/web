@@ -23,6 +23,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\ParentDashboard;
 use App\Filament\Resources\FeeResource\Widgets\IncomeChart;
 use App\Filament\Resources\FeeResource\Widgets\IncomeStatsOverview;
@@ -46,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->login()
+            ->login(Login::class)
             ->registration(Register::class)
             ->passwordReset()
             ->emailVerification()

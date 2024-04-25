@@ -62,17 +62,22 @@ class CreateQuestion extends CreateRecord
                                 ])
                                 ->default(1),
                             Select::make('topics')
+                                ->relationship('topics', 'name')
                                 ->label('Select a topic')
                                 ->createOptionForm([
-                                    TextInput::make('name')->required()
+                                    TextInput::make('name')
+                                        ->live(true)
+                                        ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                                            if (($get('slug') ?? '') !== Str::slug($old)) {
+                                                return;
+                                            }
+
+                                            $set('slug', Str::slug($state));
+                                        })
+                                        ->required(),
+                                    TextInput::make('slug')
+                                        ->required()
                                 ])
-                                ->createOptionUsing(function ($data) {
-                                    Topic::create([
-                                        'name' => $data['name'],
-                                        'slug' => Str::slug($data['name']),
-                                    ]);
-                                })
-                                ->options(Topic::all()->pluck('name', 'id'))
                                 ->searchable(),
                             Toggle::make('is_active')
                                     ->default(true)

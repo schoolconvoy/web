@@ -24,8 +24,6 @@ class QuizPerformance extends ChartWidget
                 ->perMonth()
                 ->count('score');
 
-        Log::debug('Quiz performance data is ' . print_r($data->toArray(), true));
-
         return [
             'datasets' => [
                 [

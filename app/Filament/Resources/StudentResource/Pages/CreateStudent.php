@@ -115,13 +115,12 @@ class CreateStudent extends CreateRecord
             $password = Str::random(8);
             $this->password = $password;
 
-            Log::debug('Password is ' . $password);
-
             $data['password'] = Hash::make($this->password);
+            $user->password = $data['password'];
 
             $user->save();
 
-            Log::debug('Successfully saved user: ' . print_r($user, true));
+            Log::debug('Successfully saved student: ' . print_r($user, true));
 
         } catch (\Throwable $th) {
             Log::debug('An error has occurred when saving user ' . print_r($th, true));

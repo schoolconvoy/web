@@ -141,7 +141,12 @@ class ClassSeeder extends Seeder
 
         foreach($classes as $class)
         {
-            $level = Level::create($class);
+
+            if (Level::where('name', $class['name'])->exists()) {
+                $level = Level::where('name', $class['name'])->first();
+            } else {
+                $level = Level::create($class);
+            }
 
             $class = Classes::create([
                 'name' => $class['name'],
@@ -150,6 +155,6 @@ class ClassSeeder extends Seeder
             ]);
         }
 
-        Log::debug('Info: Created ' . print_r(Classes::count() . ' classes', true));
+        Log::debug('Info: Created ' . print_r(Classes::count() . ' classes' . ' And ' . Level::count() . ' levels ', true));
     }
 }

@@ -121,6 +121,12 @@ class StaffResource extends Resource
                     ->label('Role')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('teacher_class.name')
+                    // TODO: Hide if the role is not teacher
+                    // ->hidden(fn($record) => $record->roles->name !== 'teacher')
+                    ->label('Class')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
         ]);
     }
 

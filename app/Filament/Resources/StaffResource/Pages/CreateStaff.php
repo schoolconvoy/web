@@ -3,6 +3,8 @@
 namespace App\Filament\Resources\StaffResource\Pages;
 
 use App\Filament\Resources\StaffResource;
+use App\Models\Classes;
+use App\Models\Level;
 use App\Models\User;
 use Filament\Actions;
 use Filament\Forms\Components\DatePicker;
@@ -57,6 +59,13 @@ class CreateStaff extends CreateRecord
                         return $query->where('name', '!=', 'super-admin');
                     })
                 ,
+                Select::make('class_assigned')
+                    ->label('Assign class')
+                    ->options([
+                        'Elementary school' => Level::where('order', '<=', 11)->pluck('name', 'id')->toArray(),
+                        'High school' => Level::where('order', '>', 11)->pluck('name', 'id')->toArray(),
+                    ])
+                    ->nullable(),
                 TextInput::make('address')
                     ->required()
             ]);
@@ -65,18 +74,28 @@ class CreateStaff extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $role = $data['roles'];
+        $class_assigned = isset($data['class_assigned']) ? $data['class_assigned'] : null;
 
+        unset($data['class_assigned']);
+
+        // Relationship on select field handles this
         unset($data['roles']);
 
         $password = Str::random(8);
         $this->password = $password;
 
-        Log::debug('Password is ' . $password);
-
         $data['password'] = Hash::make($this->password);
 
         $user = static::getModel()::create($data);
+        $user->password = $password;
+
+        if ($class_assigned !== null) {
+            $target_class = Classes::find($class_assigned);
+            $target_class->teacher = $user->id;
+            $target_class->save();
+        }
+
+        $user->save();
 
         return $user;
     }

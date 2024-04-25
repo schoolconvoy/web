@@ -53,6 +53,7 @@ class QuizResource extends Resource
                             ->dateTime('l, jS F, Y'),
                 TextColumn::make('created_at')
                             ->label('Created')
+                            ->sortable()
                             ->since(),
             ])
             ->filters([
@@ -123,9 +124,9 @@ class QuizResource extends Resource
                                                 ->weight(FontWeight::Bold),
                                             Infolists\Components\TextEntry::make('question.options')
                                                 ->label('Option')
+                                                ->helperText('Correct option in asterisks (*)')
                                                 ->size(TextEntry\TextEntrySize::Large)
                                                 ->formatStateUsing(function ($state) {
-                                                    Log::debug('state is ' . print_r($state, true));
                                                     $options = explode("},", $state);
                                                     $options = array_map(function ($item) {
                                                         $item = rtrim($item, "}");

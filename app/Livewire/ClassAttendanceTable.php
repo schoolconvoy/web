@@ -63,18 +63,18 @@ class ClassAttendanceTable extends IRelationalEntityTable
                     ])
             ])
             ->headerActions([
-                TableAction::make('export')
-                        ->label('Export')
-                        ->icon('heroicon-o-cloud-arrow-up')
-                        ->color('primary')
-                        ->form([
-                            FileUpload::make('Import students')
-                                    ->acceptedFileTypes(['application/pdf'])
-                        ])
-                        ->action(function () {
-                            // TODO: Allow bulk import students to a class
-                            // Handle file upload
-                        }),
+                // TableAction::make('export')
+                //         ->label('Export')
+                //         ->icon('heroicon-o-cloud-arrow-up')
+                //         ->color('primary')
+                //         ->form([
+                //             FileUpload::make('Import students')
+                //                     ->acceptedFileTypes(['application/pdf'])
+                //         ])
+                //         ->action(function () {
+                //             // TODO: Allow bulk import students to a class
+                //             // Handle file upload
+                //         }),
             ]);
     }
 

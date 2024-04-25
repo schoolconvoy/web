@@ -53,9 +53,7 @@ class ClassSubjectsTable extends IRelationalEntityTable
                     ->label('Subject')
                     ->searchable(),
                 TextColumn::make('teacher')
-                    ->description(function(Subject $subject) {
-                        return $subject->teacher ? User::find($subject->teacher)->fullname : 'Not set';
-                    })
+                    ->formatStateUsing(fn (Subject $subject): string => __(':firstname :lastname', ['firstname' => User::find($subject->teacher)->firstname, 'lastname' => User::find($subject->teacher)->lastname]))
             ])
             ->filters([
 

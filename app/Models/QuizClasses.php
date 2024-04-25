@@ -10,11 +10,18 @@ class QuizClasses extends Model
 {
     use HasFactory;
 
+    protected $table = 'quiz_classes';
+
     /**
      * @return \Harishdurga\LaravelQuiz\Models\Quiz
      */
     public function quiz()
     {
-        return $this->belongsToMany(Quiz::class);
+        return $this->belongsTo(Quiz::class);
+    }
+
+    public function quiz_class()
+    {
+        return $this->belongsTo(Classes::class);
     }
 }

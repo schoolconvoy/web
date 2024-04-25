@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Auth\EditProfile;
+use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
 use App\Filament\Parent\Resources\FeeResource\Widgets\FeeStatsOverview;
 use Filament\Http\Middleware\Authenticate;
@@ -29,7 +30,7 @@ class ParentPanelProvider extends PanelProvider
         return $panel
             ->id('parent')
             ->path('parent')
-            ->login()
+            ->login(Login::class)
             ->passwordReset()
             ->emailVerification()
             ->profile(EditProfile::class)

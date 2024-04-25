@@ -60,6 +60,7 @@ class QuestionResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
+                            ->sortable()
                             ->html(),
                 TextColumn::make('topics.name')
                             ->label('Topic'),
@@ -69,7 +70,8 @@ class QuestionResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(auth()->user()->can('delete')),
             ])
             ->headerActions([
                 // Tables\Actions\Action::make('import_questions')

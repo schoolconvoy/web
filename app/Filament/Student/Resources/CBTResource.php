@@ -31,6 +31,15 @@ class CBTResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->query(function () {
+                // Only get quizzes assigned to this class.
+                $class_id = auth()->user()->class->id;
+                $quizzes = Quiz::whereHas('quizAuthors', function (Builder $query) use ($class_id) {
+                    $query->where('classes_id', $class_id);
+                });
+
+                return $quizzes;
+            })
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('pass_marks')
@@ -77,13 +86,14 @@ class CBTResource extends Resource
                         ->size(TextEntry\TextEntrySize::Large)
                         ->weight(FontWeight::Bold),
                     TextEntry::make('duration')
-                        ->time('i:s')
+                        ->time('H:i:s')
                         ->size(TextEntry\TextEntrySize::Large)
                         ->weight(FontWeight::Bold),
                     TextEntry::make('max_attempts')
                         ->size(TextEntry\TextEntrySize::Large)
                         ->weight(FontWeight::Bold),
                     TextEntry::make('time_between_attempts')
+                        ->time('H:i:s')
                         ->size(TextEntry\TextEntrySize::Large)
                         ->weight(FontWeight::Bold),
                     TextEntry::make('pass_marks')

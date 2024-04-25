@@ -36,8 +36,9 @@ class ClassStudentsTable extends IRelationalEntityTable
             ->query(Classes::find($this->classId)->users()->getQuery())
             ->modelLabel('Students')
             ->columns([
-                TextColumn::make('fullname')
+                TextColumn::make('firstname')
                     ->label('Students')
+                    ->formatStateUsing(fn (User $record): string => __(':firstname :lastname', ['firstname' => $record->firstname, 'lastname' => $record->lastname]))
                     ->searchable()
                     ->description(fn (User $record): string => $record->admission_no ?? ''),
             ])

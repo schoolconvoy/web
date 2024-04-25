@@ -99,11 +99,11 @@ class CreateQuiz extends CreateRecord
                                 TextInput::make('time_between_attempts')
                                     ->helperText('Time in seconds between each attempts')
                                     ->required()
-                                    ->suffix('seconds'),
+                                    ->suffix('minutes'),
                                 TextInput::make('duration')
                                     ->helperText('How long should each attempt last for?')
                                     ->required()
-                                    ->suffix('seconds'),
+                                    ->suffix('minutes'),
                             ])
                         ]),
                 Section::make('Class')
@@ -117,6 +117,7 @@ class CreateQuiz extends CreateRecord
                         ->schema([
                             Select::make('classes')
                                 ->label('Class')
+                                ->required()
                                 ->searchable()
                                 ->options(Classes::all(['name', 'id'])->pluck('name', 'id'))
                         ])
@@ -129,28 +130,27 @@ class CreateQuiz extends CreateRecord
                     Repeater::make('quiz')
                             ->label('Questions')
                             ->schema([
-                                Select::make('topics')
-                                        ->searchable()
-                                        ->label('Select a topic (optional)')
-                                        ->createOptionForm([
-                                            TextInput::make('name')->required()
-                                        ])
-                                        ->model(Topic::class)
-                                        ->createOptionUsing(function ($data) {
-                                            Topic::create([
-                                                'name' => $data['name'],
-                                                'slug' => Str::slug($data['name']),
-                                            ]);
-                                        })
-                                        ->options(Topic::all(['name', 'id'])->pluck('name', 'id'))
-                                        ->live(true),
+                                // TODO: In an ideal world, we want them to be able to filter the questions by topic but
+                                // TODO: the questions aren't populated based on selected topic at the moment
+                                // Select::make('topics')
+                                //         ->searchable()
+                                //         ->label('Select a topic (optional)')
+                                //         ->createOptionForm([
+                                //             TextInput::make('name')->required()
+                                //         ])
+                                //         ->model(Topic::class)
+                                //         ->createOptionUsing(function ($data) {
+                                //             Topic::create([
+                                //                 'name' => $data['name'],
+                                //                 'slug' => Str::slug($data['name']),
+                                //             ]);
+                                //         })
+                                //         ->options(Topic::all(['name', 'id'])->pluck('name', 'id'))
+                                //         ->live(true),
                                 Select::make('questions')
-                                        ->options(function (Get $get) {
-                                            $topic = Topic::find($get('topics'));
-                                            $questions = $topic && $topic->questions ? $topic->questions->pluck('name', 'id') : Question::all(['name', 'id'])->pluck('name', 'id');
-
-                                            return $questions;
-                                        })
+                                        ->relationship('questions.question', 'name')
+                                        ->preload()
+                                        ->allowHtml()
                                         ->searchable()
                                         ->createOptionForm([
                                             Textarea::make('name') // TODO: Change back to richtext but dropdown must be formatted
@@ -158,6 +158,7 @@ class CreateQuiz extends CreateRecord
                                                 ->required(),
                                             Select::make('question_type_id')
                                                 ->label('Question type')
+                                                ->default(1)
                                                 ->options([
                                                     1 => 'multiple_choice_single_answer',
                                                     2 => 'multiple_choice_multiple_answer',
@@ -208,44 +209,57 @@ class CreateQuiz extends CreateRecord
         ];
     }
 
+    /**
+     * TODO: Leaving out topic for now, will revisit. Consult TODO comment
+     * TODO: above
+     */
     protected function handleRecordCreation(array $data): Model
     {
+        // Convert to seconds
+        $data['duration'] = $data['duration'] * 60;
+        $data['time_between_attempts'] = $data['time_between_attempts'] * 60;
+
         $questions_array = $data['quiz'];
         $classes = $data['classes'];
 
         $data['slug'] = Str::slug($data['name']) . '-' . static::getModel()::count() +  1000 . '-' . rand(1234, 9999);
         $data['is_published'] = 1;
 
-        unset($data['classes']); // TODO: Attach a quiz to a class
+        unset($data['classes']);
         unset($data['quiz']);
 
         // Create quiz
         $quiz = static::getModel()::create($data);
 
-        $topics = collect($questions_array)->pluck('topics');
+        // $topics = collect($questions_array)->pluck('topics');
 
         foreach($questions_array as $question)
         {
             $questions = $question['questions'];
             $marks = $question['marks'];
-            $topics = $question['topics'];
+            // $topics = $question['topics'];
 
             // Associate question with quiz
             QuizQuestion::create([
                 'quiz_id' => $quiz->id,
                 'question_id' => $questions,
                 'marks' => $marks,
-                'order' => 1, // TODO: allow reordering of questions
+                'order' => 1, // TODO: (good to have): allow reordering of questions
                 'negative_marks' => 0,
                 'is_optional' => false // Note: Nigerian exams hardly have optional questions. Review in future
             ]);
         }
 
-
         // Associate quiz with class
-        $quiz->classes()->attach($classes);
+        $quiz->quizAuthors()->save(
+            QuizClasses::create([
+                'quiz_id' => $quiz->id, // In an ideal world we won't have to specify this (if the relationship worked!)
+                'classes_id' => $classes,
+                'is_active' => 1,
+            ])
+        );
 
-        $quiz->topics()->attach($topics);
+        // $quiz->topics()->attach($topics);
 
         return $quiz;
     }

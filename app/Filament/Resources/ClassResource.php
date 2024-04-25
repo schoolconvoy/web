@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ClassResource\Pages;
 use App\Filament\Resources\ClassResource\RelationManagers;
 use App\Models\Classes;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -39,12 +40,19 @@ class ClassResource extends Resource
     {
         return $table
             ->query(function () {
-                return auth()->user()->isHighSchool() ? Classes::highSchool() : Classes::elementarySchool();
+                if (auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE)) {
+                    return Classes::query();
+                } else {
+                    return auth()->user()->isHighSchool() ? Classes::highSchool() : Classes::elementarySchool();
+                }
             })
             ->columns([
                 TextColumn::make('name'),
                 TextColumn::make('level.shortname')
                             ->label('Shortname'),
+                TextColumn::make('users_count')
+                            ->label('Students')
+                            ->counts('users'),
             ])
             ->filters([
                 Tables\Filters\TrashedFilter::make(),

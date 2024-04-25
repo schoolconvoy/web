@@ -79,6 +79,7 @@ class ClassTeacherTable extends IRelationalEntityTable implements HasInfolists, 
 
     public function form(Form $form): Form
     {
+        Log::debug("Making a user request when role is high school principal: " . print_r(User::role(User::$TEACHER_ROLE)->pluck('firstname', 'id'), true));
         return $form
             ->schema([
                 Select::make('teacher')

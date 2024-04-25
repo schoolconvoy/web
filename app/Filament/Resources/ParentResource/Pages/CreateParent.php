@@ -196,7 +196,7 @@ class CreateParent extends CreateRecord
         Log::debug('Password is ' . $password);
 
         $data['password'] = Hash::make($this->password);
-
+        $parent->password = $data['password'];
         $parent->save();
 
         // Dispatch event

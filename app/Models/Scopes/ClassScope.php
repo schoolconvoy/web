@@ -17,7 +17,7 @@ class ClassScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         if (Auth::hasUser()) {
-            if (Auth::user()->hasAnyRole([User::$HIGH_PRINCIPAL_ROLE, User::$ELEM_PRINCIPAL_ROLE]))
+            if (Auth::user()->hasAnyRole([User::$HIGH_PRINCIPAL_ROLE, User::$ELEM_PRINCIPAL_ROLE, User::$TEACHER_ROLE]))
             {
                 if (Auth::user()->isHighSchool())
                 {

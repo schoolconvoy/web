@@ -109,11 +109,11 @@ class EditQuiz extends EditRecord
                                 TextInput::make('time_between_attempts')
                                     ->helperText('Time in seconds between each attempts')
                                     ->required()
-                                    ->suffix('seconds'),
+                                    ->suffix('minutes'),
                                 TextInput::make('duration')
                                     ->helperText('How long should each attempt last for?')
                                     ->required()
-                                    ->suffix('seconds'),
+                                    ->suffix('minutes'),
                             ])
                         ]),
                 Section::make('Class')
@@ -127,6 +127,7 @@ class EditQuiz extends EditRecord
                         ->schema([
                             Select::make('classes')
                                 ->label('Class')
+                                ->required()
                                 ->searchable()
                                 ->options(Classes::all(['name', 'id'])->pluck('name', 'id'))
                         ])
@@ -162,6 +163,10 @@ class EditQuiz extends EditRecord
     {
         // TODO: Handle classes
         unset($data['classes']);
+
+        // Convert to seconds
+        $data['duration'] = $data['duration'] * 60;
+        $data['time_between_attempts'] = $data['time_between_attempts'] * 60;
 
         $record->update($data);
 
