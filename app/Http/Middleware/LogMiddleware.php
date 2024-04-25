@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,7 +17,9 @@ class LogMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->hasPermissionTo('view-logs')) {
+        if (Auth::check()
+            &&
+            (Auth::user()->hasAnyRole([User::$SUPER_ADMIN_ROLE]) || Auth::user()->hasPermissionTo('view-logs'))) {
             return $next($request);
         }
 
