@@ -31,7 +31,8 @@ class FeeStatsOverview extends BaseWidget
         return [
             Stat::make(
                     'Total fees paid',
-                    'NGN' . number_format(User::find(Cache::get('ward'))
+                    'NGN' . number_format(
+                            User::find(Cache::get('ward'))
                             ->fees()
                             ->whereHas('payments')
                             ->get()

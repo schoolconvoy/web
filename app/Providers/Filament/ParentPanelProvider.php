@@ -22,6 +22,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Filament\Navigation\NavigationItem;
 
 class ParentPanelProvider extends PanelProvider
 {
@@ -46,7 +47,17 @@ class ParentPanelProvider extends PanelProvider
             ->widgets([
                 FeeStatsOverview::class,
             ])
-            ->middleware([
+            ->navigationItems([
+                NavigationItem::make('Newsletter')
+                    ->url('#')
+                    ->icon('heroicon-o-newspaper'),
+                NavigationItem::make('Results')
+                    ->url('#')
+                    ->icon('heroicon-c-table-cells'),
+                NavigationItem::make('Academic Calendar')
+                    ->url('#')
+                    ->icon('heroicon-m-calendar-days')
+            ])->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
