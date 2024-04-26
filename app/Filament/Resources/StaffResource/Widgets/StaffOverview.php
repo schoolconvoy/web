@@ -26,7 +26,7 @@ class StaffOverview extends BaseWidget
                 ->description('Remove inactive staffs')
                 ->color('danger'),
             Stat::make('Teachers', User::role(User::$TEACHER_ROLE)->count())
-                ->description('Remove inactive staffs')
+                // ->description('Remove inactive staffs')
                 ->color('danger')
         ];
     }

@@ -56,6 +56,7 @@ class CreateQuestion extends CreateRecord
                             Select::make('topics')
                                 ->relationship('topics', 'name')
                                 ->label('Select a topic')
+                                ->preload()
                                 ->createOptionForm([
                                     TextInput::make('name')
                                         ->live(true)
