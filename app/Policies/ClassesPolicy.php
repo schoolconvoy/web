@@ -21,7 +21,7 @@ class ClassesPolicy
      */
     public function view(User $user, Classes $classes): bool
     {
-        return $user->can('view Classes');
+        return $user->hasAnyRole([User::$HIGH_PRINCIPAL_ROLE, User::$ELEM_PRINCIPAL_ROLE, User::$SUPER_ADMIN_ROLE]) || $user->teacher_class->id === $classes->id || $user->can('view Classes', $classes);
     }
 
     /**

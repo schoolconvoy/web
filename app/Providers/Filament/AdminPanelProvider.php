@@ -25,6 +25,8 @@ use Filament\Navigation\NavigationGroup;
 use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugin;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\ParentDashboard;
+use App\Filament\Resources\ClassResource;
+use App\Filament\Resources\ClassResource\Pages\MyClass;
 use App\Filament\Resources\FeeResource\Widgets\IncomeChart;
 use App\Filament\Resources\FeeResource\Widgets\IncomeStatsOverview;
 use App\Filament\Student\Resources\StudentResource\Widgets\PopulationStatsOverview;
@@ -49,6 +51,14 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(Login::class)
             ->registration(Register::class)
+            ->navigationItems([
+                NavigationItem::make('My Class')
+                    ->url(fn () => ClassResource::getUrl('view', ['record' => auth()->user()->teacher_class]))
+                    ->icon('heroicon-o-presentation-chart-line')
+                    ->visible(fn () => auth()->user()->hasRole(User::$TEACHER_ROLE))
+                    ->group('Manage your class')
+                    ->sort(3),
+            ])
             ->passwordReset()
             ->emailVerification()
             ->profile(EditProfile::class)
@@ -78,16 +88,6 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist'
             ])
-            ->userMenuItems([
-                MenuItem::make()
-                    ->label('Staff')
-                    ->url(fn (): string => StaffResource::getUrl())
-                    ->icon('heroicon-o-cog-6-tooth'),
-            ])
-            // ->navigationGroups([
-            //     NavigationGroup::make()
-            //         ->label('Settings')
-            // ])
             ->plugin(
                 FilamentSpatieRolesPermissionsPlugin::make(),
                 \BezhanSalleh\FilamentExceptions\FilamentExceptionsPlugin::make()
