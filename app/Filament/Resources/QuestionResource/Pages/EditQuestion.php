@@ -29,14 +29,6 @@ class EditQuestion extends EditRecord
                 RichEditor::make('name') // TODO: Change back to richtext but dropdown must be formatted
                     ->label('Question')
                     ->required(),
-                Select::make('question_type_id')
-                    ->label('Question type')
-                    ->options([
-                        1 => 'multiple_choice_single_answer',
-                        2 => 'multiple_choice_multiple_answer',
-                        3 => 'fill_the_blank'
-                    ])
-                    ->default(1),
                 FileUpload::make('media_url')
                             ->acceptedFileTypes(['image/*'])
                             ->maxFiles(1)

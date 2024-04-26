@@ -53,14 +53,6 @@ class CreateQuestion extends CreateRecord
                                 ->acceptedFileTypes(['image/*'])
                                 ->maxFiles(1)
                                 ->label('Image'),
-                            Select::make('question_type_id')
-                                ->label('Question type')
-                                ->options([
-                                    1 => 'multiple_choice_single_answer',
-                                    2 => 'multiple_choice_multiple_answer',
-                                    3 => 'fill_the_blank'
-                                ])
-                                ->default(1),
                             Select::make('topics')
                                 ->relationship('topics', 'name')
                                 ->label('Select a topic')
