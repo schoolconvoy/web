@@ -84,7 +84,6 @@ class ClassResource extends Resource
             'create' => Pages\CreateClass::route('/create'),
             'view' => Pages\ViewClasses::route('/{record}'),
             'edit' => Pages\EditClass::route('/{record}/edit'),
-            'my-class' => Pages\MyClass::route('/{record}/my-class'),
         ];
     }
 
