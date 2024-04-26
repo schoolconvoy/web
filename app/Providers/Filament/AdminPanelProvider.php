@@ -88,7 +88,10 @@ class AdminPanelProvider extends PanelProvider
             //     NavigationGroup::make()
             //         ->label('Settings')
             // ])
-            ->plugin(FilamentSpatieRolesPermissionsPlugin::make())
+            ->plugin(
+                FilamentSpatieRolesPermissionsPlugin::make(),
+                \BezhanSalleh\FilamentExceptions\FilamentExceptionsPlugin::make()
+            )
             ->sidebarCollapsibleOnDesktop();
     }
 }
