@@ -17,7 +17,7 @@
                                 {!! $quiz_question->question->name !!}
                             </h1>
                             @if($quiz_question->question->media_url)
-                                <img src="{{ asset('/storage/'. $quiz_question->question->media_url) }}" class="h-32 pt-4 px-6 w-auto" alt="">
+                                <img src="{{ $quiz_question->question->media_url ? asset('/storage/'. $quiz_question->question->media_url) : null }}" class="h-32 pt-4 px-6 w-auto" alt="">
                             @endif
                         </div>
                         <div class="flex flex-row flex-wrap items-center justify-between max-w-prose mb-4">

@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     <!-- Tab links -->
     <div class="h-20 w-20 rounded-full overflow-hidden">
-        <img src="{{asset('/storage/'. $record->picture)}}" alt="{{ $record->firstname }}">
+        <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname }}">
     </div>
     <div class="flex gap-3 items-center py-3">
         <div class="flex flex-row gap-x-2.5" title="wards">
