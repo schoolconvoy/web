@@ -115,6 +115,10 @@ class CreateStudent extends CreateRecord
             $password = Str::random(8);
             $this->password = $password;
 
+            if (auth()->user()->hasAnyRole([User::$TEACHER_ROLE])) {
+                $user->class_id = auth()->user()->teacher_class->id;
+            }
+
             $data['password'] = Hash::make($this->password);
             $user->password = $data['password'];
 
