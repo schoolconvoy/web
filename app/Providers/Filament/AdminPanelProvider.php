@@ -51,14 +51,14 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(Login::class)
             ->registration(Register::class)
-            ->navigationItems([
-                NavigationItem::make('My Class')
-                    ->url(fn () => ClassResource::getUrl('view', ['record' => auth()->user()->teacher_class]))
-                    ->icon('heroicon-o-presentation-chart-line')
-                    ->visible(fn () => auth()->user()->hasRole(User::$TEACHER_ROLE))
-                    ->group('Manage your class')
-                    ->sort(3),
-            ])
+            //->navigationItems([
+                //NavigationItem::make('My Class')
+                  //  ->url(fn () => ClassResource::getUrl('view', ['record' => auth()->user()->teacher_class ?? '']))
+                    //->icon('heroicon-o-presentation-chart-line')
+                    //->visible(fn () => auth()->user()->hasRole(User::$TEACHER_ROLE))
+                    //->group('Manage your class')
+              //      ->sort(3),
+            //])
             ->passwordReset()
             ->emailVerification()
             ->profile(EditProfile::class)
