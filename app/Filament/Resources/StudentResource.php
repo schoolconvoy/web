@@ -19,9 +19,13 @@ use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Forms\Components\Wizard;
+use Filament\Resources\Pages\EditRecord\Concerns\HasWizard;
 
 class StudentResource extends Resource
 {
+    use HasWizard;
+
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -39,6 +43,68 @@ class StudentResource extends Resource
             ->schema([
                 //
             ]);
+    }
+
+    protected function getSteps(): array
+    {
+        return [
+            Wizard\Step::make('Bio data')
+                ->icon('heroicon-s-user-circle')
+                ->description('Some description')
+                ->schema([
+                    Grid::make([
+                            'sm' => 2,
+                            'xl' => 2,
+                            '2xl' => 2,
+                        ])
+                        ->schema([
+                            FileUpload::make('picture')
+                                ->label('Upload a picture')
+                                ->avatar()
+                                ->inlineLabel()
+                                ->columns()
+                                ->maxFiles(1)
+                                ->image(),
+                            Radio::make('gender')
+                                ->options([
+                                    'Male' => 'Male',
+                                    'Female' => 'Female'
+                                ])
+                                ->required()
+                            ,
+                            TextInput::make('firstname')
+                                ->required(),
+                            TextInput::make('lastname')
+                                ->required(),
+                            TextInput::make('email')
+                                ->unique()
+                                ->email(),
+                            TextInput::make('phone')
+                                ->tel()
+                            ,
+                            DatePicker::make('dob')
+                                ->label('Date of birth')
+                                ->required()
+                                ->columns(),
+                            TextInput::make('height')
+                                ->label('Height'),
+                            TextInput::make('weight')
+                                ->label('Weight'),
+                            Textarea::make('address')
+                                ->required()
+                                ->maxLength(200)
+                         ])
+                         ,
+                ])->live(onBlur: true, debounce: 500)
+                ->afterStateUpdated(function ($state) {
+                    $this->review['bio'] = $state;
+                }),
+            Wizard\Step::make('Confirm details')
+                        ->schema([
+                            View::make('reviews')
+                                ->view('filament.form.student-review', ['review' => $this->review])
+                        ]),
+        ];
     }
 
     public static function table(Table $table): Table

@@ -3,20 +3,21 @@
         @foreach($students as $student)
             <div class="border flex flex-col items-center w-3/4 p-6 rounded-md">
                 <x-heroicon-m-user-circle class="w-16" />
-                @php $user = App\Models\User::find($student['student']) @endphp
+                @php $ward = App\Models\User::find($student['student']) @endphp
+                {{ Log::debug('ward - ' . print_r($ward, true)) }}
                 <h2 class="font-semibold">
                     @if (isset($student->firstname))
                         {{ $student->firstname . ' ' . $student->lastname }}
                     @else
-                        {{ $user->firstname . ' ' . $user->lastname }}
+                        {{ $ward->firstname . ' ' . $ward->lastname }}
                     @endif
                 </h2>
-                @if ($user->admission_no)
-                    <p>{{ $user->admission_no ?? $student->admission_no }}</p>
+                @if ($ward->admission_no)
+                    <p>{{ $ward->admission_no ?? $student->admission_no }}</p>
                 @else
-                    <p>{{ $user->admission_no ?? $student->admission_no }}</p>
+                    <p>{{ $ward->admission_no ?? $student->admission_no }}</p>
                 @endif
-                <button type="button" wire:click="removeWard({{$user->id ?? $student->id}})" class="bg-gray-200 h-5 left-0 relative rounded-full text-xs w-5">x</button>
+                <button type="button" wire:click="removeWard({{$ward->id ?? $student->id}})" class="bg-gray-200 h-5 left-0 relative rounded-full text-xs w-5">x</button>
             </div>
         @endforeach
     </div>

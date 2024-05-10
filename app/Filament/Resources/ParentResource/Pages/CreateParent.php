@@ -61,6 +61,14 @@ class CreateParent extends CreateRecord
                             ])
                             ->required()
                         ,
+                        Select::make('title')
+                            ->options([
+                                'mr' => 'Mr',
+                                'mrs' => 'Mrs',
+                                'miss' => 'Miss',
+                                'dr' => 'Dr',
+                                'prof' => 'Prof',
+                            ]),
                         TextInput::make('firstname')
                             ->required(),
                         TextInput::make('lastname')
@@ -114,35 +122,32 @@ class CreateParent extends CreateRecord
                                                 return $link['student'] === $get('student');
                                             });
 
+                                            Log::debug('student is ' . $get('student'));
                                             if (count($unique) === 0) {
+
                                                 array_push($this->parentStudent, array(
-                                                    'student' => $get('student'),
+                                                    'student' =>  $get('student'),
                                                     'relationship' => $get('relationship'),
                                                 ));
                                             }
 
                                             // Set review here first
-                                            $this->review['student'] = $this->parentStudent;
+                                            // $this->review['student'] = $this->parentStudent;
 
                                             // TODO: Figure out how to safely empty the data once it's added
                                             // $set('student', '');
                                             // $set('relationship', '');
-
-                                            Log::debug('Parent-student relationship is ' . print_r($this->parentStudent, true));
                                         })
                                 ),
                             View::make('students')
                                 ->columns(3)
                                 ->view('filament.form.parent-students', ['students' => $this->parentStudent]),
                         ])
-                ])->live(onBlur: true)
-                ->afterStateUpdated(function($operation, $state, Set $set, Get $get) {
-                    $this->review['student'] = $this->parentStudent;
-                }),
+                ])->live(onBlur: true),
             Wizard\Step::make('Review and Confirm')
                 ->schema([
                     View::make('reviews')
-                        ->view('filament.form.parent-review', ['review' => $this->review])
+                        ->view('filament.form.parent-review', ['review' => $this->bioData()])
                 ]),
         ];
     }
@@ -155,6 +160,24 @@ class CreateParent extends CreateRecord
     public function getReviewData()
     {
         return $this->review;
+    }
+
+    public function mergeData()
+    {
+        $data = array_merge(
+            $this->parentStudent,
+            collect($this->record->wards ?? [])->mapWithKeys(fn ($user) => ['student' => $user])->toArray()
+        );
+
+        return $data;
+    }
+
+    public function bioData()
+    {
+        return [
+            'bio' => $this->data ? $this->data : [],
+            'student' => $this->mergeData()
+        ];
     }
 
     public function removeWard($id)

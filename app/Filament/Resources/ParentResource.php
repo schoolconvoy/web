@@ -41,9 +41,11 @@ class ParentResource extends Resource
         return $table
             ->query(User::role(User::$PARENT_ROLE))
             ->columns([
+                TextColumn::make('title'),
                 TextColumn::make('firstname'),
-                TextColumn::make('lastname'),
+                TextColumn::make('lastname')->searchable(),
                 TextColumn::make('phone'),
+                TextColumn::make('email'),
             ])
             ->filters([
 
@@ -64,6 +66,9 @@ class ParentResource extends Resource
     {
         return $infolist
             ->schema([
+                Infolists\Components\TextEntry::make('title')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold),
                 Infolists\Components\TextEntry::make('firstname')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),

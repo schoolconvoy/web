@@ -98,21 +98,19 @@ class EditParent extends EditRecord
                                     return User::studentsDropdown();
                                 })
                                 ->columns(1)
-                                ->searchable()
-                                ->required(),
+                                ->searchable(),
+                            // TODO: Adding a new student while editting is not working!!!
                             Select::make('relationship')
                                 ->options([
                                     'father' => 'Father',
                                     'mother' => 'Mother',
                                     'guardian' => 'Guardian',
                                 ])
-                                ->required()
                                 ->suffixAction(
                                     Action::make('Add link')
                                         ->icon('heroicon-o-user-plus')
                                         ->requiresConfirmation()
                                         ->action(function (Set $set, Get $get, $state) {
-                                            Log::debug('Parent-student relationship is ' . print_r($this->record->wards()->get()->toArray(), true));
 
                                             array_push($this->parentStudent, array(
                                                 'student' => User::find($get('student')),
@@ -136,7 +134,7 @@ class EditParent extends EditRecord
             Wizard\Step::make('Review and Confirm')
                 ->schema([
                     View::make('reviews')
-                        ->view('filament.form.parent-review', ['review' => $this->review])
+                        ->view('filament.form.parent-review', ['review' => $this->bioData()])
                 ]),
         ];
     }
@@ -157,19 +155,45 @@ class EditParent extends EditRecord
 
     public function mergeData()
     {
-        return array_merge(
+        $data = array_merge(
             $this->parentStudent,
-            $this->record->wards()->get()->toArray()->mapWithKeys(fn ($user) => ['student' => $user, 'relationship' => $user->pivot->relationship])
+            collect($this->record->wards)->mapWithKeys(fn ($user) => ['student' => $user])->toArray()
         );
+
+        return $data;
+    }
+
+    public function bioData()
+    {
+        return [
+            'bio' => $this->record->toArray(),
+            'student' => $this->mergeData()
+        ];
     }
 
     public function getParentStudents()
     {
         $parent_relationships = $this->record->meta()->where('key', ParentResource::PARENT_STUDENT_RELATIONSHIP)->get()->pluck('value');
 
-        Log::debug('parent_relationship -- ' . print_r($parent_relationships, true));
-
         return $parent_relationships[0] || [];
     }
 
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
+        unset($data['student']);
+        unset($data['relationship']);
+
+        $this->record->update($data);
+
+        try {
+            foreach($this->parentStudent as $relationship)
+            {
+                $this->record->wards()->attach($relationship['student'], ['relationship' => $relationship['relationship']]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error updating parent-student relationship: ' . $e->getMessage());
+        }
+
+        return $this->record;
+    }
 }
