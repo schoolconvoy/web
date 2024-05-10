@@ -51,9 +51,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static array $ELEMENTARY_SCHOOL_CLASSES = [
         'CRECHE',
         'PRE-SCHOOL ONE',
-        'PRE-SCHOOL TWO',
-        'PRE-SCHOOL THREE',
-        'PRE-SCHOOL FOUR',
+        'PRE-NURSERY',
+        'NURSERY',
+        'RECEPTION',
         'GRADE ONE',
         'GRADE TWO',
         'GRADE THREE',
