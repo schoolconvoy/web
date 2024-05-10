@@ -115,7 +115,8 @@ class CreateStudent extends CreateRecord
             $password = Str::random(8);
             $this->password = $password;
 
-            if (auth()->user()->hasAnyRole([User::$TEACHER_ROLE])) {
+            // TODO: Think of how to handle case of subject teachers who aren't class teachers
+            if (auth()->user()->hasAnyRole([User::$TEACHER_ROLE]) && auth()->user()->teacher_class) {
                 $user->class_id = auth()->user()->teacher_class->id;
             }
 
