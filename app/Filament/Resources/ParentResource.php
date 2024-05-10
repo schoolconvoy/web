@@ -53,9 +53,9 @@ class ParentResource extends Resource
                 Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
-                // Tables\Actions\BulkActionGroup::make([
-                //     Tables\Actions\DeleteBulkAction::make(),
-                // ]),
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ])
             ;
     }
@@ -97,5 +97,15 @@ class ParentResource extends Resource
             'view' => Pages\ViewParent::route('/{record}'),
             'edit' => Pages\EditParent::route('/{record}/edit'),
         ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE,
+            User::$SUPER_ADMIN_ROLE
+        ]);
     }
 }
