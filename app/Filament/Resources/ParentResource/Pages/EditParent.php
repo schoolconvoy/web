@@ -183,7 +183,7 @@ class EditParent extends EditRecord
         unset($data['student']);
         unset($data['relationship']);
 
-        $this->record->update($data);
+        $record->update($data);
 
         try {
             foreach($this->parentStudent as $relationship)
@@ -194,6 +194,6 @@ class EditParent extends EditRecord
             Log::error('Error updating parent-student relationship: ' . $e->getMessage());
         }
 
-        return $this->record;
+        return $record;
     }
 }
