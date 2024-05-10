@@ -291,7 +291,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         })->orWhereHas('roles', function($query) {
             // Allow a principal to view what teachers in that school can view without being assigned to a class
             // TODO: I don't know why but it only works when i compare with a teacher role rather than a principal role
-            $query->where('name', User::$TEACHER_ROLE);
+            $query->whereIn('name', [User::$TEACHER_ROLE, User::$PARENT_ROLE]);
         });
     }
 
@@ -301,7 +301,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             $query->whereIn('name', User::$ELEMENTARY_SCHOOL_CLASSES);
         })->orWhereHas('roles', function($query) {
             // Allow a principal to view what teachers in that school can view without being assigned to a class
-            $query->where('name', User::$TEACHER_ROLE);
+            $query->whereIn('name', [User::$TEACHER_ROLE, User::$PARENT_ROLE]);
         });
     }
 
