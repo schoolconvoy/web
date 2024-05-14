@@ -336,4 +336,27 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         return $this->hasOne(Classes::class, 'teacher', 'id');
     }
+
+    public static function generateAdmissionNo()
+    {
+        $admission_no = 'ITGA-' . User::withoutGlobalScopes()->role(self::$STUDENT_ROLE)->count() + 10000;
+
+        return $admission_no;
+    }
+
+    public static function getUserLevel()
+    {
+        $isHighSchool = auth()->user()->isHighSchool();
+
+        if ($isHighSchool) {
+            return Level::where('order', '>', 12)->pluck('name', 'id')->toArray();
+        }
+
+        return Level::where('order', '<', 12)->pluck('name', 'id')->toArray();
+    }
+
+    public function entry_class()
+    {
+        return $this->belongsTo(Level::class, 'class_at_entry', 'id');
+    }
 }

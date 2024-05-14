@@ -2,9 +2,6 @@
 
 namespace App\Filament\Resources\StudentResource\Pages;
 
-use App\Events\CreatedUser;
-use App\Events\StudentCreatedEvent;
-use App\Events\StudentIsLate;
 use App\Filament\Resources\StudentResource;
 use App\Models\User;
 use App\Models\UserMeta;
@@ -27,108 +24,46 @@ use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Level;
+use Filament\Forms\Components\Actions\Action;
 
 class CreateStudent extends CreateRecord
 {
-    use CreateRecord\Concerns\HasWizard;
-
     protected static string $resource = StudentResource::class;
+
+    public static bool $hasInlineLabels = true;
     public array $review = [];
     public string $password = '';
 
-    protected function getSteps(): array
-    {
-        return [
-            Wizard\Step::make('Bio data')
-                ->icon('heroicon-s-user-circle')
-                ->description('Some description')
-                ->schema([
-                    Grid::make([
-                            'sm' => 2,
-                            'xl' => 2,
-                            '2xl' => 2,
-                        ])
-                        ->schema([
-                            FileUpload::make('picture')
-                                ->label('Upload a picture')
-                                ->avatar()
-                                ->inlineLabel()
-                                ->columns()
-                                ->maxFiles(1)
-                                ->image(),
-                            Radio::make('gender')
-                                ->options([
-                                    'Male' => 'Male',
-                                    'Female' => 'Female'
-                                ])
-                                ->required()
-                            ,
-                            TextInput::make('firstname')
-                                ->required(),
-                            TextInput::make('lastname')
-                                ->required(),
-                            TextInput::make('email')
-                                ->unique()
-                                ->email(),
-                            TextInput::make('phone')
-                                ->tel()
-                            ,
-                            DatePicker::make('dob')
-                                ->label('Date of birth')
-                                ->required()
-                                ->columns(),
-                            TextInput::make('height')
-                                ->label('Height'),
-                            TextInput::make('weight')
-                                ->label('Weight'),
-                            Textarea::make('address')
-                                ->required()
-                                ->maxLength(200)
-                         ])
-                         ,
-                ])->live(onBlur: true, debounce: 500)
-                ->afterStateUpdated(function ($state) {
-                    $this->review['bio'] = $state;
-                }),
-            Wizard\Step::make('Confirm details')
-                        ->schema([
-                            View::make('reviews')
-                                ->view('filament.form.student-review', ['review' => $this->review])
-                        ]),
-        ];
-    }
-
     protected function handleRecordCreation(array $data): Model
     {
-        Log::debug('data to be saved: ' . print_r($data, true));
-
         try {
+            $class_assigned = $data['class_assigned'] ?? null;
+            $data['admission_no'] = $data['admission_no'] ?? User::generateAdmissionNo();
+
+            // Set the password
+            $password = Str::random(8);
+            $this->password = $password;
+            $data['password'] = Hash::make($this->password);
+
+            unset($data['class_assigned']);
+
             $user = static::getModel()::create($data);
 
             // Automatically assign the student role
             $user->assignRole(User::$STUDENT_ROLE);
 
-            $admission_no = 'ITGA-' . static::getModel()::count() + 10000;
+            Log::debug("Class assigned " . $class_assigned);
 
-            $user->admission_no = $admission_no;
-
-            $password = Str::random(8);
-            $this->password = $password;
-
-            // TODO: Think of how to handle case of subject teachers who aren't class teachers
-            if (auth()->user()->hasAnyRole([User::$TEACHER_ROLE]) && auth()->user()->teacher_class) {
+            // Set the class
+            if (is_null($class_assigned) && auth()->user()->hasAnyRole([User::$TEACHER_ROLE]) && auth()->user()->teacher_class) {
                 $user->class_id = auth()->user()->teacher_class->id;
+            } else {
+                $user->class_id = $class_assigned;
             }
 
-            $data['password'] = Hash::make($this->password);
-            $user->password = $data['password'];
-
             $user->save();
-
-            Log::debug('Successfully saved student: ' . print_r($user, true));
-
         } catch (\Throwable $th) {
-            Log::debug('An error has occurred when saving user ' . print_r($th, true));
             throw $th;
         }
 

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PublicController;
 use Illuminate\Support\Facades\Cache;
 
 /*
@@ -35,3 +36,8 @@ Route::get('/wards/{id}', function (Request $request) {
 
 Route::get('/pay', [PaymentController::class, 'redirectToGateway'])->name('pay');
 Route::get('/payment/callback', [PaymentController::class, 'handleGatewayCallback']);
+
+/**
+ * Public routes
+ */
+Route::get('/admission', [PublicController::class, 'index'])->name('admission.index');

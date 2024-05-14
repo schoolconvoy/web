@@ -6,14 +6,20 @@
     <div class="flex gap-3 items-center py-3">
         <div class="flex flex-row gap-x-2.5">
             <x-heroicon-m-users class="h-5" />
-            <h1 class="text-sm font-bold text-gray-800">
+            <h1 title="Admission number" class="text-sm font-bold text-gray-800">
                 {{ $record->admission_no }}
             </h1>
         </div>
         <div class="flex flex-row gap-x-2.5">
             <x-heroicon-s-academic-cap class="h-5" />
-            <h1 class="text-sm font-bold text-gray-800">
+            <h1 title="Class" class="text-sm font-bold text-gray-800">
                 {{ $record->class->name ?? '' }}
+            </h1>
+        </div>
+        <div class="flex flex-row gap-x-2.5">
+            <x-heroicon-c-calendar-days class="h-5" />
+            <h1 title="Year of entry" class="text-sm font-bold text-gray-800">
+                {{ $record->year_of_entry ?? '' }}
             </h1>
         </div>
     </div>
