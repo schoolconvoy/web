@@ -11,7 +11,7 @@ use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentView;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Blade;
-
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -44,5 +44,10 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Model::unguard();
+
+
+        Gate::define('viewPulse', function (User $user) {
+            return $user->isSuperAdmin();
+        });
     }
 }
