@@ -349,7 +349,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         $isHighSchool = auth()->user()->isHighSchool();
 
         if ($isHighSchool) {
-            return Level::where('order', '>', 12)->pluck('name', 'id')->toArray();
+            return Level::where('order', '>=', 12)->pluck('name', 'id')->toArray();
         }
 
         return Level::where('order', '<', 12)->pluck('name', 'id')->toArray();
