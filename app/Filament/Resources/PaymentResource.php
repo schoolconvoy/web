@@ -32,7 +32,7 @@ class PaymentResource extends Resource
     {
         return $form
             ->schema([
-                //
+                // You can't create a manual payment since only online payment is accepted
             ]);
     }
 
@@ -46,11 +46,18 @@ class PaymentResource extends Resource
                             ->numeric()
                             ->money('NGN')
                             ->sortable(),
+                TextColumn::make('student.fullname')
+                            ->label('Paid by'),
+                TextColumn::make('student.class.name')
+                            ->sortable()
+                            ->label('Class'),
                 TextColumn::make('type'),
                 TextColumn::make('fees.category.name')
                             ->sortable(),
                 TextColumn::make('provider'),
-                TextColumn::make('created_at')->label('Date'),
+                TextColumn::make('created_at')
+                            ->dateTime('Y-m-d h:i A')
+                            ->label('Date'),
             ])
             ->filters([
                 SelectFilter::make('category')
@@ -92,6 +99,14 @@ class PaymentResource extends Resource
                 Infolists\Components\TextEntry::make('type')
                     ->size(TextEntry\TextEntrySize::Large)
                     ->weight(FontWeight::Bold),
+                Infolists\Components\TextEntry::make('student.fullname')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold)
+                    ->label('Paid by'),
+                Infolists\Components\TextEntry::make('student.class.name')
+                    ->size(TextEntry\TextEntrySize::Large)
+                    ->weight(FontWeight::Bold)
+                    ->label('Class')
         ]);
     }
 
@@ -106,7 +121,7 @@ class PaymentResource extends Resource
     {
         return [
             'index' => Pages\ListPayments::route('/'),
-            'create' => Pages\CreatePayment::route('/create'),
+            // 'create' => Pages\CreatePayment::route('/create'),
             'edit' => Pages\EditPayment::route('/{record}/edit'),
             'view' => Pages\ViewPayment::route('/{record}'),
         ];

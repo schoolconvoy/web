@@ -57,7 +57,7 @@ class IncomeStatsOverview extends BaseWidget
                         ->perMonth()
                         ->sum('amount');
 
-        $paid = Payment::where('paid', 1);
+        $paid = Fee::whereHas('payments');
         $paid = Trend::query($paid)
                         ->between(
                             start: now()->subYear(),

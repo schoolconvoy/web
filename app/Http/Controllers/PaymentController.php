@@ -35,7 +35,11 @@ class PaymentController extends Controller
                 return Redirect::back()->with('message', ['msg'=>'No amount due', 'type'=>'error']);
             }
 
-            $total = $amount * 100;
+            // Convert to kobo and add paystack charges (1.5% + 100 naira)
+            $charges = ((1.5 / 100) * $amount) + 100;
+            $total = (($amount + $charges) * 100);
+
+            Log::debug("Total amount to pay: " . print_r($total, true) . " base fee " . $amount);
 
             $ref = "ITGA-PAYMENT-" . Payment::count() + 1000 . "-"  . rand(1000, 9000);
 
@@ -72,7 +76,7 @@ class PaymentController extends Controller
         $wardId = Cache::get('ward', 0);
         $ward = User::find($wardId);
 
-        $fees = $ward->class->fees;
+        $fees = $ward->fees;
 
         // Create a new invoice
         $payment = Payment::create([
@@ -80,7 +84,8 @@ class PaymentController extends Controller
             'paid' => $paymentDetails['status'],
             'feedback' => $paymentDetails['message'],
             'type' => $paymentDetails['data']['channel'],
-            'provider' => 'paystack'
+            'provider' => 'paystack',
+            'student_id' => $ward->id,
         ]);
 
         $payment->fees()->saveMany($fees);
