@@ -177,6 +177,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                 User::$HIGH_PRINCIPAL_ROLE,
                 User::$ELEM_PRINCIPAL_ROLE,
                 User::$RECEPTIONIST_ROLE,
+                User::$ACCOUNTANT_ROLE,
             ]);
         }
         else if ($panel->getId() === 'parent')

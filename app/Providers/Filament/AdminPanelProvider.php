@@ -26,7 +26,6 @@ use Althinect\FilamentSpatieRolesPermissions\FilamentSpatieRolesPermissionsPlugi
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\ParentDashboard;
 use App\Filament\Resources\ClassResource;
-use App\Filament\Resources\ClassResource\Pages\MyClass;
 use App\Filament\Resources\FeeResource\Widgets\IncomeChart;
 use App\Filament\Resources\FeeResource\Widgets\IncomeStatsOverview;
 use App\Filament\Student\Resources\StudentResource\Widgets\PopulationStatsOverview;
