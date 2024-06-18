@@ -20,3 +20,4 @@ yarn-error.log
 /draft.yaml
 /.blueprint
 worker*
+.htaccess
