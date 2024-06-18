@@ -32,6 +32,9 @@ class FeeResource extends FeeBase
                             ->numeric(2)
                             ->money('NGN'),
                 TextColumn::make('category.name'),
+                TextColumn::make('students_count')
+                                ->counts('students')
+                                ->label('Students'),
 
             ])
             // Group summary is wrong at the moment
