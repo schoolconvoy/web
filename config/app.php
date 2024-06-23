@@ -171,6 +171,7 @@ return [
         App\Providers\Filament\ParentPanelProvider::class,
         App\Providers\Filament\StudentPanelProvider::class,
         App\Providers\RouteServiceProvider::class,
+        // App\Providers\TelescopeServiceProvider::class,
         Unicodeveloper\Paystack\PaystackServiceProvider::class,
     ])->toArray(),
 

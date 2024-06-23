@@ -24,7 +24,9 @@ class WardSwitcher extends Component
 
         if (!Cache::has('ward'))
         {
-            Cache::put('ward', $children[0]->id);
+            if ($children->count() > 0) {
+                Cache::put('ward', $children[0]->id);
+            }
         }
 
         $this->wards = $children;

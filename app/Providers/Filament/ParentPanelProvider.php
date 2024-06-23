@@ -50,12 +50,15 @@ class ParentPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('Newsletter')
                     ->url('#')
+                    ->sort(10)
                     ->icon('heroicon-o-newspaper'),
                 NavigationItem::make('Results')
                     ->url('#')
+                    ->sort(10)
                     ->icon('heroicon-c-table-cells'),
                 NavigationItem::make('Academic Calendar')
                     ->url('#')
+                    ->sort(10)
                     ->icon('heroicon-m-calendar-days')
             ])->middleware([
                 EncryptCookies::class,

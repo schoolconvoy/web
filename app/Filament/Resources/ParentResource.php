@@ -44,6 +44,10 @@ class ParentResource extends Resource
                 TextColumn::make('title'),
                 TextColumn::make('firstname'),
                 TextColumn::make('lastname')->searchable(),
+                TextColumn::make('wards_count')
+                            ->sortable()
+                            ->counts('wards')
+                            ->label('Wards'),
                 TextColumn::make('phone'),
                 TextColumn::make('email'),
             ])
