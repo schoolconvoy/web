@@ -180,10 +180,12 @@ class StudentResource extends Resource
                 TextColumn::make('firstname')
                     ->searchable(),
                 TextColumn::make('lastname')
+                    ->sortable()
                     ->searchable(),
                 TextColumn::make('dob')
                     ->dateTime('Y-m-d'),
                 TextColumn::make('gender')
+                    ->sortable(),
             ])
             ->filters([
                 // filter by class

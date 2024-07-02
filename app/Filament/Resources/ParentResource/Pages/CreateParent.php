@@ -203,7 +203,9 @@ class CreateParent extends CreateRecord
 
         foreach($this->parentStudent as $relationship)
         {
-            $parent->wards()->attach($relationship['student'], ['relationship' => $relationship['relationship']]);
+            $parent->wards()->attach($relationship['student'], [
+                'relationship' => $relationship['relationship']
+            ]);
         }
 
         // Automatically assign the student role

@@ -41,9 +41,16 @@ class ParentResource extends Resource
         return $table
             ->query(User::role(User::$PARENT_ROLE))
             ->columns([
-                TextColumn::make('title'),
+                TextColumn::make('title')
+                            ->sortable(),
                 TextColumn::make('firstname'),
-                TextColumn::make('lastname')->searchable(),
+                TextColumn::make('lastname')
+                            ->sortable()
+                            ->searchable(),
+                TextColumn::make('wards_count')
+                            ->sortable()
+                            ->counts('wards')
+                            ->label('Wards'),
                 TextColumn::make('phone'),
                 TextColumn::make('email'),
             ])
