@@ -35,11 +35,11 @@ class Admission extends Component implements HasForms
 
     private function getUserLevel()
     {
-        $isHighSchool = auth()->user()->isHighSchool();
+        // $isHighSchool = auth()->user()->isHighSchool();
 
-        if ($isHighSchool) {
-            return Level::where('order', '>', 12)->pluck('name', 'id')->toArray();
-        }
+        // if ($isHighSchool) {
+        //     return Level::where('order', '>', 12)->pluck('name', 'id')->toArray();
+        // }
 
         return Level::where('order', '<', 12)->pluck('name', 'id')->toArray();
     }
