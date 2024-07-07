@@ -9,11 +9,18 @@ use Filament\Resources\Pages\EditRecord;
 class EditAdmission extends EditRecord
 {
     protected static string $resource = AdmissionResource::class;
+    public static bool $hasInlineLabels = true;
+    public array $review = [];
 
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
+            Actions\ForceDeleteAction::make(),
+            Actions\RestoreAction::make(),
         ];
     }
+    
+
 }

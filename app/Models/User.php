@@ -110,7 +110,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         // return $this->role(self::$STUDENT_ROLE)->get();
 
         return $this->belongsToMany(User::class, 'user_student', 'user_id', 'student_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     public function class()
@@ -121,8 +121,8 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static function studentsDropdown()
     {
         return self::role(self::$STUDENT_ROLE)
-                    ->get()
-                    ->mapWithKeys(fn($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
+            ->get()
+            ->mapWithKeys(fn ($user) => [$user->id => $user->firstname . ' ' . $user->lastname]);
     }
 
     public function getFullNameAttribute()
@@ -179,17 +179,13 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                 User::$RECEPTIONIST_ROLE,
                 User::$ACCOUNTANT_ROLE,
             ]);
-        }
-        else if ($panel->getId() === 'parent')
-        {
+        } else if ($panel->getId() === 'parent') {
             return $this->hasAnyRole([
                 User::$PARENT_ROLE,
                 User::$SUPER_ADMIN_ROLE,
                 User::$ADMIN_ROLE,
             ]);
-        }
-        else if ($panel->getId() === 'student')
-        {
+        } else if ($panel->getId() === 'student') {
             return $this->hasAnyRole([
                 User::$STUDENT_ROLE,
                 User::$SUPER_ADMIN_ROLE,
@@ -223,15 +219,15 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function wards()
     {
         return $this->belongsToMany(User::class, 'ward_parent', 'parent_id', 'ward_id', 'id', 'id')
-                    ->withPivot(['relationship', 'created_at', 'updated_at'])
-                    ->withTimestamps();
+            ->withPivot(['relationship', 'created_at', 'updated_at'])
+            ->withTimestamps();
     }
 
     public function parent()
     {
         return $this->belongsToMany(User::class, 'ward_parent', 'ward_id', 'parent_id', 'id', 'id')
-                    ->withPivot(['relationship', 'created_at', 'updated_at'])
-                    ->withTimestamps();
+            ->withPivot(['relationship', 'created_at', 'updated_at'])
+            ->withTimestamps();
     }
 
     public function sendWelcomeNotification($email)
@@ -243,25 +239,20 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         try {
 
             if ($user->hasAnyRole(
-                    [
-                        User::$ADMIN_ROLE,
-                        User::$SUPER_ADMIN_ROLE,
-                        User::$TEACHER_ROLE,
-                        User::$HIGH_PRINCIPAL_ROLE,
-                        User::$ELEM_PRINCIPAL_ROLE,
-                        User::$RECEPTIONIST_ROLE,
-                        User::$ACCOUNTANT_ROLE
-                    ]
-                ))
-            {
+                [
+                    User::$ADMIN_ROLE,
+                    User::$SUPER_ADMIN_ROLE,
+                    User::$TEACHER_ROLE,
+                    User::$HIGH_PRINCIPAL_ROLE,
+                    User::$ELEM_PRINCIPAL_ROLE,
+                    User::$RECEPTIONIST_ROLE,
+                    User::$ACCOUNTANT_ROLE
+                ]
+            )) {
                 Filament::setCurrentPanel(Filament::getPanel('admin'));
-            }
-            else if ($user->hasAnyRole([User::$PARENT_ROLE]))
-            {
+            } else if ($user->hasAnyRole([User::$PARENT_ROLE])) {
                 Filament::setCurrentPanel(Filament::getPanel('parent'));
-            }
-            else if ($user->hasAnyRole([User::$STUDENT_ROLE]))
-            {
+            } else if ($user->hasAnyRole([User::$STUDENT_ROLE])) {
                 Filament::setCurrentPanel(Filament::getPanel('student'));
             }
 
@@ -289,7 +280,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         $query->whereHas('class', function ($query) {
             $query->whereIn('name', User::$HIGH_SCHOOL_CLASSES);
-        })->orWhereHas('roles', function($query) {
+        })->orWhereHas('roles', function ($query) {
             // Allow a principal to view what teachers in that school can view without being assigned to a class
             // TODO: I don't know why but it only works when i compare with a teacher role rather than a principal role
             $query->whereIn('name', [User::$TEACHER_ROLE, User::$PARENT_ROLE]);
@@ -300,7 +291,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         $query->whereHas('class', function ($query) {
             $query->whereIn('name', User::$ELEMENTARY_SCHOOL_CLASSES);
-        })->orWhereHas('roles', function($query) {
+        })->orWhereHas('roles', function ($query) {
             // Allow a principal to view what teachers in that school can view without being assigned to a class
             $query->whereIn('name', [User::$TEACHER_ROLE, User::$PARENT_ROLE]);
         });
@@ -310,23 +301,19 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         $role = $this->roles[0]->name;
 
-        if ($role === User::$TEACHER_ROLE && $this->teacher_class)
-        {
+        if ($role === User::$TEACHER_ROLE && $this->teacher_class) {
             return in_array($this->teacher_class->name, User::$HIGH_SCHOOL_CLASSES);
         }
 
-        if($role === User::$ELEM_PRINCIPAL_ROLE)
-        {
+        if ($role === User::$ELEM_PRINCIPAL_ROLE) {
             return false;
         }
 
-        if ($role === User::$HIGH_PRINCIPAL_ROLE)
-        {
+        if ($role === User::$HIGH_PRINCIPAL_ROLE) {
             return true;
         }
 
-        if ($this->class)
-        {
+        if ($this->class) {
             return in_array($this->class->name, User::$HIGH_SCHOOL_CLASSES);
         }
 
@@ -338,10 +325,13 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->hasOne(Classes::class, 'teacher', 'id');
     }
 
-    public static function generateAdmissionNo()
+    public static function generateAdmissionNo($addNUmber = 1)
     {
-        $admission_no = 'ITGA-' . User::withoutGlobalScopes()->role(self::$STUDENT_ROLE)->count() + 10000;
-
+        $admission_no = 'ITGA-' . User::withoutGlobalScopes()->role(self::$STUDENT_ROLE)->count() + 10000 + $addNUmber;
+        $user = User::where('admission_no', $admission_no)->first();
+        if ($user) {
+            return self::generateAdmissionNo(++$addNUmber);
+        }
         return $admission_no;
     }
 

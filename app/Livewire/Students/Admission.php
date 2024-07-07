@@ -21,12 +21,21 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Facades\Log;
 use App\Models\Level;
+use Filament\Forms\Get;
+use App\Trait\UserTrait;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Toggle;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class Admission extends Component implements HasForms
 {
     use InteractsWithForms;
+    use UserTrait;
 
     public ?array $data = [];
+    private $password;
 
     public function mount(): void
     {
@@ -44,144 +53,193 @@ class Admission extends Component implements HasForms
         return Level::where('order', '<', 12)->pluck('name', 'id')->toArray();
     }
 
-    public function form(Form $form): Form
+    public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Wizard::make([
-                    Step::make('Bio data')
-                    ->icon('heroicon-s-user-circle')
-                    ->description('Add basic information about student here')
-                    ->schema([
-                        Grid::make([
+                    Step::make('Student Information')
+                        ->icon('heroicon-s-user-circle')
+                        ->description('Add basic Student information')
+                        ->schema([
+                            Grid::make([
                                 'sm' => 2,
                                 'xl' => 2,
                                 '2xl' => 2,
                             ])
-                            ->schema([
-                                FileUpload::make('picture')
-                                    ->label('Upload a picture')
-                                    ->avatar()
-                                    ->inlineLabel()
-                                    ->columns()
-                                    ->maxFiles(1)
-                                    ->image(),
-                                Radio::make('gender')
-                                    ->options([
-                                        'Male' => 'Male',
-                                        'Female' => 'Female'
-                                    ])
-                                    ->required()
-                                ,
-                                TextInput::make('firstname')
-                                    ->required(),
-                                TextInput::make('middle name'),
-                                TextInput::make('lastname')
-                                    ->required(),
-                                TextInput::make('email')
-                                    ->unique()
-                                    ->email(),
-                                TextInput::make('phone')
-                                    ->tel()
-                                ,
-                                DatePicker::make('dob')
-                                    ->label('Date of birth')
-                                    ->required()
-                                    ->columns(),
-                                Select::make('class_assigned')
-                                    ->label('Assign class')
-                                    ->options(
-                                        $this->getUserLevel()
-                                    )
-                                    ->nullable(),
-                                TextInput::make('height')
-                                    ->label('Height'),
-                                TextInput::make('weight')
-                                    ->label('Weight'),
-                                Textarea::make('address')
-                                    ->required()
-                                    ->maxLength(200)
-                            ]),
-                    ]),
-                    Step::make('Add guardian/parent')
-                    ->icon('heroicon-s-user-circle')
-                    ->description('Add parent information')
-                    ->schema([
-                        Grid::make([
-                                'sm' => 2,
-                                'xl' => 2,
-                                '2xl' => 2,
-                            ])
-                            ->schema([
-                                FileUpload::make('parent_picture')
-                                    ->label('Upload a picture')
-                                    ->avatar()
-                                    ->inlineLabel()
-                                    ->columns()
-                                    ->image(),
-                                Radio::make('parent_gender')
-                                    ->options([
-                                        'male' => 'Male',
-                                        'female' => 'Female'
-                                    ])
-                                    ->required()
-                                ,
-                                Select::make('parent_title')
-                                    ->options([
-                                        'mr' => 'Mr',
-                                        'mrs' => 'Mrs',
-                                        'miss' => 'Miss',
-                                        'dr' => 'Dr',
-                                        'prof' => 'Prof',
-                                    ]),
-                                TextInput::make('parent.firstname')
-                                    ->required(),
-                                TextInput::make('parent_lastname')
-                                    ->required(),
-                                TextInput::make('parent_email')
-                                ->required()
-                                ->unique('users', 'email')
-                                    ->email(),
-                                TextInput::make('parent_phone')
-                                    ->required()
-                                    ->tel(),
-                                Textarea::make('parent_address')
+                                ->schema([
+                                    FileUpload::make('picture')
+                                        ->label('Upload a picture')
+                                        ->avatar()
+                                        ->inlineLabel()
+                                        ->columns()
+                                        ->maxFiles(1)
+                                        ->image(),
+                                    Radio::make('gender')
+                                        ->options([
+                                            'male' => 'Male',
+                                            'female' => 'Female'
+                                        ])
+                                        ->required(),
+                                    TextInput::make('firstname')
+                                        ->required(),
+                                    TextInput::make('middle_name'),
+                                    TextInput::make('lastname')
+                                        ->required(),
+                                    TextInput::make('email')
+                                        ->unique(ignoreRecord: true)
+                                        ->email(),
+                                    TextInput::make('phone')
+                                        ->tel(),
+                                    DatePicker::make('dob')
+                                        ->label('Date of birth')
                                         ->required()
-                                        ->maxLength(200),
-                                TextInput::make('parent_lga')
-                                    ->required()
-                                    ->tel(),
-                                TextInput::make('parent_state')
-                                    ->required()
-                                    ->tel(),
+                                        ->columns(),
+                                    Select::make('class_at_entry')
+                                        ->label('Assign class')
+                                        ->options(
+                                            UserTrait::getUserLevel()
+                                        )
+                                        ->nullable(),
+                                    TextInput::make('height')
+                                        ->label('Height')->numeric(),
+                                    TextInput::make('weight')
+                                        ->label('Weight')->numeric(),
+                                    Textarea::make('address'),
+                                ])
+                        ]),
+
+                    Step::make('Add Guardian/Parent')
+                        ->icon('heroicon-s-user-circle')
+                        ->description('Add Parent information')
+                        ->schema([
+                            Grid::make([
+                                'sm' => 2,
+                                'xl' => 2,
+                                '2xl' => 2,
                             ])
-                    ]),
+                                ->schema([
+                                    Toggle::make('existing_parent')
+                                        ->onIcon('heroicon-m-bolt')
+                                        ->offIcon('heroicon-m-user')
+                                        ->required()
+                                        ->label('An exsisting Parent')
+                                        ->live()
+                                        ->default(false),
+                                    Section::make('Parent')
+                                        ->description('Provide Email of existing Parent')
+                                        ->schema([
+                                            TextInput::make('parent_email')
+                                                ->required()
+                                                ->exists('users', 'email')
+                                                ->email(),
+                                            Select::make('parent_relationship')
+                                                ->options([
+                                                    'father' => 'Father',
+                                                    'mother' => 'Mother',
+                                                    'guardian' => 'Guardian',
+                                                ])
+                                        ])
+                                        ->hidden((fn (Get $get): bool => !$get('existing_parent'))),
+                                    Section::make('Add Guardian/Parent')
+                                        ->description('Add Parent information')
+                                        ->schema([
+                                            Grid::make([
+                                                'sm' => 2,
+                                                'xl' => 2,
+                                                '2xl' => 2,
+                                            ])->schema([
+                                                FileUpload::make('parent_picture')
+                                                    ->label('Upload a picture')
+                                                    ->avatar()
+                                                    ->inlineLabel()
+                                                    ->columns()
+                                                    ->image(),
+                                                Radio::make('parent_gender')
+                                                    ->options([
+                                                        'male' => 'Male',
+                                                        'female' => 'Female'
+                                                    ])
+                                                    ->required(),
+                                                Select::make('parent_title')
+                                                    ->options([
+                                                        'mr' => 'Mr',
+                                                        'mrs' => 'Mrs',
+                                                        'miss' => 'Miss',
+                                                        'dr' => 'Dr',
+                                                        'prof' => 'Prof',
+                                                    ]),
+
+                                                TextInput::make('parent_firstname')
+                                                    ->required(),
+                                                TextInput::make('parent_lastname')
+                                                    ->required(),
+                                                TextInput::make('parent_email')
+                                                    ->required()
+                                                    ->unique('users', 'email')
+                                                    ->email(),
+                                                TextInput::make('parent_phone')
+                                                    ->required()
+                                                    ->tel(),
+                                                Select::make('parent_relationship')
+                                                    ->options([
+                                                        'father' => 'Father',
+                                                        'mother' => 'Mother',
+                                                        'guardian' => 'Guardian',
+                                                    ]),
+                                                Textarea::make('parent_address')
+                                                    ->required()
+                                                    ->maxLength(200),
+                                                TextInput::make('parent_lga')
+                                                    ->required(),
+                                                TextInput::make('parent_state')
+                                                    ->required(),
+
+                                            ])
+                                        ])->hidden(fn (Get $get): bool => $get('existing_parent'))
+
+
+                                ])
+                        ]),
                 ])
-                ->persistStepInQueryString()
-                ->submitAction(
-                    new HtmlString(Blade::render(<<<BLADE
-                        <x-filament::button
-                            type="submit"
-                            size="sm"
-                        >
-                            Submit
-                        </x-filament::button>
-                    BLADE))
-                ),
+                    ->persistStepInQueryString()
+                    ->submitAction(
+                        new HtmlString(Blade::render(<<<BLADE
+                                        <x-filament::button
+                                            type="submit"
+                                            size="sm"
+                                        >
+                                            Submit
+                                        </x-filament::button>
+                                    BLADE))
+                    ),
             ])
             ->statePath('data')
             ->model(User::class);
     }
 
-    public function create(): void
+
+    public function create(): Model
     {
         $data = $this->form->getState();
 
-        Log::debug("Data: " . json_encode($data));
+        $studentAndParent = $this->convertParentAndStudentToDualArray($data);
 
-        $record = User::create($data);
+        $this->password = Str::random(8);
+        $studentAndParent['student']['password'] = Hash::make($this->password);
+        $student = $this->createStudent($studentAndParent['student']);
 
-        $this->form->model($record)->saveRelationships();
+        if ($studentAndParent['existing_parent']) {
+            $this->updateParent($studentAndParent['parent'], $student->id);
+            //handle existing parent
+            //update parent_ward table
+        } else {
+            $this->createParent($studentAndParent['parent'], $student->id);
+            //handle parent
+        }
+
+
+        return $student;
     }
 
     public function render(): View

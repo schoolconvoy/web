@@ -196,6 +196,7 @@ class CreateParent extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        dd($data, $this->parentStudent);
         unset($data['student']);
         unset($data['relationship']);
 
@@ -208,7 +209,7 @@ class CreateParent extends CreateRecord
             ]);
         }
 
-        // Automatically assign the student role
+        // Automatically assign the parent role
         $parent->assignRole(User::$PARENT_ROLE);
 
         $parent_no = 'ITGA-PARENT-' . static::getModel()::count() + 10000;
