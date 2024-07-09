@@ -17,6 +17,7 @@ class UserObserver
     {
         // This implies that the "User" is added to the school of the
         // user creating their account
+
         if (auth()->check()) {
             $user->school()->associate(auth()->user()->school);
         }
@@ -28,7 +29,7 @@ class UserObserver
     public function created(User $user): void
     {
         // Dispatch event
-        CreatedUser::dispatch($user);
+        // CreatedUser::dispatch($user);
     }
 
     /**

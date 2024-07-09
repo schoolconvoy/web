@@ -167,31 +167,7 @@ class Admission extends Component implements HasForms
             ])
             ->statePath('data')
             ->model(User::class);
-    }
-    public function extractParentInfo(array $data)
-    {
-        // Filter out elements that start with "parent_"
-        $parentData = array_filter($data, function ($key) {
-            return strpos($key, 'parent_') === 0;
-        }, ARRAY_FILTER_USE_KEY);
-
-        // Remove parent elements from the original array
-        $remainingData = array_diff_key($data, $parentData);
-
-        // Remove the "parent_" prefix from the keys in the parentData array
-        $parentData = array_combine(
-            array_map(function ($key) {
-                return substr($key, 7); // Remove the first 7 characters ("parent_")
-            }, array_keys($parentData)),
-            $parentData
-        );
-        $parentData['school_id'] = 1; //this is a default available school
-        $remainingData['school_id'] = 1;
-        return [
-            'parent' => $parentData,
-            'student' => $remainingData
-        ];
-    }
+    } 
 
     public function create(): void
     {
@@ -200,10 +176,11 @@ class Admission extends Component implements HasForms
         $parentAndStudent = $this->convertParentAndStudentToDualArray($data);
         // $parent = $this->parentHandler(($parentAndStudent['parent']));
         $student = $this->studentHandler(($parentAndStudent['student']));
+        $student = $this->parentHandler(($parentAndStudent['student']));
     }
     public function parentHandler($data)
     {
-        $parent = $this->createStudent($data);
+        $parent = $this->createParent($data);
     }
     public function studentHandler($data)
     {

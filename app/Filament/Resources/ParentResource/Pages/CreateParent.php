@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ParentResource\Pages;
 
+use App\Events\CreatedUser;
 use App\Events\ParentCreated;
 use App\Filament\Resources\ParentResource;
 use App\Filament\Resources\StudentResource;
@@ -196,7 +197,7 @@ class CreateParent extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        dd($data, $this->parentStudent);
+
         unset($data['student']);
         unset($data['relationship']);
 
@@ -226,7 +227,7 @@ class CreateParent extends CreateRecord
         $parent->save();
 
         // Dispatch event
-        ParentCreated::dispatch($parent);
+        CreatedUser::dispatch($parent);
 
         return $parent;
     }

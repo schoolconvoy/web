@@ -237,6 +237,7 @@ class Admission extends Component implements HasForms
             $this->createParent($studentAndParent['parent'], $student->id);
             //handle parent
         }
+        
 
 
         return $student;

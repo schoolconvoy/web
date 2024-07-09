@@ -2,6 +2,7 @@
 
 namespace App\Trait;
 
+use App\Events\CreatedUser;
 use App\Events\ParentCreated;
 use App\Models\Level;
 use App\Models\User;
@@ -32,7 +33,6 @@ trait UserTrait
 
         $parent_password = Str::random(8);
         $parentData['password'] = Hash::make($parent_password);
-
         $parent = User::create($parentData);
 
         $parent->assignRole(User::$PARENT_ROLE);
@@ -41,15 +41,8 @@ trait UserTrait
         $parent->wards()->attach($student_id, [
             'relationship' => $relationship
         ]);
-        Notification::make()
-            ->title('Parent created successfully! Their temporary password is ' . $parent_password)
-            ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
-            ->persistent()
-            ->success()
-            ->send();
-
         // Dispatch event
-        ParentCreated::dispatch($parent);
+        CreatedUser::dispatch($parent);
         return $parent;
     }
     public function createStudent($studentData)
@@ -60,12 +53,7 @@ trait UserTrait
 
         $student->assignRole(User::$STUDENT_ROLE);
         $student->save();
-        Notification::make()
-            ->title('Student created successfully! Their temporary password is ' . $student_password)
-            ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
-            ->persistent()
-            ->success()
-            ->send();
+        CreatedUser::dispatch($student);
         return $student;
     }
     public function convertParentAndStudentToDualArray(array $data)

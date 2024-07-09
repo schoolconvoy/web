@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\AdmissionResource\Pages; 
+use App\Filament\Resources\AdmissionResource\Pages;
 use App\Models\User;
-use App\Trait\UserTrait; 
+use App\Trait\UserTrait;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -16,7 +16,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Wizard;
 use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Concerns\InteractsWithForms; 
+use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Infolists\Components\TextEntry;
@@ -26,8 +26,8 @@ use Filament\Resources\Resource;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Table; 
-use Illuminate\Support\Facades\Blade; 
+use Filament\Tables\Table;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 
 class AdmissionResource extends Resource
@@ -219,13 +219,14 @@ class AdmissionResource extends Resource
                 User::role(User::$STUDENT_ROLE)->whereNull('admission_date')
             )
             ->columns([
-                TextColumn::make('firstname')->label('First Name'),
-                TextColumn::make('lastname')->label('Last Name'),
+                TextColumn::make('firstname')->label('First Name')->searchable(),
+                TextColumn::make('lastname')->label('Last Name')->searchable(),
                 TextColumn::make('phone')->label('Phone'),
                 TextColumn::make('dob')->label('Date of Birth'),
-                TextColumn::make('gender')->label('Gender'),
+                TextColumn::make('gender')->label('Gender')->sortable(),
                 TextColumn::make('class_at_entry')->label('Class'),
-            ])
+                TextColumn::make('created_at')->label('Created')->sortable(),
+            ])->defaultSort('created_at', 'desc')
             ->filters([
                 //
             ])

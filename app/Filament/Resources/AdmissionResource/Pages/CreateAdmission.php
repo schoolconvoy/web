@@ -22,21 +22,35 @@ class CreateAdmission extends CreateRecord
     {
         $studentAndParent = $this->convertParentAndStudentToDualArray($data);
 
-        
+        $student_password = Str::random(8);
+        $studentAndParent['student']['password'] = Hash::make($student_password);
         $student = $this->createStudent($studentAndParent['student']);
+        Notification::make()
+            ->title('Student created successfully! Their temporary password is ' . $student_password)
+            ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
+            ->persistent()
+            ->success()
+            ->send();
 
         if ($studentAndParent['existing_parent']) {
             $this->updateParent($studentAndParent['parent'], $student->id);
             //handle existing parent
             //update parent_ward table
+
         } else {
+            $parent_password = Str::random(8);
+            $studentAndParent['parent']['password'] = Hash::make($parent_password);
             $this->createParent($studentAndParent['parent'], $student->id);
             //handle parent
+            Notification::make()
+                ->title('Parent created successfully! Their temporary password is ' . $parent_password)
+                ->body('It is important that they change this password immediately to keep their account secure. Please inform them to check their email for further instructions.')
+                ->persistent()
+                ->success()
+                ->send();
         }
 
 
         return $student;
     }
-
-    
 }

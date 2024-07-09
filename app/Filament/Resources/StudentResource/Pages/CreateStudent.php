@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StudentResource\Pages;
 
+use App\Events\CreatedUser;
 use App\Filament\Resources\StudentResource;
 use App\Models\User;
 use App\Models\UserMeta;
@@ -61,8 +62,8 @@ class CreateStudent extends CreateRecord
             } else {
                 $user->class_id = $class_assigned;
             }
-
             $user->save();
+            CreatedUser::dispatch($user);
         } catch (\Throwable $th) {
             throw $th;
         }

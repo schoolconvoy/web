@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StaffResource\Pages;
 
+use App\Events\CreatedUser;
 use App\Filament\Resources\StaffResource;
 use App\Models\Classes;
 use App\Models\Level;
@@ -97,6 +98,7 @@ class CreateStaff extends CreateRecord
         }
 
         $user->save();
+        CreatedUser::dispatch($user);
 
         return $user;
     }

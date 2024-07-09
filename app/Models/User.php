@@ -237,7 +237,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         $token = app('auth.password.broker')->createToken($user);
 
         try {
-
+            Log::debug('User Role ' . print_r($user->roles, true));
             if ($user->hasAnyRole(
                 [
                     User::$ADMIN_ROLE,
