@@ -81,7 +81,7 @@ class Admission extends Component implements HasForms
                                         ->unique()
                                         ->email(),
                                     TextInput::make('phone')
-                                        ->tel(),
+                                        ->tel()->required(),
                                     DatePicker::make('dob')
                                         ->label('Date of birth')
                                         ->required()
@@ -141,8 +141,7 @@ class Admission extends Component implements HasForms
                                         ->unique('users', 'email')
                                         ->email(),
                                     TextInput::make('parent_phone')
-                                        ->required()
-                                        ->tel(),
+                                        ->tel()->required(),
                                     Textarea::make('parent_address')
                                         ->required()
                                         ->maxLength(200),
@@ -167,7 +166,7 @@ class Admission extends Component implements HasForms
             ])
             ->statePath('data')
             ->model(User::class);
-    } 
+    }
 
     public function create(): void
     {
@@ -176,15 +175,15 @@ class Admission extends Component implements HasForms
         $parentAndStudent = $this->convertParentAndStudentToDualArray($data);
         // $parent = $this->parentHandler(($parentAndStudent['parent']));
         $student = $this->studentHandler(($parentAndStudent['student']));
-        $student = $this->parentHandler(($parentAndStudent['student']));
+        $parent = $this->parentHandler(($parentAndStudent['student']), $student->id);
     }
-    public function parentHandler($data)
+    public function parentHandler($data, $student_id)
     {
-        $parent = $this->createParent($data);
+        $parent = $this->createParent($data, $student_id);
     }
     public function studentHandler($data)
     {
-        $student = $this->createStudent($data);
+        return $this->createStudent($data);
     }
     public function render(): View
     {

@@ -3,9 +3,7 @@
 namespace App\Filament\Resources\ParentResource\Pages;
 
 use App\Events\CreatedUser;
-use App\Events\ParentCreated;
 use App\Filament\Resources\ParentResource;
-use App\Filament\Resources\StudentResource;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
@@ -17,7 +15,6 @@ use Filament\Forms\Components\Wizard;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\UserMeta;
 use Filament\Forms\Components\View;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Set;

@@ -14,6 +14,7 @@ use Illuminate\Support\Str;
 class CreateAdmission extends CreateRecord
 {
     use UserTrait;
+    
     protected static string $resource = AdmissionResource::class;
     public static bool $hasInlineLabels = true;
     // public array $review = [];

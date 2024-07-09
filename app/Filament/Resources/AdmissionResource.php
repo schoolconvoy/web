@@ -84,7 +84,7 @@ class AdmissionResource extends Resource
                                         ->unique(ignoreRecord: true)
                                         ->email(),
                                     TextInput::make('phone')
-                                        ->tel(),
+                                        ->tel()->required(),
                                     DatePicker::make('dob')
                                         ->label('Date of birth')
                                         ->required()
@@ -180,7 +180,7 @@ class AdmissionResource extends Resource
                                                         'father' => 'Father',
                                                         'mother' => 'Mother',
                                                         'guardian' => 'Guardian',
-                                                    ]),
+                                                    ])->required(),
                                                 Textarea::make('parent_address')
                                                     ->required()
                                                     ->maxLength(200),
