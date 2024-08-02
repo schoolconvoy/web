@@ -52,6 +52,7 @@ class FeeBase extends Resource
                             )
                             ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname} - {$record->class?->name}")
                             ->searchable(['firstname', 'lastname'])
+                            ->helperText('Search with student name')
                             ->multiple()
             ]);
     }
