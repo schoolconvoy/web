@@ -22,6 +22,7 @@ use Filament\Support\Enums\VerticalAlignment;
 use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action as TableAction;
 use App\Livewire\IRelationalEntityTable;
+use Filament\Actions\DeleteAction;
 
 class ClassStudentsTable extends IRelationalEntityTable
 {
@@ -47,8 +48,17 @@ class ClassStudentsTable extends IRelationalEntityTable
             ])
             ->actions([
                 ActionGroup::make([
-                    ViewAction::make(),
+                    ViewAction::make()
+                                ->url(fn (User $record): string => route('filament.admin.resources.students.view', $record)),
                     EditAction::make()
+                                ->url(fn (User $record): string => route('filament.admin.resources.students.edit', $record)),
+                    TableAction::make('remove_student')
+                                // ->icon('heroicon-o-user-remove')
+                                ->requiresConfirmation()
+                                ->action(function (User $record) {
+                                    $record->class_id = null;
+                                    $record->save();
+                                })
                 ]),
             ])
             ->headerActions([
