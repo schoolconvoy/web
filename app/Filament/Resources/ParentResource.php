@@ -18,7 +18,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Filters\SelectFilter;
 
-
 class ParentResource extends Resource
 {
     protected static ?string $model = User::class;
@@ -47,6 +46,7 @@ class ParentResource extends Resource
                 TextColumn::make('lastname')
                             ->sortable()
                             ->searchable(),
+                TextColumn::make('wards.class.name'),
                 TextColumn::make('wards_count')
                             ->sortable()
                             ->counts('wards')
@@ -55,11 +55,15 @@ class ParentResource extends Resource
                 TextColumn::make('email'),
             ])
             ->filters([
-
+                SelectFilter::make('class_filter')
+                    ->relationship('wards.class', 'name')
+                    ->searchable()
+                    ->preload()
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
