@@ -11,6 +11,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Resource;
 
 class FeeBase extends Resource
@@ -43,8 +45,13 @@ class FeeBase extends Resource
                             ->autosize(),
                 DatePicker::make('deadline'),
                 Select::make('students')
-                            ->relationship('students', 'lastname')
-                            ->options(User::role(User::$STUDENT_ROLE)->pluck('lastname', 'id'))
+                            // ->options(User::role(User::$STUDENT_ROLE)->pluck('lastname', 'id'))
+                            ->relationship(
+                                name: 'students',
+                                modifyQueryUsing: fn ($query) => $query->orderBy('firstname')->orderBy('lastname'),
+                            )
+                            ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname} - {$record->class?->name}")
+                            ->searchable(['firstname', 'lastname'])
                             ->multiple()
             ]);
     }
