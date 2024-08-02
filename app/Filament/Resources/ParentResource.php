@@ -46,7 +46,7 @@ class ParentResource extends Resource
                 TextColumn::make('lastname')
                             ->sortable()
                             ->searchable(),
-                TextColumn::make('wards.class.name'),
+                TextColumn::make('wards.class.name')->label('Ward class(es)'),
                 TextColumn::make('wards_count')
                             ->sortable()
                             ->counts('wards')
