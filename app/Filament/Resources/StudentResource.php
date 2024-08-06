@@ -32,6 +32,8 @@ use Filament\Forms\Components\Wizard;
 use Filament\Resources\Pages\EditRecord\Concerns\HasWizard;
 use Filament\Forms\Components\View;
 use App\Models\Level;
+use Filament\Tables\Filters\TernaryFilter;
+
 
 class StudentResource extends Resource
 {
@@ -195,7 +197,18 @@ class StudentResource extends Resource
                             ->options([
                                 'male' => 'Male',
                                 'female' => 'Female'
-                            ])
+                            ]),
+                TernaryFilter::make('parent')
+                            ->label('Parents with ward(s)')
+                            ->nullable()
+                            ->placeholder('All student')
+                            ->trueLabel('With parent(s)')
+                            ->falseLabel('Without parent(s)')
+                            ->queries(
+                                true: fn (Builder $query) => $query->whereHas('parent'),
+                                false: fn (Builder $query) => $query->whereDoesntHave('parent'),
+                                blank: fn (Builder $query) => $query,
+                            )
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
