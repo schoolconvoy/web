@@ -17,6 +17,7 @@ use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 
 class ParentResource extends Resource
 {
@@ -58,7 +59,18 @@ class ParentResource extends Resource
                 SelectFilter::make('class_filter')
                     ->relationship('wards.class', 'name')
                     ->searchable()
-                    ->preload()
+                    ->preload(),
+                TernaryFilter::make('wards')
+                    ->label('Parents with ward(s)')
+                    ->nullable()
+                    ->placeholder('All parents')
+                    ->trueLabel('With ward(s)')
+                    ->falseLabel('Without ward(s)')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereHas('wards'),
+                        false: fn (Builder $query) => $query->whereDoesntHave('wards'),
+                        blank: fn (Builder $query) => $query,
+                    )
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
