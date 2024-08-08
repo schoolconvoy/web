@@ -39,6 +39,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static string $RECEPTIONIST_ROLE = 'Receptionist';
     public static string $SUPER_ADMIN_ROLE = 'super-admin';
     public static string $ASST_TEACHER_ROLE = 'Assistant Teacher';
+    public static string $PART_TIME_TEACHER_ROLE = 'Part-time Teacher';
     public static string $SUBSTITUTE_TEACHER_ROLE = 'Substitute Teacher';
     public static string $CORPER_ROLE = 'NYSC Corper';
 
@@ -149,6 +150,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$ELEM_PRINCIPAL_ROLE,
             User::$LIBRARIAN_ROLE,
             User::$RECEPTIONIST_ROLE,
+            User::$PART_TIME_TEACHER_ROLE,
             User::$SUPER_ADMIN_ROLE
         ];
     }
@@ -167,6 +169,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$RECEPTIONIST_ROLE,
             User::$SUPER_ADMIN_ROLE,
             User::$ASST_TEACHER_ROLE,
+            User::$PART_TIME_TEACHER_ROLE,
             User::$SUBSTITUTE_TEACHER_ROLE,
             User::$CORPER_ROLE,
         ];
@@ -188,6 +191,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                 User::$RECEPTIONIST_ROLE,
                 User::$ACCOUNTANT_ROLE,
                 User::$ASST_TEACHER_ROLE,
+                User::$PART_TIME_TEACHER_ROLE,
                 User::$SUBSTITUTE_TEACHER_ROLE,
                 User::$CORPER_ROLE,
             ]);
@@ -265,6 +269,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                         User::$RECEPTIONIST_ROLE,
                         User::$ACCOUNTANT_ROLE,
                         User::$ASST_TEACHER_ROLE,
+                        User::$PART_TIME_TEACHER_ROLE,
                         User::$SUBSTITUTE_TEACHER_ROLE,
                         User::$CORPER_ROLE,
                     ]
