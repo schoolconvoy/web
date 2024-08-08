@@ -75,6 +75,7 @@ class ParentPanelProvider extends PanelProvider
                 Authenticate::class,
                 'role:Parent|Admin|super-admin'
             ])
+            ->favicon(asset('images/favicon.ico'))
             ->plugin(
                 FilamentFullCalendarPlugin::make()
                     // ->selectable()

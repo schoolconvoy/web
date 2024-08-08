@@ -85,12 +85,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist'
+                'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist|Assistant Teacher|Substitute Teacher|NYSC Corper'
             ])
             ->plugin(
                 FilamentSpatieRolesPermissionsPlugin::make(),
                 \BezhanSalleh\FilamentExceptions\FilamentExceptionsPlugin::make()
             )
+            ->favicon(asset('images/favicon.ico'))
+            ->unsavedChangesAlerts()
             ->sidebarCollapsibleOnDesktop();
     }
 }

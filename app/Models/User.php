@@ -38,6 +38,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public static string $LIBRARIAN_ROLE = 'Librarian';
     public static string $RECEPTIONIST_ROLE = 'Receptionist';
     public static string $SUPER_ADMIN_ROLE = 'super-admin';
+    public static string $ASST_TEACHER_ROLE = 'Assistant Teacher';
+    public static string $SUBSTITUTE_TEACHER_ROLE = 'Substitute Teacher';
+    public static string $CORPER_ROLE = 'NYSC Corper';
 
     public static array $HIGH_SCHOOL_CLASSES = [
         'JUNIOR SECONDARY SCHOOL ONE',
@@ -137,6 +140,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         return [
             User::$TEACHER_ROLE,
+            User::$ASST_TEACHER_ROLE,
+            User::$SUBSTITUTE_TEACHER_ROLE,
+            User::$CORPER_ROLE,
             User::$ADMIN_ROLE,
             User::$ACCOUNTANT_ROLE,
             User::$HIGH_PRINCIPAL_ROLE,
@@ -159,7 +165,10 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$ELEM_PRINCIPAL_ROLE,
             User::$LIBRARIAN_ROLE,
             User::$RECEPTIONIST_ROLE,
-            User::$SUPER_ADMIN_ROLE
+            User::$SUPER_ADMIN_ROLE,
+            User::$ASST_TEACHER_ROLE,
+            User::$SUBSTITUTE_TEACHER_ROLE,
+            User::$CORPER_ROLE,
         ];
     }
 
@@ -178,6 +187,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                 User::$ELEM_PRINCIPAL_ROLE,
                 User::$RECEPTIONIST_ROLE,
                 User::$ACCOUNTANT_ROLE,
+                User::$ASST_TEACHER_ROLE,
+                User::$SUBSTITUTE_TEACHER_ROLE,
+                User::$CORPER_ROLE,
             ]);
         }
         else if ($panel->getId() === 'parent')
@@ -193,6 +205,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             return $this->hasAnyRole([
                 User::$STUDENT_ROLE,
                 User::$SUPER_ADMIN_ROLE,
+                User::$PARENT_ROLE,
                 User::$ADMIN_ROLE,
             ]);
         }
@@ -250,7 +263,10 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                         User::$HIGH_PRINCIPAL_ROLE,
                         User::$ELEM_PRINCIPAL_ROLE,
                         User::$RECEPTIONIST_ROLE,
-                        User::$ACCOUNTANT_ROLE
+                        User::$ACCOUNTANT_ROLE,
+                        User::$ASST_TEACHER_ROLE,
+                        User::$SUBSTITUTE_TEACHER_ROLE,
+                        User::$CORPER_ROLE,
                     ]
                 ))
             {

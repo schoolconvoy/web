@@ -53,6 +53,7 @@ class StudentPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
+            ->favicon(asset('images/favicon.ico'))
             ->authMiddleware([
                 Authenticate::class,
                 'role:Admin|super-admin|Student'
