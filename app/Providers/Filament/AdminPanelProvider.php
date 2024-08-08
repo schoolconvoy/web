@@ -85,7 +85,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-                'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist|Assistant Teacher|Substitute Teacher|NYSC Corper'
+                'role:Admin|super-admin|Teacher|Elementary School Principal|High School Principal|Accountant|Librarian|Receptionist|Assistant Teacher|Substitute Teacher|NYSC Corper|Part-time Teacher'
             ])
             ->plugin(
                 FilamentSpatieRolesPermissionsPlugin::make(),
