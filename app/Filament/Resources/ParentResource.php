@@ -42,6 +42,7 @@ class ParentResource extends Resource
             ->query(User::role(User::$PARENT_ROLE))
             ->columns([
                 TextColumn::make('title')
+                            ->formatStateUsing(fn (string $state): string => ucfirst($state))
                             ->sortable(),
                 TextColumn::make('firstname'),
                 TextColumn::make('lastname')
