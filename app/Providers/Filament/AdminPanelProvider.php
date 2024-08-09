@@ -93,6 +93,9 @@ class AdminPanelProvider extends PanelProvider
             )
             ->favicon(asset('images/favicon.ico'))
             ->unsavedChangesAlerts()
+            ->resources([
+                config('filament-logger.activity_resource')
+            ])
             ->sidebarCollapsibleOnDesktop();
     }
 }
