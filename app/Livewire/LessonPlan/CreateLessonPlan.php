@@ -61,12 +61,14 @@ class CreateLessonPlan extends Component implements HasForms
                 Select::make('lesson_plan_topic_id')
                     ->helperText('Select the lesson plan topic')
                     ->preload()
-                    ->options(LessonPlanTopic::pluck('name', 'id'))
+                    ->relationship(name: 'topic', titleAttribute: 'name')
+                    // ->options(LessonPlanTopic::pluck('name', 'id'))
                     ->searchable()
                     ->createOptionForm([
                         TextInput::make('name')
                             ->required(),
                     ])
+                    ->createOptionUsing(fn ($data) => LessonPlanTopic::create($data)->getKey())
                     ->required(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('period')
@@ -116,6 +118,10 @@ class CreateLessonPlan extends Component implements HasForms
         Log::info(print_r($data, true));
 
         $record = LessonPlan::create($data);
+
+        LessonPlanTopic::find($data['lesson_plan_topic_id'])->update([
+            'lesson_plan_id' => $record->id
+        ]);
 
         $this->form->model($record)->saveRelationships();
 
