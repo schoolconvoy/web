@@ -1,0 +1,22 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-2ac30bb1.css",
+    "isEntry": true,
+    "src": "resources/css/app.css"
+  },
+  "resources/css/filament/admin/theme.css": {
+    "file": "assets/theme-e7e40a4b.css",
+    "isEntry": true,
+    "src": "resources/css/filament/admin/theme.css"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-f9f1eaaf.js",
+    "isEntry": true,
+    "src": "resources/js/app.js"
+  },
+  "resources/js/schoolconvoy.js": {
+    "file": "assets/schoolconvoy-a7a48db7.js",
+    "isEntry": true,
+    "src": "resources/js/schoolconvoy.js"
+  }
+}
