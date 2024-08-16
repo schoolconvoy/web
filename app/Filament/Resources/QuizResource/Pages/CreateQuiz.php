@@ -172,7 +172,7 @@ class CreateQuiz extends CreateRecord
                                                 ->schema([
                                                     Repeater::make('options')
                                                             ->schema([
-                                                                TextArea::make('answer'),
+                                                                Textarea::make('answer'),
                                                                 Toggle::make('is_correct')
                                                                         ->label('Correct answer?')
                                                                         ->onColor('success')
