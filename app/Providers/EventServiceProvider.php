@@ -18,6 +18,12 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use App\Observers\UserObserver;
+use App\Events\LessonPlanApproved as LessonPlanApprovedEvent;
+use App\Listeners\LessonPlanApproved as LessonPlanApprovedListener;
+use App\Events\LessonPlanReviewed;
+use App\Listeners\LessonPlanReviewed as LessonPlanReviewedListener;
+use App\Events\LessonPlanReviewUpdated;
+use App\Listeners\LessonPlanReviewUpdated as LessonPlanReviewUpdatedListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -38,6 +44,15 @@ class EventServiceProvider extends ServiceProvider
         ],
         CreatedUser::class => [
             SendWelcomeNotification::class,
+        ],
+        LessonPlanApprovedEvent::class => [
+            LessonPlanApprovedListener::class,
+        ],
+        LessonPlanReviewed::class => [
+            LessonPlanReviewedListener::class,
+        ],
+        LessonPlanReviewUpdated::class => [
+            LessonPlanReviewUpdatedListener::class,
         ],
     ];
 

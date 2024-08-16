@@ -109,6 +109,17 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->hasMany(UserMeta::class);
     }
 
+    public static function teachers()
+    {
+        return self::role([
+                            self::$ASST_TEACHER_ROLE,
+                            self::$PART_TIME_TEACHER_ROLE,
+                            self::$SUBSTITUTE_TEACHER_ROLE,
+                            self::$CORPER_ROLE
+                        ])
+                        ->get();
+    }
+
     public function students()
     {
         // return $this->role(self::$STUDENT_ROLE)->get();
