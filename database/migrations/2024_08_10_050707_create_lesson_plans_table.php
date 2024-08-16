@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->string('period');
-            $table->timestamp('duration');
+            $table->string('duration')->nullable();
             $table->text('objectives');
             $table->unsignedBigInteger('session_id');
             $table->unsignedBigInteger('term_id');
