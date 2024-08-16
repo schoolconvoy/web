@@ -1,4 +1,4 @@
-<x-filament-panels::page x-data="{ tab: 'all_weeks' }">
+<x-filament-panels::page x-data="{ tab: 'my_lesson_plans' }">
 
     <x-filament::tabs label="Content tabs">
         @role('Admin|super-admin|Elementary School Principal|High School Principal')

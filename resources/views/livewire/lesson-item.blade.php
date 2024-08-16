@@ -1,6 +1,6 @@
 <div class="mx-auto bg-white w-full shadow-lg rounded-lg overflow-hidden">
     <div class="border-b-2 border-gray-100 items-center flex flex-row justify-between px-6 py-3 w-full">
-        <p class="text-gray-800 text-sm">{{ $plan->class->name }}</p>
+        <p class="text-gray-800 text-sm">{{ $plan->class?->name }}</p>
         <div class="flex flex-row justify-end items-center w-1/2">
             <span class="h-3 w-3 rounded-full block" style="background-color: {{ \App\Models\LessonPlan::STATUS_COLORS[$plan->status] }}"></span>
             <p class="text-gray-400 text-sm p-2">
@@ -10,7 +10,7 @@
     </div>
     <div class="flex flex-row justify-between p-6">
         <div class="w-full col-md-3">
-            <h2 class="text-lg font-bold text-gray-800 mb-2">{{ $plan->subject->name }}</h2>
+            <h2 class="text-lg font-bold text-gray-800 mb-2">{{ $plan->subject?->name }}</h2>
             <span class="text-gray-400">{{ $plan->topic?->name }}</span>
         </div>
         <div class="col-md- gap-2 flex flex-row items-center justify-end w-full">
@@ -43,7 +43,7 @@
                 <x-heroicon-o-user-circle class="h-5 w-5 text-gray-400" />
             </h6>
             <p class="text-gray-600 text-sm">
-                {{ $plan->teacher->lastname . ' ' . $plan->teacher->firstname }}
+                {{ $plan->teacher?->lastname . ' ' . $plan->teacher?->firstname }}
             </p>
         </div>
     </div>
