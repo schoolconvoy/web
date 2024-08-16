@@ -14,7 +14,7 @@ use Livewire\Component;
 use Illuminate\Contracts\View\View;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Filament\Forms\Components\TextArea;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Grid;
@@ -86,7 +86,7 @@ class CreateLessonPlan extends Component implements HasForms
                         ->searchable()
                         ->helperText('Enter the duration of the lesson plan'),
                 ]),
-                TextArea::make('objectives')
+                Textarea::make('objectives')
                     ->required()
                     ->rows(3)
                     ->maxLength(255)
