@@ -40,7 +40,7 @@ class LessonPlan extends Model
 
     public function teacher()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'teacher_id', 'id');
     }
 
     public function approvedBy()

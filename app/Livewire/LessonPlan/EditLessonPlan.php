@@ -61,12 +61,13 @@ class EditLessonPlan extends Component implements HasForms
                 Select::make('lesson_plan_topic_id')
                     ->helperText('Select the lesson plan topic')
                     ->preload()
-                    ->options(LessonPlanTopic::pluck('name', 'id'))
+                    ->relationship(name: 'topic', titleAttribute: 'name')
                     ->searchable()
                     ->createOptionForm([
                         TextInput::make('name')
                             ->required(),
                     ])
+                    ->createOptionUsing(fn ($data) => LessonPlanTopic::create($data)->getKey())
                     ->required(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('period')
@@ -93,6 +94,7 @@ class EditLessonPlan extends Component implements HasForms
                     ->helperText('Enter the objectives of the lesson plan. Max. 255 characters'),
                 FileUpload::make('files')
                     ->label('Upload lesson file')
+                    ->maxFiles(1)
                     ->required(),
 
             ])
@@ -119,23 +121,9 @@ class EditLessonPlan extends Component implements HasForms
             ->success()
             ->send();
 
+        $this->dispatch('close-modal', id: 'edit-lesson-plan-modal');
+
         // TODO: Notify the admin(s) that a lesson plan has been submitted for review
-        // Notify the admin(s) that a lesson plan has been submitted for review
-        // if ($this->record->reviews()->exist()) {
-        //     $this->notifyReviewer();
-        //     $reviewer = User::find($this->record->reviewed_by);
-        //     $reviewer = [$reviewer];
-
-        //     $users = User::role([
-        //         User::$ADMIN_ROLE,
-        //         User::$SUPER_ADMIN_ROLE,
-        //         User::$HIGH_PRINCIPAL_ROLE,
-        //         User::$ELEM_PRINCIPAL_ROLE
-        //     ])->get();
-
-        //     // Dispatch event to notify the reviewer
-        //     NotificationFacade::send(count($reviewer) > 0 ? $reviewer : $users, new LessonPlanReviewUpdated($review));
-        // }
     }
 
     public function render(): View

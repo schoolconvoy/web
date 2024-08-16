@@ -39,26 +39,21 @@ class ViewLessonPlans extends ViewRecord
         // Get the last fragment of the URL
         $lastFragment = end($url);
 
-        Log::debug("Last fragment " . $lastFragment . " record id " . $this->record->id);
-
         if ($lastFragment === 'mine') {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->where('teacher_id', auth()->id())->get();
-            Log::debug("Mine Lesson plans " . print_r($this->lessonPlans, true));
+            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->where('teacher_id', auth()->id())->with('teacher')->get();
 
             return;
         }
 
         // A hack to get all lesson plans when no status is provided. || Comparing string with int, therefore loose comparison
         if ($lastFragment === 'view' || $lastFragment == $this->record->id) {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->get();
-            Log::debug("View Lesson plans " . print_r($this->lessonPlans, true));
+            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->with('teacher')->get();
 
             return;
         }
 
         if ($lastFragment != $this->record->id) {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->where('status', $lastFragment)->get();
-            Log::debug("Others Lesson plans " . print_r($this->lessonPlans, true));
+            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->with('teacher')->orderBy('created_at', 'desc')->where('status', $lastFragment)->get();
 
             return;
         }

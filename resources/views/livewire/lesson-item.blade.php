@@ -27,7 +27,7 @@
                 tag="a"
                 href="{{ route('filament.admin.resources.lesson-plans.view-lesson', ['record' => $plan->week->id, 'plan' => $plan]) }}"
             >
-                View lesson plan
+                View lesson
             </x-filament::button>
         </div>
     </div>
@@ -43,7 +43,7 @@
                 <x-heroicon-o-user-circle class="h-5 w-5 text-gray-400" />
             </h6>
             <p class="text-gray-600 text-sm">
-                {{ $plan->teacher?->lastname . ' ' . $plan->teacher?->firstname }}
+                {{ $plan->teacher?->firstname . ' ' . $plan->teacher?->lastname }}
             </p>
         </div>
     </div>

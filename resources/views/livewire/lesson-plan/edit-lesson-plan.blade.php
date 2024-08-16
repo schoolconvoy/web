@@ -1,5 +1,5 @@
 <div class="col-md-12">
-    <x-filament::modal width="3xl" :close-button="true" id="reviewLessonPlanModal">
+    <x-filament::modal width="3xl" :close-button="true" id="edit-lesson-plan-modal">
         <x-slot name="trigger">
             <x-filament::button
                 outlined

@@ -27,13 +27,12 @@ class CreateLessonPlan extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public ?array $data = [];
+    public ?array $createData = ['files' => null];
     public $week;
 
     public function mount(): void
     {
         $this->form->fill();
-        Log::debug(print_r($this->week, true));
     }
 
     public function form(Form $form): Form
@@ -62,7 +61,6 @@ class CreateLessonPlan extends Component implements HasForms
                     ->helperText('Select the lesson plan topic')
                     ->preload()
                     ->relationship(name: 'topic', titleAttribute: 'name')
-                    // ->options(LessonPlanTopic::pluck('name', 'id'))
                     ->searchable()
                     ->createOptionForm([
                         TextInput::make('name')
@@ -98,28 +96,26 @@ class CreateLessonPlan extends Component implements HasForms
                     ->required(),
 
             ])
-            ->statePath('data')
+            ->statePath('createData')
             ->model(LessonPlan::class);
     }
 
     public function create(): void
     {
-        $data = $this->form->getState();
+        $createData = $this->form->getState();
 
         $session = Session::active();
 
-        $data['session_id'] = $session->id;
-        $data['term_id'] = $session->terms->where('active', true)->first()->id;
-        $data['teacher_id'] = auth()->id();
-        $data['status'] = LessonPlan::AWAITING_REVIEW;
+        $createData['session_id'] = $session->id;
+        $createData['term_id'] = $session->terms->where('active', true)->first()->id;
+        $createData['teacher_id'] = auth()->id();
+        $createData['status'] = LessonPlan::AWAITING_REVIEW;
 
-        $data['week_id'] = $this->week;
+        $createData['week_id'] = $this->week;
 
-        Log::info(print_r($data, true));
+        $record = LessonPlan::create($createData);
 
-        $record = LessonPlan::create($data);
-
-        LessonPlanTopic::find($data['lesson_plan_topic_id'])->update([
+        LessonPlanTopic::find($createData['lesson_plan_topic_id'])->update([
             'lesson_plan_id' => $record->id
         ]);
 

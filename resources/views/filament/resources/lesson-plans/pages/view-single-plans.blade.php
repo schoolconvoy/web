@@ -17,7 +17,7 @@
             @endrole
 
             @if ($this->plan->status !== 'approved' && $this->plan->teacher_id === auth()->user()->id)
-                @livewire('lesson-plan.edit-lesson-plan', ['record' => $this->plan])
+                @livewire('lesson-plan.edit-lesson-plan', ['record' => $this->plan], key('edit-lesson-plan-'.$this->plan->id))
             @endif
         </div>
     </div>
