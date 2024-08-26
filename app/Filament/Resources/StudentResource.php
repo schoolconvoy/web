@@ -209,6 +209,17 @@ class StudentResource extends Resource
                                 false: fn (Builder $query) => $query->whereDoesntHave('parent'),
                                 blank: fn (Builder $query) => $query,
                             ),
+                TernaryFilter::make('without_class')
+                            ->label('Students without a class')
+                            ->nullable()
+                            ->placeholder('All student')
+                            ->trueLabel('Without class')
+                            ->falseLabel('With class')
+                            ->queries(
+                                true: fn (Builder $query) => $query->whereNull('class_id'),
+                                false: fn (Builder $query) => $query->whereNotNull('class_id'),
+                                blank: fn (Builder $query) => $query,
+                            ),
                 Tables\Filters\TrashedFilter::make(),
 
             ])
