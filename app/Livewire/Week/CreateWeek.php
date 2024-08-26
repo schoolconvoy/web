@@ -49,7 +49,9 @@ class CreateWeek extends Component implements HasForms
                         Select::make('term_id')
                             ->label('Term')
                             ->options(function(Get $get) {
-                                return Term::where('session_id', $get('session_id'))->pluck('name', 'id');
+                                return Term::where('session_id', $get('session_id'))
+                                            ->where('school_id', auth()->user()->school_id)
+                                            ->pluck('name', 'id');
                             })
                             ->native(false)
                             ->searchable()

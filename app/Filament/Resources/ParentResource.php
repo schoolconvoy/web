@@ -137,4 +137,12 @@ class ParentResource extends Resource
             User::$SUPER_ADMIN_ROLE
         ]);
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }

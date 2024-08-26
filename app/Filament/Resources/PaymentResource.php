@@ -134,4 +134,12 @@ class PaymentResource extends Resource
             IncomeStatsOverview::class
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }

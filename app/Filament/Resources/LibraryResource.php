@@ -38,15 +38,17 @@ class LibraryResource extends Resource
                         ->label('Category')
                         ->relationship('category', 'name')
                         ->searchable()
+                        ->preload()
                         ->createOptionForm([
                             TextInput::make('name')
                                 ->required(),
                             Textarea::make('description')
                         ])
                         ->required(),
-                Select::make('subcategory')
+                Select::make('subcategory_id')
                         ->relationship('subcategory', 'name')
                         ->searchable()
+                        ->preload()
                         ->createOptionForm([
                             TextInput::make('name')
                                 ->required(),
@@ -59,6 +61,7 @@ class LibraryResource extends Resource
                             ->imageCropAspectRatio('1:1'),
                 FileUpload::make('file')
                         ->label('Upload the book (optional)')
+                        ->multiple(true)
                         ->acceptedFileTypes(['application/pdf'])
                         ->helperText('Upload a PDF file if this is a digital book'),
                 Radio::make('type')
@@ -125,5 +128,13 @@ class LibraryResource extends Resource
             'create' => Pages\CreateLibrary::route('/create'),
             'edit' => Pages\EditLibrary::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

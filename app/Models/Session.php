@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
-class Session extends Model
+class Session extends BaseModel
 {
     use HasFactory;
 
@@ -18,17 +20,21 @@ class Session extends Model
      */
     public static function generateSessions()
     {
-        $sessions = [];
-        $year = date('Y') - 3;
+        $existingYears = Session::all()->pluck('year')->toArray();
 
-        for ($i = 0; $i < 20; $i++) {
+        $sessions = [];
+        $year = date('Y') - 5;
+
+        for ($i = 0; $i < 50; $i++) {
 
             $sessions[$year . '/' . substr($year + 1, 2)] = $year . '/' . substr($year + 1, 2);
 
             $year++;
         }
 
-        return $sessions;
+        $newYears = array_diff($sessions, $existingYears);
+
+        return $newYears;
     }
 
     public function terms()
@@ -36,8 +42,10 @@ class Session extends Model
         return $this->hasMany(Term::class);
     }
 
-    public static function active()
+    public static function active($school_id)
     {
-        return self::where('active', true)->first();
+        return self::where('active', true)
+                    ->where('school_id', $school_id)
+                    ->first();
     }
 }

@@ -6,8 +6,11 @@ use App\Filament\Resources\StudentResource;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class UserMeta extends Model
+// #[ScopedBy([SessionTermSchoolScope::class])]
+class UserMeta extends BaseModel
 {
     use HasFactory;
 

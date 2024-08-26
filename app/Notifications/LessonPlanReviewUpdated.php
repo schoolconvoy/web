@@ -46,7 +46,7 @@ class LessonPlanReviewUpdated extends Notification implements ShouldQueue
                     ->line('The lesson plan **' . $lessonPlan->name . '** in '
                             . $lessonPlan->subject->name .
                             ' for the class **' . $lessonPlan->class->name .
-                            '** has new been updated by '
+                            '** has now been updated by '
                             . $lessonPlan->teacher?->firstname
                             . ' ' . $lessonPlan->teacher?->lastname . ':'
                         )

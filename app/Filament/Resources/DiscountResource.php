@@ -93,4 +93,12 @@ class DiscountResource extends Resource
             'edit' => Pages\EditDiscount::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }

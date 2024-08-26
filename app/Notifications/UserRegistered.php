@@ -21,7 +21,7 @@ class UserRegistered extends Notification implements ShouldQueue
         public User $user
     )
     {
-        Log::debug('UserRegistered notification created');
+        //
     }
 
     /**
@@ -39,8 +39,6 @@ class UserRegistered extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        Log::debug('User getting email is ' . print_r($this->user, true));
-
         $roleName = $this->user->roles[0]->name ?? User::$STUDENT_ROLE;
 
         $name = $this->user->fullname;

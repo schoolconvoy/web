@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class Classes extends Model
+#[ScopedBy([SchoolScope::class])]
+class Classes extends BaseModel
 {
     use HasFactory, SoftDeletes;
 

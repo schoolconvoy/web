@@ -38,9 +38,9 @@ class CreateSession extends Component implements HasForms
         return $form
             ->schema([
                 Select::make('year')
-                    ->label('Select current session')
+                    ->label('Select a new session')
                     ->options(Session::generateSessions())
-                    ->default(Session::active()->year ?? null)
+                    ->default(Session::active(auth()->user()->school_id)->year ?? null)
                     ->searchable(),
             ])
             ->statePath('data')
@@ -51,7 +51,7 @@ class CreateSession extends Component implements HasForms
     {
         $data = $this->form->getState();
 
-        if (Session::where('year', $data['year'])->exists()) {
+        if (Session::where('year', $data['year'])->where('school_id', auth()->user()->school_id)->exists()) {
                 Notification::make()
                     ->title('Session already exists!')
                     ->danger()
@@ -60,9 +60,12 @@ class CreateSession extends Component implements HasForms
             return;
         }
 
-        Session::where('active', true)->update(['active' => false]);
+        Session::where('active', true)
+                ->where('school_id', auth()->user()->school_id)
+                ->update(['active' => false]);
 
         $data['active'] = true;
+        $data['school_id'] = auth()->user()->school_id;
 
         $record = Session::create($data);
 
@@ -72,6 +75,8 @@ class CreateSession extends Component implements HasForms
             ->title('Session created successfully!')
             ->success()
             ->send();
+
+        $this->dispatch('close-modal', id: 'create-session-modal');
     }
 
     public function render(): View

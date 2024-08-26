@@ -5,7 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FeeCategory extends Model
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
+
+#[ScopedBy([SessionTermSchoolScope::class])]
+class FeeCategory extends BaseModel
 {
     use HasFactory;
 }

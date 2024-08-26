@@ -4,8 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class LessonPlanTopic extends Model
+#[ScopedBy([SessionTermSchoolScope::class])]
+class LessonPlanTopic extends BaseModel
 {
     use HasFactory;
 

@@ -3,30 +3,29 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
-use App\Models\Scopes\SchoolScope;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Althinect\FilamentSpatieRolesPermissions\Concerns\HasSuperAdmin;
-use App\Filament\Resources\StudentResource;
+use App\Models\Scopes\SchoolScope;
+use App\Models\Scopes\SessionTermSchoolScope;
 use App\Notifications\UserRegistered;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Notifications\Welcome;
-use Filament\Facades\Filament as FacadesFilament;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Password;
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([SchoolScope::class])]
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin;
+    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes;
 
     public static string $TEACHER_ROLE = 'Teacher';
     public static string $STUDENT_ROLE = 'Student';
@@ -101,7 +100,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function school(): BelongsTo
     {
-        return $this->belongsTo(School::class);
+        return $this->belongsTo(School::class, 'school_id', 'id');
     }
 
     public function meta(): HasMany
@@ -391,5 +390,65 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function entry_class()
     {
         return $this->belongsTo(Level::class, 'class_at_entry', 'id');
+    }
+
+    /**
+     * Only the user model has a scope to add the session, term and school id
+     * to every query because it doesn't extend BaseModel
+     */
+    protected static function booted(): void
+    {
+        static::created(function ($model) {
+            $session = Session::active(auth()->user()->school_id);
+            $term = $session->terms()->where('active', true)->first();
+            Log::debug('Model created: ' . get_class($model) . ' with ID: ' . $model->id);
+            Log::debug('Model before update with: session: ' . $model->session_id . ' term ' . $model->term_id . ' school_id: ' . $model->school_id);
+
+            $model->school_id = $model->school_id ?? auth()->user()->school_id;
+            $model->session_id = $model->session_id ?? $session->id;
+            $model->term_id = $model->term_id ?? $term->id;
+
+            $model->save();
+
+            Log::debug('Model updated with: session: ' . $model->session_id . ' term ' . $model->term_id . ' school_id: ' . $model->school_id);
+        });
+    }
+
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
+
+    public function promote()
+    {
+        $currentClass = $this->class;
+        $currentClassLevel = $currentClass->level;
+        $currentClassLevelOrder = $currentClassLevel->order;
+
+        $nextClassLevel = $currentClassLevelOrder + 1;
+
+        // Check if the next class exists
+        $nextClass = $currentClassLevel->school->classes()->where('level_id', $nextClassLevel)->first();
+
+        if ($nextClass) {
+            // Update the student's class to the next
+            $this->class_id = $nextClass->id;
+            $this->save();
+
+            // Notify the student of the promotion
+            // $student->notify(new PromotionNotification($nextClass));
+
+            // Store the promotion in the student's history
+            $this->promotions()->create(['class_id' => $nextClass->id]);
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class, 'student_id', 'id');
     }
 }

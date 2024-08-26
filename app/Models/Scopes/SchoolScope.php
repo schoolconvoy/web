@@ -17,8 +17,17 @@ class SchoolScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
        if (Auth::hasUser()) {
-           $school = Auth::user()->school;
-           $builder->whereBelongsTo($school);
+           $user = Auth::user();
+            $table = $model->getTable();
+
+           if (session()->has('school_id')) {
+                $school_id = session()->get('school_id');
+           } else {
+               $school_id = School::find($user->school_id);
+               session()->put('school_id', $school_id->id);
+           }
+
+           $builder->where($table.'.school_id', $school_id);
        }
     }
 }

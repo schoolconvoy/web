@@ -1,7 +1,7 @@
 <x-filament-panels::page>
     <!-- Tab links -->
     <div class="h-20 w-20 rounded-full overflow-hidden">
-        <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname }}">
+        <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname . ' ' . $record->lastname }}">
     </div>
     <div class="flex gap-3 items-center py-3">
         <div class="flex flex-row gap-x-2.5" title="wards">
@@ -16,11 +16,17 @@
             <li class="mr-2" role="presentation">
                 <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>
             </li>
+            <li class="mr-2" role="presentation">
+                <button class="inline-block p-4 border-b-2 rounded-t-lg" id="payment-tab" data-tabs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">Payments</button>
+            </li>
         </ul>
     </div>
     <div id="default-tab-content">
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             {{ $this->infolist }}
+        </div>
+        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+            @livewire(\App\Filament\Resources\ParentResource\Widgets\ParentFeeStatsOverview::class, ['parentId' => $record->id])
         </div>
     </div>
 

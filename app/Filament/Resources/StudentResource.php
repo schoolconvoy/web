@@ -208,7 +208,9 @@ class StudentResource extends Resource
                                 true: fn (Builder $query) => $query->whereHas('parent'),
                                 false: fn (Builder $query) => $query->whereDoesntHave('parent'),
                                 blank: fn (Builder $query) => $query,
-                            )
+                            ),
+                Tables\Filters\TrashedFilter::make(),
+
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
@@ -288,5 +290,13 @@ class StudentResource extends Resource
             'view' => Pages\ViewStudent::route('/{record}'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
     }
 }

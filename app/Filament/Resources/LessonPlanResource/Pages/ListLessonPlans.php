@@ -46,11 +46,8 @@ class ListLessonPlans extends ListRecords
     #[On('week-created')]
     public function updateWeekList($id)
     {
-        Log::debug('before updating weeks ' . print_r($this->weeks, true));
         $record = Week::find($id);
         $this->weeks = collect($this->weeks)->prepend($record);
-
-        Log::debug('after updating weeks ' . print_r($this->weeks, true));
     }
 
     public function mount(): void

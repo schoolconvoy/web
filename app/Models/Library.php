@@ -4,10 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class Library extends Model
+#[ScopedBy([SessionTermSchoolScope::class])]
+class Library extends BaseModel
 {
     use HasFactory;
+
+    protected $casts = [
+        'file' => 'json',
+    ];
 
     public function category()
     {
@@ -16,7 +23,7 @@ class Library extends Model
 
     public function subcategory()
     {
-        return $this->belongsTo(LibrarySubcategory::class);
+        return $this->belongsTo(LibrarySubcategory::class, 'subcategory_id', 'id');
     }
 
     public function user()

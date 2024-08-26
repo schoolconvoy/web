@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\StudentPromoted;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use App\Notifications\PromotionNotification;
 
 class SendPromotionNotification
 {
@@ -21,6 +22,6 @@ class SendPromotionNotification
      */
     public function handle(StudentPromoted $event): void
     {
-        //
+        $event->user->notify(new PromotionNotification($event->oldClass, $event->newClass));
     }
 }

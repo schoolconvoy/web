@@ -7,10 +7,14 @@ use App\Events\StudentIsLate;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class Attendance extends Model
+#[ScopedBy([SessionTermSchoolScope::class])]
+class Attendance extends BaseModel
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     const UNRECORDED = 0;
     const PRESENT = 1;

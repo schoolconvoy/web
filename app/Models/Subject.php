@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
-class Subject extends Model
+#[ScopedBy([SchoolScope::class])]
+class Subject extends BaseModel
 {
     use HasFactory;
 

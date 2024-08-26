@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Auth;
 class ClassScope implements Scope
 {
     /**
-     * Apply the scope to a given Eloquent query builder.
+     * This scope is used to only show people information related to their classes
+     * Which is in turn an hack for separating the two schools from each other.
+     * We have to take into consideration the fact that a school can have both
+     * high school and elementary schools and the system has to interpret that as
+     * two different schools. But with a common parent school.
      */
     public function apply(Builder $builder, Model $model): void
     {

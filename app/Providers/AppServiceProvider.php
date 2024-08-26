@@ -39,12 +39,16 @@ class AppServiceProvider extends ServiceProvider
             fn (): string => auth()->user()->hasRole(User::$PARENT_ROLE) ? Blade::render('@livewire(\'ward-switcher\')') : '',
         );
 
+        FilamentView::registerRenderHook(
+            'panels::user-menu.before',
+            fn (): string => auth()->user()->hasAnyRole(User::staff()) ? Blade::render('@livewire(\'session-and-term-picker\')') : '',
+        );
+
         FilamentAsset::register([
             Js::make('schoolconvoy', __DIR__ . '/../../resources/js/schoolconvoy.js'),
         ]);
 
         Model::unguard();
-
 
         Gate::define('viewPulse', function (User $user) {
             return $user->isSuperAdmin();

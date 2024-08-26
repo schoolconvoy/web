@@ -104,7 +104,7 @@ class CreateLessonPlan extends Component implements HasForms
     {
         $createData = $this->form->getState();
 
-        $session = Session::active();
+        $session = Session::active(auth()->user()->school_id);
 
         $createData['session_id'] = $session->id;
         $createData['term_id'] = $session->terms->where('active', true)->first()->id;

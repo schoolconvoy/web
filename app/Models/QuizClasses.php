@@ -5,8 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Harishdurga\LaravelQuiz\Models\Quiz;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Models\Scopes\SessionTermSchoolScope;
 
-class QuizClasses extends Model
+#[ScopedBy([SessionTermSchoolScope::class])]
+class QuizClasses extends BaseModel
 {
     use HasFactory;
 

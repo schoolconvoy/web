@@ -106,7 +106,7 @@ class EditLessonPlan extends Component implements HasForms
     {
         $data = $this->form->getState();
 
-        $session = Session::active();
+        $session = Session::active(auth()->user()->school_id);
 
         $data['session_id'] = $session->id;
         $data['term_id'] = $session->terms->where('active', true)->first()->id;

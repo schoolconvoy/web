@@ -26,6 +26,7 @@
         "z3d0x/filament-logger": "^0.7.2"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.13",
         "fakerphp/faker": "^1.9.1",
         "jasonmccreary/laravel-test-assertions": "^2.3",
         "laravel-shift/blueprint": "^2.9",

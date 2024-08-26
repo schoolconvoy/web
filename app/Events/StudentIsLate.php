@@ -24,7 +24,7 @@ class StudentIsLate
         public User $student, public Attendance $attendance
     )
     {
-        Log::debug('Dispatched student is late event');
+        //
     }
 
     /**

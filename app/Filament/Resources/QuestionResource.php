@@ -135,4 +135,12 @@ class QuestionResource extends Resource
     // {
     //     return auth()->user()->hasRole(User::$SUPER_ADMIN_ROLE |);
     // }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+    }
 }

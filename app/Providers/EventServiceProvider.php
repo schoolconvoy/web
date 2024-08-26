@@ -23,7 +23,10 @@ use App\Listeners\LessonPlanApproved as LessonPlanApprovedListener;
 use App\Events\LessonPlanReviewed;
 use App\Listeners\LessonPlanReviewed as LessonPlanReviewedListener;
 use App\Events\LessonPlanReviewUpdated;
+use App\Events\StudentPromoted;
 use App\Listeners\LessonPlanReviewUpdated as LessonPlanReviewUpdatedListener;
+use App\Listeners\PromotionListener;
+use App\Listeners\SendPromotionNotification;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -53,6 +56,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         LessonPlanReviewUpdated::class => [
             LessonPlanReviewUpdatedListener::class,
+        ],
+        StudentPromoted::class => [
+            SendPromotionNotification::class,
         ],
     ];
 

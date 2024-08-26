@@ -1,0 +1,79 @@
+<?php
+
+namespace App\Livewire;
+
+use Livewire\Component;
+use App\Models\Session;
+use App\Models\Term;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
+
+class SessionAndTermPicker extends Component
+{
+    public $sessions = [];
+    public $currentSession;
+    public $currentTerm;
+
+    public function mount()
+    {
+        $this->currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
+        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->first();
+
+        $this->setSessionAndTermMapping();
+    }
+
+    /**
+     * Get all the sessions and terms and map them to the sessions array.
+     *
+     * @return void
+     */
+    public function setSessionAndTermMapping()
+    {
+        if (Cache::has('session_term_picker')) {
+            $this->sessions = Cache::get('session_term_picker');
+        } else {
+            Session::where('school_id', auth()->user()->school_id)->get()->each(function ($session) {
+                $terms = $session->terms()->get();
+
+                $currentlyActiveSession = Session::active(auth()->user()->school_id);
+                $currentlyActiveTerm = $currentlyActiveSession->terms()->where('active', true)->first();
+                $terms->each(function ($term) use ($session, $currentlyActiveTerm, $currentlyActiveSession) {
+                    $currentText = $term->id === $currentlyActiveTerm->id && $session->id === $currentlyActiveSession->id ? '(Current) ' : '';
+                    $this->sessions['term_'.$term->id.'_session_'.$session->id] = $currentText . $session->year .' '. $term->name;
+                });
+            });
+
+            Cache::put('session_term_picker', $this->sessions);
+        }
+    }
+
+    public function setCurrentSession($term_session_id)
+    {
+        $term_session = explode('_', $term_session_id);
+        $term = Term::where('id', $term_session[1])
+                    ->where('school_id', auth()->user()->school_id)
+                    ->first();
+
+        $session = Session::where('id', $term_session[3])
+                            ->where('school_id', auth()->user()->school_id)
+                            ->first();
+
+        $this->currentSession = $session;
+        $this->currentTerm = $term;
+
+        session()->put('currentSession', $session);
+        session()->put('currentTerm', $term);
+
+        $this->setSessionAndTermMapping();
+
+        $this->redirect(route('filament.admin.pages.dashboard'));
+    }
+
+    public function render()
+    {
+        return view('livewire.session-and-term-picker');
+    }
+}
