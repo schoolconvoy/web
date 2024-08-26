@@ -43,8 +43,10 @@ class PromotionNotification extends Notification implements ShouldQueue
     {
         $oldClass = $this->oldClass;
         $newClass = $this->newClass;
+        $parent = $notifiable->parent()->pluck('email');
 
         return (new MailMessage)
+                    ->cc($parent)
                     ->subject('Congratulations! You have been promoted.')
                     ->greeting("Congratulations {$notifiable->firstname}!")
                     ->line("You have been promoted from {$oldClass->name} to {$newClass->name}.")
