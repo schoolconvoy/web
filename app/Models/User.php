@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Log;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use App\Events\StudentPromoted;
 
 #[ScopedBy([SchoolScope::class])]
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
@@ -421,29 +422,43 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function promote()
     {
+        Log::debug("Promoting student {$this->firstname} {$this->lastname}.");
+
+        if (!$this->class) {
+            Log::debug("Student {$this->firstname} {$this->lastname} has no class.");
+            return false;
+        }
+
+        Log::debug("Promoting student {$this->firstname} {$this->lastname}.");
         $currentClass = $this->class;
         $currentClassLevel = $currentClass->level;
         $currentClassLevelOrder = $currentClassLevel->order;
 
-        $nextClassLevel = $currentClassLevelOrder + 1;
+        $expectedNextClassLevel = $currentClassLevelOrder + 1;
 
-        // Check if the next class exists
-        $nextClass = $currentClassLevel->school->classes()->where('level_id', $nextClassLevel)->first();
+        // Check if the next class level exists
+        $nextClassLevel = $this->class->level->where('order', $expectedNextClassLevel)->first();
 
-        if ($nextClass) {
-            // Update the student's class to the next
+        // Check if the next class level exists
+        $nextClassLevel = $this->class->level->where('order', $expectedNextClassLevel)->first();
+
+        if ($nextClassLevel) {
+            // Get the next class
+            $nextClass = Classes::where('level_id', $nextClassLevel->id)->first();
+
+            // Update the student's class to the next class
             $this->class_id = $nextClass->id;
             $this->save();
 
             // Notify the student of the promotion
-            // $student->notify(new PromotionNotification($nextClass));
+            StudentPromoted::dispatch($this, $currentClass, $nextClass);
 
             // Store the promotion in the student's history
             $this->promotions()->create(['class_id' => $nextClass->id]);
 
-            return true;
+            return $nextClass->name;
         } else {
-            return false;
+            Log::debug("Student {$this->firstname} {$this->lastname} has reached the highest class level of {$currentClassLevel->name} .");
         }
     }
 

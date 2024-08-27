@@ -27,15 +27,19 @@ use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
+use Illuminate\Support\Facades\Log;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Wizard;
 use Filament\Resources\Pages\EditRecord\Concerns\HasWizard;
 use Filament\Forms\Components\View;
 use App\Models\Level;
 use Filament\Tables\Filters\TernaryFilter;
-
+use Filament\Tables\Actions\BulkAction;
+use Illuminate\Support\Collection;
+use Filament\Notifications\Notification;
 
 class StudentResource extends Resource
+
 {
     protected static ?string $model = User::class;
 
@@ -231,6 +235,28 @@ class StudentResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    BulkAction::make('promote_students')
+                        ->label('Promote students')
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-arrow-up-circle')
+                        ->action(function (Collection $records) {
+                            $result = $records->each->promote();
+
+                            if (in_array(null, $result->pluck('class_id')->toArray())) {
+                                return Notification::make()
+                                    ->title('Some students were not promoted')
+                                    ->body('You cannot promote students who don\'t have a class.')
+                                    ->warning()
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->title('Student promoted successfully')
+                                    ->body($records->count() . ' students have been promoted successfully.')
+                                    ->success()
+                                    ->send();
+                            }
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

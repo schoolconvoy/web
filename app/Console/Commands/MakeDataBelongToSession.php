@@ -57,7 +57,7 @@ class MakeDataBelongToSession extends Command
 
                     // Update the 'session_id' column with the provided value
                     $rowsUpdated = DB::table($table)
-                                        ->whereNull('session_id')
+                                        // ->whereNull('session_id')
                                         ->update([
                                             'session_id' => $sessionId,
                                             'term_id' => $term->id

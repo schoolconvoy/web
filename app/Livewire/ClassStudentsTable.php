@@ -23,6 +23,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Tables\Actions\Action as TableAction;
 use App\Livewire\IRelationalEntityTable;
 use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 
 class ClassStudentsTable extends IRelationalEntityTable
 {
@@ -53,27 +54,40 @@ class ClassStudentsTable extends IRelationalEntityTable
                     EditAction::make()
                                 ->url(fn (User $record): string => route('filament.admin.resources.students.edit', $record)),
                     TableAction::make('remove_student')
-                                // ->icon('heroicon-o-user-remove')
+                                ->icon('heroicon-o-user-minus')
                                 ->requiresConfirmation()
                                 ->action(function (User $record) {
                                     $record->class_id = null;
                                     $record->save();
-                                })
+                                }),
+                    TableAction::make('promote_student')
+                        ->icon('heroicon-o-arrow-up-circle')
+                        ->requiresConfirmation()
+                        ->action(function (User $record) {
+                            $nextClassName = $record->promote();
+
+                            Notification::make()
+                                ->title('Student promoted successfully')
+                                ->body($record->lastname . ' ' . $record->firstname . ' has been promoted to ' . $nextClassName)
+                                ->success()
+                                ->send();
+                        })
+
                 ]),
             ])
             ->headerActions([
-                TableAction::make('import')
-                        ->label('Bulk Import')
-                        ->icon('heroicon-o-cloud-arrow-down')
-                        ->color('primary')
-                        ->form([
-                            FileUpload::make('Import students')
-                                    ->acceptedFileTypes(['application/pdf'])
-                        ])
-                        ->action(function () {
-                            // TODO: Allow bulk import students to a class
-                            // Handle file upload
-                        }),
+                // TableAction::make('import')
+                //         ->label('Bulk Import')
+                //         ->icon('heroicon-o-cloud-arrow-down')
+                //         ->color('primary')
+                //         ->form([
+                //             FileUpload::make('Import students')
+                //                     ->acceptedFileTypes(['application/pdf'])
+                //         ])
+                //         ->action(function () {
+                //             // TODO: Allow bulk import students to a class
+                //             // Handle file upload
+                //         }),
                 TableAction::make('add_students')
                         ->label('Add Class Member')
                         ->icon('heroicon-o-user-plus')
@@ -133,10 +147,11 @@ class ClassStudentsTable extends IRelationalEntityTable
 
         foreach($this->students as $student)
         {
+            $oldClass = Classes::find($student->class_id) ?? new Classes();
             $student->class_id = $this->classId;
             $student->save();
 
-            StudentPromoted::dispatch($class, $student);
+            StudentPromoted::dispatch($student, $oldClass, $class);
         }
 
         // close the modal
