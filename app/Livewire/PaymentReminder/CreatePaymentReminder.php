@@ -119,7 +119,7 @@ class CreatePaymentReminder extends Component implements HasForms
         $this->dispatch('close-modal', id: 'create-reminder-modal');
 
         // Update the UI with the newly created lesson
-        $this->dispatch('lesson-created', id: $record->id);
+        $this->dispatch('reminder-created', id: $record->id);
     }
 
     public function render(): View
