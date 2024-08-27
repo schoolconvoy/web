@@ -115,7 +115,7 @@ class IncomeStatsOverview extends BaseWidget
         return [
             Stat::make(
                 'Total fees receieved',
-                'NGN' . number_format(Payment::sum('amount'), 2, '.', ',')
+                '₦' . number_format(Payment::sum('amount'), 2, '.', ',')
             )
                 ->description('Total amount of fees paid.')
                 ->icon('heroicon-m-currency-dollar')
@@ -126,7 +126,7 @@ class IncomeStatsOverview extends BaseWidget
             ,
             Stat::make(
                 'Unpaid fees',
-                'NGN' . number_format($unpaid_sum, 2, '.', ',')
+                '₦' . number_format($unpaid_sum, 2, '.', ',')
             )
                 ->color('danger')
                 ->description('Total amount due as at today.')
@@ -137,7 +137,7 @@ class IncomeStatsOverview extends BaseWidget
 
             Stat::make(
                 'Expected fees',
-                'NGN' .
+                '₦' .
                 number_format(
                     // TODO: Revisit when the final_amount attribute is fixed
                     $expected_sum,

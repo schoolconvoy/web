@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Models\Scopes\SessionTermSchoolScope;
 
-#[ScopedBy([SessionTermSchoolScope::class])]
+// #[ScopedBy([SessionTermSchoolScope::class])]
 class Fee extends BaseModel
 {
     use HasFactory;
@@ -51,5 +51,10 @@ class Fee extends BaseModel
         $discountedAmount = $this->amount - ($this->amount * $discountedPercentage / 100);
 
         return $discountedAmount;
+    }
+
+    public function reminders()
+    {
+        return $this->hasMany(PaymentReminder::class);
     }
 }

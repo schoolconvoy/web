@@ -18,15 +18,31 @@ class ParentFeeStatsOverview extends BaseWidget
             return $ward->payments()->where('paid', 1)->sum('amount');
         });
 
+        $outstandingFees = $parent->wards()->get()->sum(function ($ward) {
+            return $ward->fees()->whereDoesntHave('payments')->sum('amount');
+        });
+
         Log::debug("Total paid: " . print_r($totalPaid, true));
+        Log::debug("Outstanding unpaid: " . print_r($outstandingFees, true));
         // $totalDue = parent->fees()->where('status', 'due')->sum('amount');
         return [
-            Stat::make('Total paid this term', '₦' . number_format($totalPaid, 2, '.', ','))
+            Stat::make('Total paid this term', self::formatToMoney($totalPaid))
                 ->description('Total amount of fees paid this term.')
                 ->icon('heroicon-m-currency-dollar')
                 ->color('primary'),
-            // Stat::make('Bounce rate', '21%'),
-            // Stat::make('Average time on page', '3:12'),
+            Stat::make('Outstanding fees', self::formatToMoney($outstandingFees))
+                ->description('Total amount of fees yet to be paid this term.')
+                ->icon('heroicon-m-currency-dollar')
+                ->color('danger'),
+            Stat::make('Total fees', self::formatToMoney($totalPaid + $outstandingFees))
+                ->description('Total amount of fees for all your wards this term.')
+                ->icon('heroicon-m-currency-dollar')
+                ->color('success'),
         ];
+    }
+
+    public static function formatToMoney($amount)
+    {
+        return '₦' . number_format($amount, 2, '.', ',');
     }
 }

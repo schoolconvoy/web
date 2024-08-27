@@ -99,6 +99,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         'status' => 'boolean'
     ];
 
+    // load relationship
+    // protected $with = ['fees', 'payments'];
+
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class, 'school_id', 'id');
@@ -465,5 +468,15 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function payments()
     {
         return $this->hasMany(Payment::class, 'student_id', 'id');
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->picture ? asset('/storage/'. $this->picture) : "https://ui-avatars.com/api/?name=" . urlencode($this->firstname . ' ' . $this->lastname) . "&color=FFFFFF&background=09090b";
+    }
+
+    public function paymentReminders()
+    {
+        return $this->hasMany(PaymentReminder::class, 'parent_id', 'id');
     }
 }

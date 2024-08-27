@@ -1,7 +1,12 @@
 <x-filament-panels::page>
     <!-- Tab links -->
     <div class="h-20 w-20 rounded-full overflow-hidden">
-        <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname . ' ' . $record->lastname }}">
+        {{-- <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname . ' ' . $record->lastname }}"> --}}
+        <x-filament::avatar
+            src="{{ $record->getFilamentAvatarUrl() }}"
+            alt="{{ $record->firstname . ' ' . $record->lastname }}"
+            size="w-12 h-12"
+        />
     </div>
     <div class="flex gap-3 items-center py-3">
         <div class="flex flex-row gap-x-2.5" title="wards">
@@ -27,6 +32,8 @@
         </div>
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="payment" role="tabpanel" aria-labelledby="payment-tab">
             @livewire(\App\Filament\Resources\ParentResource\Widgets\ParentFeeStatsOverview::class, ['parentId' => $record->id])
+            @livewire('list-parent-ward-fees', ['parentId' => $record->id])
+            @livewire(\App\Livewire\PaymentReminder\ListPaymentReminders::class, ['parentId' => $record->id])
         </div>
     </div>
 
