@@ -7,7 +7,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
-class Session extends BaseModel
+#[ScopedBy(SchoolScope::class)]
+class Session extends Model
 {
     use HasFactory;
 
@@ -47,5 +48,10 @@ class Session extends BaseModel
         return self::where('active', true)
                     ->where('school_id', $school_id)
                     ->first();
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class, 'school_id', 'id');
     }
 }

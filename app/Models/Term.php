@@ -6,9 +6,10 @@ use App\Models\Scopes\SchoolScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use App\Models\Scopes\SessionTermSchoolScope;
 
-class Term extends BaseModel
+
+#[ScopedBy(SchoolScope::class)]
+class Term extends Model
 {
     use HasFactory;
 
@@ -19,6 +20,11 @@ class Term extends BaseModel
     public function session()
     {
         return $this->belongsTo(Session::class);
+    }
+
+    public function school()
+    {
+        return $this->belongsTo(School::class, 'school_id', 'id');
     }
 
     /**
