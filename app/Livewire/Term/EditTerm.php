@@ -60,9 +60,11 @@ class EditTerm extends Component implements HasForms
         // Set all the terms associated with this session to inactive
         if($data['active'] === true) {
             $this->record->session->terms()->update(['active' => false]);
+            $this->record->update($data);
+        } else {
+            $this->record->update($data);
         }
 
-        $this->record->update($data);
 
         Notification::make()
             ->title('Terms updated successfully!')
