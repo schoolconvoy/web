@@ -19,10 +19,7 @@ class SessionAndTermPicker extends Component
 
     public function mount()
     {
-        $this->currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
-        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->first();
 
-        $this->setSessionAndTermMapping();
     }
 
     /**
@@ -74,6 +71,11 @@ class SessionAndTermPicker extends Component
 
     public function render()
     {
+        $this->currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
+        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->first();
+
+        $this->setSessionAndTermMapping();
+
         return view('livewire.session-and-term-picker');
     }
 }
