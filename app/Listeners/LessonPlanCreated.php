@@ -3,6 +3,7 @@
 namespace App\Listeners;
 
 use App\Events\LessonPlanCreated as LessonPlanCreatedEvent;
+use App\Models\Scopes\ClassScope;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Notifications\LessonPlanCreated as LessonPlanCreatedNotification;
@@ -40,7 +41,7 @@ class LessonPlanCreated
             array_push($roles, User::$ELEM_PRINCIPAL_ROLE);
         }
 
-        $admins = User::role($roles)->withoutGlobalScopes();
+        $admins = User::role($roles)->withoutGlobalScope(ClassScope::class);
         $admins = $admins->get();
 
         Notification::send($admins, new LessonPlanCreatedNotification($lessonPlan));

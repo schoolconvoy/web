@@ -28,6 +28,7 @@ use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Forms\Components\Wizard;
 use Filament\Resources\Pages\EditRecord\Concerns\HasWizard;
@@ -39,7 +40,6 @@ use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
 
 class StudentResource extends Resource
-
 {
     protected static ?string $model = User::class;
 
@@ -171,10 +171,6 @@ class StudentResource extends Resource
 
     public static function table(Table $table): Table
     {
-        /**
-         * TODO: Next we need to add classes, subjects, sessions so we can list
-         * those information about a student.
-         */
         return $table
             ->query(User::role(User::$STUDENT_ROLE))
             ->columns([
