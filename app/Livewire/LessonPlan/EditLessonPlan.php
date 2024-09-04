@@ -22,6 +22,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use App\Notifications\LessonPlanReviewUpdated;
 use App\Models\User;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Illuminate\Support\Str;
 
 class EditLessonPlan extends Component implements HasForms
 {
@@ -40,6 +43,10 @@ class EditLessonPlan extends Component implements HasForms
     {
         return $form
             ->schema([
+                FileUpload::make('files')
+                    ->label('Upload lesson file')
+                    ->maxFiles(1)
+                    ->required(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('name')
                         ->required()
@@ -58,17 +65,25 @@ class EditLessonPlan extends Component implements HasForms
                     ->searchable()
                     ->required(),
                 // Should be relationship with subject
-                Select::make('lesson_plan_topic_id')
-                    ->helperText('Select the lesson plan topic')
+                Select::make('topics')
+                    ->relationship('topics', 'name')
+                    ->label('Select a topic')
                     ->preload()
-                    ->relationship(name: 'topic', titleAttribute: 'name')
-                    ->searchable()
                     ->createOptionForm([
                         TextInput::make('name')
+                            ->live(true)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                                if (($get('slug') ?? '') !== Str::slug($old)) {
+                                    return;
+                                }
+
+                                $set('slug', Str::slug($state));
+                            })
                             ->required(),
+                        TextInput::make('slug')
+                            ->required()
                     ])
-                    ->createOptionUsing(fn ($data) => LessonPlanTopic::create($data)->getKey())
-                    ->required(),
+                    ->searchable(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('period')
                         ->required()
@@ -92,10 +107,6 @@ class EditLessonPlan extends Component implements HasForms
                     ->rows(3)
                     ->maxLength(255)
                     ->helperText('Enter the objectives of the lesson plan. Max. 255 characters'),
-                FileUpload::make('files')
-                    ->label('Upload lesson file')
-                    ->maxFiles(1)
-                    ->required(),
 
             ])
             ->statePath('data')
@@ -106,14 +117,20 @@ class EditLessonPlan extends Component implements HasForms
     {
         $data = $this->form->getState();
 
-        $session = Session::active(auth()->user()->school_id);
+        $activeSession = session()->get('currentSession');
+        $activeTerm = session()->get('currentTerm');
 
-        $data['session_id'] = $session->id;
-        $data['term_id'] = $session->terms->where('active', true)->first()->id;
+        $data['session_id'] = $activeSession->id;
+        $data['term_id'] = $activeTerm->id;
+
         $data['teacher_id'] = auth()->id();
         $data['status'] = LessonPlan::AWAITING_REVIEW;
+        $topic = $data['topics'];
+        unset($data['topics']);
 
         $this->record->update($data);
+
+        $topic = $this->record->topics()->attach($topic);
 
         Notification::make()
             ->title('Lesson plan updated successfully')

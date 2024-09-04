@@ -66,9 +66,9 @@ class LessonPlan extends BaseModel
         return $this->hasMany(LessonPlanReview::class);
     }
 
-    public function topic()
+    public function topics()
     {
-        return $this->hasOne(LessonPlanTopic::class);
+        return $this->morphToMany(config('laravel-quiz.models.topic'), 'topicable');
     }
 
     public function class()

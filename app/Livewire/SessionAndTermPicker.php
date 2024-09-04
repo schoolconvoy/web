@@ -71,6 +71,10 @@ class SessionAndTermPicker extends Component
 
     public function render()
     {
+        if (!Auth::check()) {
+            return;
+        }
+
         $this->currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
 
         if (!$this->currentSession) {

@@ -26,16 +26,12 @@ class BaseModel extends Model
         static::created(function ($model) {
             $session = Session::active(auth()->user()->school_id);
             $term = $session->terms()->where('active', true)->first();
-            Log::debug('Model created: ' . get_class($model) . ' with ID: ' . $model->id);
-            Log::debug('Model before update with: session: ' . $model->session_id . ' term ' . $model->term_id . ' school_id: ' . $model->school_id);
 
             $model->school_id = $model->school_id ?? auth()->user()->school_id;
             $model->session_id = $model->session_id ?? $session->id;
             $model->term_id = $model->term_id ?? $term->id;
 
             $model->save();
-
-            Log::debug('Model updated with: session: ' . $model->session_id . ' term ' . $model->term_id . ' school_id: ' . $model->school_id);
         });
     }
 }

@@ -11,7 +11,7 @@
     <div class="flex flex-row justify-between p-6">
         <div class="w-full col-md-3">
             <h2 class="text-lg font-bold text-gray-800 mb-2">{{ $plan->subject?->name }}</h2>
-            <span class="text-gray-400">{{ $plan->topic?->name }}</span>
+            <span class="text-gray-400">{{ $plan->topics?->first()->name }}</span>
         </div>
         <div class="col-md- gap-2 flex flex-row items-center justify-end w-full">
             @role('Admin|super-admin|Elementary School Principal|High School Principal')

@@ -38,25 +38,6 @@ class CreateWeek extends Component implements HasForms
                     ->label('Week')
                     ->placeholder('Enter week name')
                     ->required(),
-                Grid::make(2)
-                    ->schema([
-                        Select::make('session_id')
-                            ->label('Session')
-                            ->options(Session::pluck('year', 'id'))
-                            ->searchable()
-                            ->native(false)
-                            ->required(),
-                        Select::make('term_id')
-                            ->label('Term')
-                            ->options(function(Get $get) {
-                                return Term::where('session_id', $get('session_id'))
-                                            ->where('school_id', auth()->user()->school_id)
-                                            ->pluck('name', 'id');
-                            })
-                            ->native(false)
-                            ->searchable()
-                            ->required(),
-                    ]),
                 Select::make('order')
                     ->placeholder('Select week order')
                     ->label('Order')
@@ -106,8 +87,19 @@ class CreateWeek extends Component implements HasForms
         // Remove hyphenated date
         unset($data['start_end_date']);
 
+        $activeSession = session()->get('currentSession');
+        $activeTerm = session()->get('currentTerm');
+
+        $data['session_id'] = $activeSession->id;
+        $data['term_id'] = $activeTerm->id;
+
         // If the week order already exists for the same term and session, throw an error
-        if(Week::where('order', $data['order'])->where('term_id', $data['term_id'])->where('session_id', $data['session_id'])->exists()) {
+        if(Week::where('order', $data['order'])
+                ->where('term_id', $activeTerm->id)
+                ->where('session_id', $activeSession->id)
+                ->exists()
+        )
+        {
             Notification::make()
                         ->title('This week already exists for the selected term and session')
                         ->danger()

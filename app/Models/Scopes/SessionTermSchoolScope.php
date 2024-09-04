@@ -31,10 +31,6 @@ class SessionTermSchoolScope implements Scope
             $school_id = session()->get('school_id') ? session()->get('school_id') : auth()->user()->school_id;
             $table = $model->getTable();
 
-            // Store the current route in session
-            $currentRoute = request()->route()->getName();
-            $currentRouteParams = request()->route()->parameters();
-
             $builder->where($table.'.session_id', $activeSession->id)
                     ->where($table.'.term_id', $activeTerm->id)
                     ->where($table.'.school_id', $school_id);

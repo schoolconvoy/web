@@ -402,6 +402,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
      */
     protected static function booted(): void
     {
+        parent::booted();
         static::created(function ($model) {
             $session = Session::active(auth()->user()->school_id);
             $term = $session->terms()->where('active', true)->first();

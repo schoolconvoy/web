@@ -2,6 +2,7 @@
 
 namespace App\Livewire\LessonPlan;
 
+use App\Events\LessonPlanCreated;
 use App\Models\LessonPlanTopic;
 use App\Models\Session;
 use App\Models\LessonPlan;
@@ -22,12 +23,16 @@ use Illuminate\Support\Facades\Log;
 use App\Notifications\LessonPlanCreated as LessonPlanCreatedNotification;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use App\Models\User;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Cache;
 
 class CreateLessonPlan extends Component implements HasForms
 {
     use InteractsWithForms;
 
-    public ?array $createData = ['files' => null];
+    public ?array $createData = ['attachments' => null];
     public $week;
 
     public function mount(): void
@@ -39,6 +44,16 @@ class CreateLessonPlan extends Component implements HasForms
     {
         return $form
             ->schema([
+                FileUpload::make('attachments')
+                ->label('Upload lesson file')
+                ->acceptedFileTypes([
+                    'application/pdf',
+                    'application/x-pdf',
+                    'application/vnd.pdf',
+                    'application/vnd.adobe.pdfxml',
+                    'application/pdfa'
+                ])
+                ->required(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('name')
                         ->required()
@@ -57,17 +72,25 @@ class CreateLessonPlan extends Component implements HasForms
                     ->searchable()
                     ->required(),
                 // Should be relationship with subject
-                Select::make('lesson_plan_topic_id')
-                    ->helperText('Select the lesson plan topic')
+                Select::make('topics')
+                    ->relationship('topics', 'name')
+                    ->label('Select a topic')
                     ->preload()
-                    ->relationship(name: 'topic', titleAttribute: 'name')
-                    ->searchable()
                     ->createOptionForm([
                         TextInput::make('name')
+                            ->live(true)
+                            ->afterStateUpdated(function (Get $get, Set $set, ?string $old, ?string $state) {
+                                if (($get('slug') ?? '') !== Str::slug($old)) {
+                                    return;
+                                }
+
+                                $set('slug', Str::slug($state));
+                            })
                             ->required(),
+                        TextInput::make('slug')
+                            ->required()
                     ])
-                    ->createOptionUsing(fn ($data) => LessonPlanTopic::create($data)->getKey())
-                    ->required(),
+                    ->searchable(),
                 Grid::make()->columns(2)->schema([
                     TextInput::make('period')
                         ->required()
@@ -91,10 +114,6 @@ class CreateLessonPlan extends Component implements HasForms
                     ->rows(3)
                     ->maxLength(255)
                     ->helperText('Enter the objectives of the lesson plan. Max. 255 characters'),
-                FileUpload::make('files')
-                    ->label('Upload lesson file')
-                    ->required(),
-
             ])
             ->statePath('createData')
             ->model(LessonPlan::class);
@@ -104,20 +123,24 @@ class CreateLessonPlan extends Component implements HasForms
     {
         $createData = $this->form->getState();
 
-        $session = Session::active(auth()->user()->school_id);
+        $activeSession = session()->get('currentSession');
+        $activeTerm = session()->get('currentTerm');
 
-        $createData['session_id'] = $session->id;
-        $createData['term_id'] = $session->terms->where('active', true)->first()->id;
+        $createData['files'] = $createData['attachments'];
+
+        unset($createData['attachments']);
+        $createData['session_id'] = $activeSession->id;
+        $createData['term_id'] = $activeTerm->id;
         $createData['teacher_id'] = auth()->id();
         $createData['status'] = LessonPlan::AWAITING_REVIEW;
+        $topic = $createData['topics'];
+        unset($createData['topics']);
 
         $createData['week_id'] = $this->week;
 
         $record = LessonPlan::create($createData);
 
-        LessonPlanTopic::find($createData['lesson_plan_topic_id'])->update([
-            'lesson_plan_id' => $record->id
-        ]);
+        $topic = $record->topics()->attach($topic);
 
         $this->form->model($record)->saveRelationships();
 
@@ -131,21 +154,10 @@ class CreateLessonPlan extends Component implements HasForms
         // Update the UI with the newly created lesson
         $this->dispatch('lesson-created', id: $record->id);
 
-        $roles = [
-            User::$ADMIN_ROLE,
-            User::$SUPER_ADMIN_ROLE
-        ];
-
-        if ($record->teacher->isHighSchool()) {
-            $roles[] = User::$HIGH_PRINCIPAL_ROLE;
-        } else {
-            $roles[] = User::$ELEM_PRINCIPAL_ROLE;
-        }
-
-        $users = User::role($roles)->get();
-
         // Dispatch event to notify the reviewer
-        NotificationFacade::send($users, new LessonPlanCreatedNotification($record));
+        LessonPlanCreated::dispatch($record);
+
+        $this->form->fill();
     }
 
     public function render(): View

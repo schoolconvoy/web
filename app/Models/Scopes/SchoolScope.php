@@ -16,8 +16,10 @@ class SchoolScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        Log::debug("Model is " . get_class($model));
+
        if (Auth::hasUser()) {
-           $user = Auth::user();
+            $user = Auth::user();
             $table = $model->getTable();
 
            if (session()->has('school_id')) {
@@ -26,6 +28,10 @@ class SchoolScope implements Scope
                $school_id = School::find($user->school_id);
                session()->put('school_id', $school_id->id);
            }
+
+        //    Log::debug('SessionTermSchoolScope: '.$table);
+        //    Log::debug('school_id: '.$school_id);
+        //    Log::debug('user: '.$user);
 
            $builder->where($table.'.school_id', $school_id);
        }

@@ -19,6 +19,8 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use Illuminate\Support\Facades\Event;
 use App\Observers\UserObserver;
 use App\Events\LessonPlanApproved as LessonPlanApprovedEvent;
+use App\Events\LessonPlanCreated as LessonPlanCreatedEvent;
+use App\Listeners\LessonPlanCreated as LessonPlanCreatedListener;
 use App\Listeners\LessonPlanApproved as LessonPlanApprovedListener;
 use App\Events\LessonPlanReviewed;
 use App\Listeners\LessonPlanReviewed as LessonPlanReviewedListener;
@@ -47,6 +49,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         CreatedUser::class => [
             SendWelcomeNotification::class,
+        ],
+        LessonPlanCreatedEvent::class => [
+            LessonPlanCreatedListener::class,
         ],
         LessonPlanApprovedEvent::class => [
             LessonPlanApprovedListener::class,

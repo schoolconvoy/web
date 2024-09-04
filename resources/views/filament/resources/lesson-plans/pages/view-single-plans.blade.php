@@ -28,7 +28,7 @@
         <ul class="gap-4 grid grid-flow-col">
             <li class="flex flex-col">
                 <span class="font-semibold">Topic</span>
-                <span>{{ $this->plan->topic?->name }}</span>
+                <span>{{ $this->plan->topics?->first()?->name }}</span>
             </li>
             <li class="flex flex-col">
                 <span class="font-semibold">Period</span>

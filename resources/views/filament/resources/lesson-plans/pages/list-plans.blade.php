@@ -20,7 +20,11 @@
         </x-filament::tabs.item>
     </x-filament::tabs>
 
-    @livewire('week.create-week')
+    @role('Admin|super-admin|Elementary School Principal|High School Principal')
+        @livewire('week.create-week')
+    @endrole
+
+    <!--- Edit Week Modal -->
     @livewire('week.edit-week')
 
     @role('Admin|super-admin|Elementary School Principal|High School Principal')

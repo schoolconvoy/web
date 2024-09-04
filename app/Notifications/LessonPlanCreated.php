@@ -43,6 +43,7 @@ class LessonPlanCreated extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->subject('New lesson plan created')
                     ->greeting('Hello ' . $notifiable->firstname . ' ' . $notifiable->lastname . '!')
+                    ->line('A new lesson plan has been created for you to review.')
                     ->line('**Lesson Plan:** ' . $lessonPlan->name)
                     ->line('**Subject:** ' . $lessonPlan->subject->name)
                     ->line('**Class:** ' . $lessonPlan->class->name)

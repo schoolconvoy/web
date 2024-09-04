@@ -35,6 +35,6 @@ class Week extends BaseModel
 
     public function lessonPlans()
     {
-        return $this->hasMany(LessonPlan::class);
+        return $this->hasMany(LessonPlan::class, 'week_id', 'id');
     }
 }

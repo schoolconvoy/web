@@ -10,6 +10,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class ViewLessonPlans extends ViewRecord
 {
@@ -39,8 +40,17 @@ class ViewLessonPlans extends ViewRecord
         // Get the last fragment of the URL
         $lastFragment = end($url);
 
+        if(!$this->record) {
+            return;
+        }
+
         if ($lastFragment === 'mine') {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->where('teacher_id', auth()->id())->with('teacher')->get();
+            $this->lessonPlans = Week::find($this->record->id)
+                                        ->lessonPlans()
+                                        ->orderBy('created_at', 'desc')
+                                        ->where('teacher_id', auth()->id())
+                                        ->with('teacher')
+                                        ->get();
 
             return;
         }
@@ -69,6 +79,16 @@ class ViewLessonPlans extends ViewRecord
     public function teachers()
     {
         return User::teachers();
+    }
+
+    public function getRecord(): Model
+    {
+        // return a 404 if record is not found
+        if (!$this->record) {
+            abort(404);
+        }
+
+        return $this->record;
     }
 
     public function mount(int | string $record): void

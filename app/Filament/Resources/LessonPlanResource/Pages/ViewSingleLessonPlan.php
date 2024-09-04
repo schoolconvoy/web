@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 use App\Notifications\LessonPlanReviewUpdated;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 
 class ViewSingleLessonPlan extends ViewRecord
 {
@@ -37,7 +38,14 @@ class ViewSingleLessonPlan extends ViewRecord
         $url = explode('/', url()->current());
         $id = end($url);
 
+        // If the url is a livewire update, then get the plan from session
+        if (!in_array('view-plan', $url)) {
+            return session()->get('currentLessonPlan');
+        }
+
         $this->plan = LessonPlan::find($id);
+
+        session()->put('currentLessonPlan', $this->plan);
 
         return $this->plan;
     }
@@ -96,10 +104,13 @@ class ViewSingleLessonPlan extends ViewRecord
         return response()->download(storage_path('app/public/' . $this->plan->files));
     }
 
+    public function getRecord(): Model
+    {
+        return $this->getLessonPlan();
+    }
+
     public function mount(int|string $record): void
     {
-        parent::mount($record);
-
-        $this->getLessonPlan();
+        // parent::mount($record);
     }
 }
