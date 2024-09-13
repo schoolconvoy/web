@@ -1,0 +1,2 @@
+php artisan filament:cache-components
+php artisan icons:cache
