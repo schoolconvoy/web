@@ -22,7 +22,7 @@ class PromoteStudents extends Command
      *
      * @var string
      */
-    protected $description = 'Promotes all students to the next level, if there is any.';
+    protected $description = 'Promotes all students to the next level, if there is any';
 
     /**
      * Execute the console command.
