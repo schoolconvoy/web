@@ -158,6 +158,6 @@ class ClassSeeder extends Seeder
             ]);
         }
 
-        Log::debug('Info: Created ' . print_r(Classes::count() . ' classes' . ' And ' . Level::count() . ' levels ', true));
+        // Log::debug('Info: Created ' . print_r(Classes::count() . ' classes' . ' And ' . Level::count() . ' levels ', true));
     }
 }
