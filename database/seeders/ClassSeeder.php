@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Level;
 use App\Models\Classes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ClassSeeder extends Seeder
@@ -141,11 +142,13 @@ class ClassSeeder extends Seeder
 
         foreach($classes as $class)
         {
+            $level = DB::table('levels')->where('name', $class['name'])->first();
 
-            if (Level::where('name', $class['name'])->exists()) {
-                $level = Level::where('name', $class['name'])->first();
+            if ($level) {
+                $level = (object) $level;
             } else {
-                $level = Level::create($class);
+                $levelId = DB::table('levels')->insertGetId($class);
+                $level = (object) array_merge($class, ['id' => $levelId]);
             }
 
             $class = Classes::create([
