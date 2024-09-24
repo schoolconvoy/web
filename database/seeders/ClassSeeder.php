@@ -142,8 +142,8 @@ class ClassSeeder extends Seeder
         foreach($classes as $class)
         {
 
-            if (Level::where('name', $class['name'])->exists()) {
-                $level = Level::where('name', $class['name'])->first();
+            if (Level::where('name', $class['name'])->withoutSoftDeletingScope()->exists()) {
+                $level = Level::where('name', $class['name'])->withoutSoftDeletingScope()->first();
             } else {
                 $level = Level::create($class);
             }
