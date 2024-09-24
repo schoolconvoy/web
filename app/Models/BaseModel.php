@@ -24,7 +24,8 @@ class BaseModel extends Model
         parent::booted();
 
         static::created(function ($model) {
-            $currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
+            // BUG: Possible bug here when the user isn't logged in. Users may see the wrong term/session
+            $currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()?->user()?->school_id || 1);
             $currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $currentSession->terms()->where('active', true)->first();
 
             $model->school_id = $model->school_id ?? auth()->user()->school_id;
