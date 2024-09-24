@@ -48,3 +48,5 @@ jobs:
             php artisan migrate --force
             php artisan optimize
             php artisan filament:optimize
+            php artisan app:add-soft-delete-to-a-table levels
+            php artisan app:add-soft-delete-to-a-table classes
