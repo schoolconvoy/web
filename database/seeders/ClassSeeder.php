@@ -151,7 +151,7 @@ class ClassSeeder extends Seeder
                 $level = (object) array_merge($class, ['id' => $levelId]);
             }
 
-            $class = Classes::create([
+            DB::table('classes')->insert([
                 'name' => $class['name'],
                 'level_id' => $level->id,
                 'school_id' => $school_id,
