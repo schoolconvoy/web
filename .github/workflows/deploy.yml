@@ -46,5 +46,6 @@ jobs:
           script: |
             cd /var/www/schoolconvoy.com/web
             php artisan migrate --force
+            php artisan config:cache
             php artisan optimize
             php artisan filament:optimize
