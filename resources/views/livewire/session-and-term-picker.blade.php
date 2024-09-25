@@ -10,7 +10,10 @@
 
         <x-filament::dropdown.list>
             @foreach($sessions as $key => $session)
-                <x-filament::dropdown.list.item wire:click="setCurrentSession('{{ $key }}')">
+                <x-filament::dropdown.list.item
+                    wire:click="setCurrentSession('{{ $key }}')"
+                    wire:key="{{ $key }}"
+                >
                     {{ $session }}
                 </x-filament::dropdown.list.item>
             @endforeach

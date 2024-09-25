@@ -13,6 +13,7 @@ class PopulationStatsOverview extends BaseWidget
     protected function getStats(): array
     {
         $student = User::role(User::$STUDENT_ROLE);
+
         $all = Trend::query($student)
                         ->between(
                             start: now()->subYear(),
@@ -21,7 +22,7 @@ class PopulationStatsOverview extends BaseWidget
                         ->perMonth()
                         ->count();
 
-        $female = Trend::query(User::role(User::$STUDENT_ROLE)->where('gender', 'female'))
+        $female = Trend::query($student->where('gender', 'female'))
                         ->between(
                             start: now()->subYear(),
                             end: now()->endOfYear(),
@@ -29,7 +30,7 @@ class PopulationStatsOverview extends BaseWidget
                         ->perMonth()
                         ->count();
 
-        $male = Trend::query(User::role(User::$STUDENT_ROLE)->where('gender', 'male'))
+        $male = Trend::query($student->where('gender', 'male'))
                         ->between(
                             start: now()->subYear(),
                             end: now()->endOfYear(),
@@ -37,7 +38,7 @@ class PopulationStatsOverview extends BaseWidget
                         ->perMonth()
                         ->count();
 
-        $student = User::role(User::$STUDENT_ROLE)->whereDoesntHave('parent');
+        $student = $student->whereDoesntHave('parent');
         $student = Trend::query($student)
                         ->between(
                             start: now()->subYear(),
@@ -46,21 +47,21 @@ class PopulationStatsOverview extends BaseWidget
                         ->perMonth()
                         ->count();
         return [
-            Stat::make('Total students', User::role(User::$STUDENT_ROLE)->count())
+            Stat::make('Total students', $student->count())
                 ->color('success')
                 ->icon('heroicon-m-users')
                 ->chart(
                     $all->map(fn (TrendValue $value) => $value->aggregate)->toArray()
                 )
                 ->description('Total amount of students registered.'),
-            Stat::make('Total male students', User::role(User::$STUDENT_ROLE)->where('gender', 'male')->count())
+            Stat::make('Total male students', $student->where('gender', 'male')->count())
                 ->color('success')
                 ->icon('heroicon-m-users')
                 ->chart(
                     $female->map(fn (TrendValue $value) => $value->aggregate)->toArray()
                 )
                 ->description('Total amount of students that are male.'),
-            Stat::make('Total female students', User::role(User::$STUDENT_ROLE)->where('gender', 'female')->count())
+            Stat::make('Total female students', $student->where('gender', 'female')->count())
                 ->color('success')
                 ->icon('heroicon-m-users')
                 ->chart(

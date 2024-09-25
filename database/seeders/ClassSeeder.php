@@ -16,6 +16,7 @@ class ClassSeeder extends Seeder
      */
     public function run(): void
     {
+        // BUG: Get the school automatically
         $school_id = 1; //auth()->user()->school->id;
 
         $classes = [

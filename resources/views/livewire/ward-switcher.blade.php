@@ -10,7 +10,7 @@
 
         <x-filament::dropdown.list>
             @foreach($wards as $ward)
-                    <x-filament::dropdown.list.item>
+                    <x-filament::dropdown.list.item wire:key="{{ $ward->id }}">
                         <x-filament::link
                             :color="$selectedWard === $ward->id ? 'orange' : 'gray'"
                             :href="route('wards.switch', [ 'id' => $ward->id ])"
