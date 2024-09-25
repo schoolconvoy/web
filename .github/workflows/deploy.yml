@@ -16,6 +16,9 @@ jobs:
         with:
           php-version: 8.3
 
+      - name: Composer dump autoloader
+        run: composer dump-autoload
+
       - name: Install Composer Dependencies
         run: composer install --optimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist
 
