@@ -49,5 +49,9 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Model::unguard();
+
+        Gate::define('viewPulse', function (User $user) {
+            return $user->isSuperAdmin();
+        });
     }
 }

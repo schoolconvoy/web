@@ -16,6 +16,7 @@
         "guzzlehttp/guzzle": "^7.2",
         "harishdurga/laravel-quiz": "^1.2",
         "laravel/framework": "^10.10",
+        "laravel/pulse": "^1.2",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "malzariey/filament-daterangepicker-filter": "^3.0",
