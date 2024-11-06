@@ -4,7 +4,7 @@
     <x-filament::dropdown>
         <x-slot name="trigger">
             <x-filament::button color="gray" icon="heroicon-s-academic-cap" icon-position="after">
-                {{ $currentSession->year }} {{ $currentTerm->name }}
+                {{ $currentSession->year ?? "" }} {{ $currentTerm->name ?? "" }}
             </x-filament::button>
         </x-slot>
 
