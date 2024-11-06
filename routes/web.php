@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ChatBotController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -41,3 +42,12 @@ Route::get('/payment/callback', [PaymentController::class, 'handleGatewayCallbac
  * Public routes
  */
 Route::get('/admission', [PublicController::class, 'index'])->name('admission.index');
+
+/**
+ * Chat Bot Routes
+ */
+Route::get('/chatbot', [ChatBotController::class, 'chatbot'])->name('chatbot.index');
+
+Route::post('/sc-h-ool-con-vo-y/webhook', [ChatBotController::class, 'webhook'])->name('chatbot.webhook');
+
+Route::get('/telegram/webhook', [ChatBotController::class, 'telegramSetupWebhook'])->name('chatbot.telegram.webhook');
