@@ -18,6 +18,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class ParentResource extends Resource
 {
@@ -48,7 +49,9 @@ class ParentResource extends Resource
                 TextColumn::make('lastname')
                             ->sortable()
                             ->searchable(),
-                TextColumn::make('wards.class.name')->label('Ward class(es)'),
+                TextColumn::make('wards.class.name')
+                            ->label('Ward class(es)')
+                            ->toggleable(true),
                 TextColumn::make('wards_count')
                             ->sortable()
                             ->counts('wards')
@@ -77,6 +80,12 @@ class ParentResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Impersonate::make('Impersonate')
+                    ->redirectTo(route('filament.parent.pages.dashboard'))
+                    ->grouped()
+                    ->link()
+                    ->icon('heroicon-o-key')
+                    ->label('Login as'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

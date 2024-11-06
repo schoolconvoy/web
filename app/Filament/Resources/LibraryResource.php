@@ -27,6 +27,10 @@ class LibraryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $modelLabel = 'Book';
+
+    protected static ?string $navigationLabel = 'Library';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -100,6 +104,10 @@ class LibraryResource extends Resource
                 TextColumn::make('title'),
                 TextColumn::make('author'),
                 TextColumn::make('category.name'),
+                TextColumn::make('type')->formatStateUsing(fn($state) => $state == 1 ? "Digital" : "Hard copy"),
+                TextColumn::make('pages'),
+                TextColumn::make('edition'),
+                TextColumn::make('count')->formatStateUsing(fn($state) => $state . ' copies'),
             ])
             ->filters([
                 SelectFilter::make('category.name')

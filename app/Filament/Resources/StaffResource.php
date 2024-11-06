@@ -22,12 +22,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Infolists;
-use Filament\Infolists\Components\Tabs;
 use Filament\Infolists\Components\TextEntry;
-use Spatie\Permission\Models\Role;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Builder;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\Auth;
+use Filament\Facades\Filament;
+use Filament\Models\Contracts\FilamentUser;
+use Illuminate\Support\Facades\Log;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class StaffResource extends Resource
 {
@@ -89,9 +92,14 @@ class StaffResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    Impersonate::make('Impersonate')
+                        ->redirectTo(route('filament.admin.pages.dashboard'))
+                        ->grouped()
+                        ->icon('heroicon-o-key')
+                        ->label('Login as'),
                     DeleteAction::make()
                         ->requiresConfirmation()
-                        ->hidden(fn() => auth()->user()->can('super-admin')),
+                        ->hidden(fn() => !auth()->user()->can('super-admin')),
                 ]),
             ])
             ->bulkActions([

@@ -20,6 +20,7 @@ use Filament\Forms\Components\View;
 use Filament\Forms\Components\Actions\Action;
 use App\Models\Level;
 use Filament\Forms\Set;
+use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class EditStudent extends EditRecord
 {
@@ -61,5 +62,12 @@ class EditStudent extends EditRecord
         }
 
         return $record;
+    }
+
+    protected function getActions(): array
+    {
+        return [
+            Impersonate::make()->record($this->getRecord())
+        ];
     }
 }

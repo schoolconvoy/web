@@ -38,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Actions\BulkAction;
 use Illuminate\Support\Collection;
 use Filament\Notifications\Notification;
+use STS\FilamentImpersonate\Tables\Actions\Impersonate;
 
 class StudentResource extends Resource
 {
@@ -227,6 +228,12 @@ class StudentResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Impersonate::make('Impersonate')
+                    ->redirectTo(route('filament.student.pages.dashboard'))
+                    ->grouped()
+                    ->link()
+                    ->icon('heroicon-o-key')
+                    ->label('Login as'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

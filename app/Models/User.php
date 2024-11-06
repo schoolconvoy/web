@@ -265,6 +265,43 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                     ->withTimestamps();
     }
 
+    public static function getUserPanel($user)
+    {
+        $panel = 'admin';
+
+        if ($user->hasAnyRole(
+            [
+                User::$ADMIN_ROLE,
+                User::$SUPER_ADMIN_ROLE,
+                User::$TEACHER_ROLE,
+                User::$HIGH_PRINCIPAL_ROLE,
+                User::$ELEM_PRINCIPAL_ROLE,
+                User::$RECEPTIONIST_ROLE,
+                User::$ACCOUNTANT_ROLE,
+                User::$ASST_TEACHER_ROLE,
+                User::$PART_TIME_TEACHER_ROLE,
+                User::$SUBSTITUTE_TEACHER_ROLE,
+                User::$CORPER_ROLE,
+            ]
+        ))
+        {
+            $panel = 'admin';
+            Filament::setCurrentPanel(Filament::getPanel('admin'));
+        }
+        else if ($user->hasAnyRole([User::$PARENT_ROLE]))
+        {
+            $panel = 'parent';
+            Filament::setCurrentPanel(Filament::getPanel('parent'));
+        }
+        else if ($user->hasAnyRole([User::$STUDENT_ROLE]))
+        {
+            $panel = 'student';
+            Filament::setCurrentPanel(Filament::getPanel('student'));
+        }
+
+        return $panel;
+    }
+
     public function sendWelcomeNotification($email)
     {
         $user = User::where('email', $email)->first();
@@ -479,5 +516,22 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     public function paymentReminders()
     {
         return $this->hasMany(PaymentReminder::class, 'parent_id', 'id');
+    }
+
+    public function canImpersonate()
+    {
+        return $this->hasAnyRole([
+            User::$SUPER_ADMIN_ROLE,
+            User::$ADMIN_ROLE
+        ]);
+    }
+
+    public function canBeImpersonated()
+    {
+        // Let's prevent impersonating other users at our own company
+        return !$this->hasAnyRole([
+            User::$SUPER_ADMIN_ROLE,
+            User::$ADMIN_ROLE
+        ]);
     }
 }

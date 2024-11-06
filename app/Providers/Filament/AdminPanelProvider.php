@@ -49,6 +49,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
+            // ->login(\Filament\Pages\Auth\Login::class)
             ->registration(Register::class)
             //->navigationItems([
                 //NavigationItem::make('My Class')

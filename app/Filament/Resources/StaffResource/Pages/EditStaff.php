@@ -6,6 +6,7 @@ use App\Filament\Resources\StaffResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Database\Eloquent\Model;
+use STS\FilamentImpersonate\Pages\Actions\Impersonate;
 
 class EditStaff extends EditRecord
 {
@@ -24,6 +25,11 @@ class EditStaff extends EditRecord
 
         return $data;
     }
+
+    protected function getActions(): array
+    {
+        return [
+            Impersonate::make()->record($this->getRecord())
+        ];
+    }
 }
-
-

@@ -27,6 +27,7 @@ class StudentPanelProvider extends PanelProvider
             ->id('student')
             ->path('student')
             ->login(Login::class)
+            // ->login(\Filament\Pages\Auth\Login::class)
             ->passwordReset()
             ->emailVerification()
             ->colors([

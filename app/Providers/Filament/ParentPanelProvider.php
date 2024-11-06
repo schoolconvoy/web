@@ -32,6 +32,7 @@ class ParentPanelProvider extends PanelProvider
             ->id('parent')
             ->path('parent')
             ->login(Login::class)
+            // ->login(\Filament\Pages\Auth\Login::class)
             ->passwordReset()
             ->emailVerification()
             ->profile(EditProfile::class)
