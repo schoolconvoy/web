@@ -33,7 +33,7 @@ class CBTResource extends Resource
         return $table
             ->query(function () {
                 // Only get quizzes assigned to this class.
-                $class_id = auth()->user()->class->id;
+                $class_id = auth()->user()->class?->id;
                 $quizzes = Quiz::whereHas('quizAuthors', function (Builder $query) use ($class_id) {
                     $query->where('classes_id', $class_id);
                 });

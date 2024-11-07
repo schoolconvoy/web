@@ -210,6 +210,17 @@ class StudentResource extends Resource
                                 false: fn (Builder $query) => $query->whereDoesntHave('parent'),
                                 blank: fn (Builder $query) => $query,
                             ),
+                TernaryFilter::make('school')
+                            ->label('Filter by school')
+                            ->nullable()
+                            ->placeholder('All student')
+                            ->trueLabel('High School Students')
+                            ->falseLabel('Elementary School Students')
+                            ->queries(
+                                true: fn (Builder $query) => $query->whereHas('class', fn (Builder $query) => $query->whereIn('name', User::$HIGH_SCHOOL_CLASSES)),
+                                false: fn (Builder $query) => $query->whereHas('class', fn (Builder $query) => $query->whereIn('name', User::$ELEMENTARY_SCHOOL_CLASSES)),
+                                blank: fn (Builder $query) => $query,
+                            ),
                 TernaryFilter::make('without_class')
                             ->label('Students without a class')
                             ->nullable()
