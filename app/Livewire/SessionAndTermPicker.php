@@ -33,10 +33,25 @@ class SessionAndTermPicker extends Component
             $this->sessions = Cache::get('session_term_picker');
         } else {
             Session::where('school_id', auth()->user()->school_id)->get()->each(function ($session) {
+
+                if (!$session) {
+                    return $this->sessions;
+                }
+
                 $terms = $session->terms()->get();
 
+                if (!$terms) {
+                    return $this->sessions;
+                }
+
                 $currentlyActiveSession = Session::active(auth()->user()->school_id);
-                $currentlyActiveTerm = $currentlyActiveSession->terms()->where('active', true)->first();
+
+                if (!$currentlyActiveSession) {
+                    return $this->sessions;
+                }
+
+                $currentlyActiveTerm = $currentlyActiveSession->terms()->where('active', true)->firstOrFail();
+
                 $terms->each(function ($term) use ($session, $currentlyActiveTerm, $currentlyActiveSession) {
                     $currentText = $term->id === $currentlyActiveTerm->id && $session->id === $currentlyActiveSession->id ? '(Current) ' : '';
                     $this->sessions['term_'.$term->id.'_session_'.$session->id] = $currentText . $session->year .' '. $term->name;
@@ -52,11 +67,11 @@ class SessionAndTermPicker extends Component
         $term_session = explode('_', $term_session_id);
         $term = Term::where('id', $term_session[1])
                     ->where('school_id', auth()->user()->school_id)
-                    ->first();
+                    ->firstOrFail();
 
         $session = Session::where('id', $term_session[3])
                             ->where('school_id', auth()->user()->school_id)
-                            ->first();
+                            ->firstOrFail();
 
         $this->currentSession = $session;
         $this->currentTerm = $term;
@@ -81,13 +96,13 @@ class SessionAndTermPicker extends Component
             $this->currentSession = Session::active(auth()->user()->school_id);
         }
 
-        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->first();
+        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->firstOrFail();
 
         if (!$this->currentTerm) {
             $this->currentTerm = Term::where('school_id', auth()->user()->school_id)
                                         ->where('active', true)
                                         ->where('session_id', $this->currentSession->id)
-                                        ->first();
+                                        ->firstOrFail();
         }
 
         $this->setSessionAndTermMapping();
