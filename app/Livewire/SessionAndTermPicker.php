@@ -50,7 +50,11 @@ class SessionAndTermPicker extends Component
                     return $this->sessions;
                 }
 
-                $currentlyActiveTerm = $currentlyActiveSession->terms()->where('active', true)->firstOrFail();
+                $currentlyActiveTerm = $currentlyActiveSession->terms()->where('active', true)->first();
+
+                if (!$currentlyActiveTerm) {
+                    return $this->sessions;
+                }
 
                 $terms->each(function ($term) use ($session, $currentlyActiveTerm, $currentlyActiveSession) {
                     $currentText = $term->id === $currentlyActiveTerm->id && $session->id === $currentlyActiveSession->id ? '(Current) ' : '';
