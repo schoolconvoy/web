@@ -67,11 +67,19 @@ class SessionAndTermPicker extends Component
         $term_session = explode('_', $term_session_id);
         $term = Term::where('id', $term_session[1])
                     ->where('school_id', auth()->user()->school_id)
-                    ->firstOrFail();
+                    ->first();
+
+        if (!$term) {
+            return;
+        }
 
         $session = Session::where('id', $term_session[3])
                             ->where('school_id', auth()->user()->school_id)
-                            ->firstOrFail();
+                            ->first();
+
+        if (!$session) {
+            return;
+        }
 
         $this->currentSession = $session;
         $this->currentTerm = $term;
