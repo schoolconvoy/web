@@ -31,8 +31,8 @@ class SessionTermSchoolScope implements Scope
             $school_id = session()->get('school_id') ? session()->get('school_id') : auth()->user()->school_id;
             $table = $model->getTable();
 
-            $builder->where($table.'.session_id', $activeSession->id)
-                    ->where($table.'.term_id', $activeTerm->id)
+            $builder->where($table.'.session_id', $activeSession->id ?? null)
+                    ->where($table.'.term_id', $activeTerm->id ?? null)
                     ->where($table.'.school_id', $school_id);
         }
     }
