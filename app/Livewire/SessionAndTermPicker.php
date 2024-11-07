@@ -102,7 +102,7 @@ class SessionAndTermPicker extends Component
             $this->currentTerm = Term::where('school_id', auth()->user()->school_id)
                                         ->where('active', true)
                                         ->where('session_id', $this->currentSession->id)
-                                        ->firstOrFail();
+                                        ->first();
         }
 
         $this->setSessionAndTermMapping();
