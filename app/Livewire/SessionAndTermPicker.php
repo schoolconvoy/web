@@ -119,7 +119,6 @@ class SessionAndTermPicker extends Component
 
         $this->setSessionAndTermMapping();
 
-        Log::debug('Current session and term: ' . print_r([$this->currentSession, $this->currentTerm], true));
         return view('livewire.session-and-term-picker');
     }
 }
