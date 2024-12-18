@@ -522,7 +522,9 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
     {
         return $this->hasAnyRole([
             User::$SUPER_ADMIN_ROLE,
-            User::$ADMIN_ROLE
+            User::$ADMIN_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE
         ]);
     }
 
