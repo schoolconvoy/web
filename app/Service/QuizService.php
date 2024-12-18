@@ -92,7 +92,7 @@ class QuizService
     /**
      * Sets the username for the current quiz session.
      */
-    public function setUsername(string $username): self
+    public function setUsername(string $username = 'anonymous'): self
     {
         $this->username = $username;
         return $this;

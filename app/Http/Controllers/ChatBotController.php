@@ -129,7 +129,7 @@ class ChatBotController extends Controller
 
     public function telegramSetupWebhook()
     {
-        $response = Telegram::setWebhook(['url' => 'https://iyiit75sm3.sharedwithexpose.com/sc-h-ool-con-vo-y/webhook']);
+        $response = Telegram::setWebhook(['url' => 'https://87u8gcmwje.sharedwithexpose.com/sc-h-ool-con-vo-y/webhook']);
 
         // Clear webhook
         // $response = Telegram::removeWebhook();
