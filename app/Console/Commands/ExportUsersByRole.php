@@ -39,15 +39,16 @@ class ExportUsersByRole extends Command
         $handle = fopen($filePath, 'w');
 
         // Write CSV header
-        fputcsv($handle, ['email', 'name', 'role', 'password']);
+        fputcsv($handle, ['school', 'email', 'name', 'type', 'password']);
 
         // Loop through users and write each row
         foreach ($users as $user) {
-            $plain_password = Str::random(8);
+            $plain_password = $this->generateMemorablePassword();
             $user->password = Hash::make($plain_password);
             $user->save();
 
             fputcsv($handle, [
+                $role === "student" ? ($user->isHighSchool() ? 'High School' : 'Elementary School') : 'General',
                 $user->email,
                 $user->fullname,
                 $role,
@@ -64,5 +65,30 @@ class ExportUsersByRole extends Command
         $this->info("Exported " . $users->count() . " user(s) with role '{$role}' to: {$filePath}");
 
         return 0; // success exit code
+    }
+
+    public function generateMemorablePassword($numWords = 3, $separator = '-')
+    {
+        // Example small dictionary. Ideally, use a larger set of words.
+        $wordList = [
+            'apple','banana','cherry','dragon','eagle','forest','globe','happy',
+            'index','jungle','kite','lemon','monkey','number','ocean','purple',
+            'quiet','river','summer','tiger','unicorn','vivid','whale','xenon',
+            'yellow','zebra'
+        ];
+
+        // Shuffle or randomly pick words
+        $words = [];
+        for ($i = 0; $i < $numWords; $i++) {
+            $words[] = $wordList[array_rand($wordList)];
+        }
+
+        // Combine the words with a separator
+        $passphrase = implode($separator, $words);
+
+        // Optionally, add a random digit/symbol to increase complexity
+        $passphrase .= rand(0, 9);
+
+        return $passphrase;
     }
 }
