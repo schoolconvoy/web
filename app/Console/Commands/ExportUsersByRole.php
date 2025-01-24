@@ -45,6 +45,7 @@ class ExportUsersByRole extends Command
         foreach ($users as $user) {
             $plain_password = Str::random(8);
             $user->password = Hash::make($plain_password);
+            $user->save();
 
             fputcsv($handle, [
                 $user->email,
