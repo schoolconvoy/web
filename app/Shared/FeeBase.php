@@ -44,11 +44,19 @@ class FeeBase extends Resource
                 Textarea::make('description')
                             ->autosize(),
                 DatePicker::make('deadline'),
+                Select::make('classes')
+                            ->options(Classes::query()->orderBy('level_id')->get()->pluck('name', 'id'))
+                            ->preload()
+                            ->required(),
                 Select::make('students')
-                            // ->options(User::role(User::$STUDENT_ROLE)->pluck('lastname', 'id'))
                             ->relationship(
                                 name: 'students',
-                                modifyQueryUsing: fn ($query) => $query->orderBy('firstname')->orderBy('lastname'),
+                                modifyQueryUsing: fn ($query, $get) => $query->when(
+                                    $get('classes'),
+                                    fn ($query, $classId) => $query->whereHas('class', fn ($query) => $query->where('id', $classId))
+                                )
+                                ->orderBy('firstname')
+                                ->orderBy('lastname'),
                             )
                             ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname} - {$record->class?->name}")
                             ->searchable(['firstname', 'lastname'])

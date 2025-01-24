@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
 use App\Models\Session;
+use App\Models\Term;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -17,16 +18,30 @@ class SessionTermSchoolScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         if (Auth::hasUser()) {
-            if (!session()->has('currentSession') || !session()->has('currentTerm')) {
-                $activeSession = Session::active(auth()->user()->school_id);
-                $activeTerm = $activeSession->terms()->where('active', true)->first();
-
-                session()->put('currentSession', $activeSession);
-                session()->put('currentTerm', $activeTerm);
-            } else {
+            // Copied from app/Livewire/SessionAndTermPicker.php
+            // TODO: Refactor this to a service class
+            if (session()->has('currentSession')) {
                 $activeSession = session()->get('currentSession');
-                $activeTerm = session()->get('currentTerm');
+            } else {
+                $activeSession = Session::active(auth()->user()->school_id);
             }
+
+            if (!$activeSession) {
+                $activeSession = Session::active(auth()->user()->school_id);
+            }
+
+            if (session()->has('currentTerm')) {
+                $activeTerm = session()->get('currentTerm');
+            } else if (!is_null($activeSession)) {
+                $activeTerm =  $activeSession->terms()->where('active', true)->first();
+            } else {
+                $activeTerm = Term::where('school_id', auth()->user()->school_id)
+                                        ->where('active', true)
+                                        ->first();
+            }
+
+            session()->put('currentSession', $activeSession);
+            session()->put('currentTerm', $activeTerm);
 
             $school_id = session()->get('school_id') ? session()->get('school_id') : auth()->user()->school_id;
             $table = $model->getTable();

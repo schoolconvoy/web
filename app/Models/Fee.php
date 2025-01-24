@@ -15,11 +15,6 @@ class Fee extends BaseModel
 
     protected $appends = ['final_amount'];
 
-    public function classes()
-    {
-        return $this->belongsToMany(Classes::class, 'classes_fee');
-    }
-
     public function category()
     {
         return $this->belongsTo(FeeCategory::class, 'fee_category', 'id');

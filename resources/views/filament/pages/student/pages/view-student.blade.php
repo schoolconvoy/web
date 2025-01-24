@@ -28,11 +28,18 @@
             <li class="mr-2" role="presentation">
                 <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>
             </li>
+            <li class="mr-2" role="presentation">
+                <button class="inline-block p-4 border-b-2 rounded-t-lg" id="fees-tab" data-tabs-target="#fees" type="button" role="tab" aria-controls="fees" aria-selected="false">Fees</button>
+            </li>
         </ul>
     </div>
     <div id="default-tab-content">
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             {{ $this->infolist }}
+        </div>
+        <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="fees" role="tabpanel" aria-labelledby="fees-tab">
+            <!-- insert table here -->
+            {{ $this->table }}
         </div>
     </div>
 
@@ -46,3 +53,43 @@
         />
     @endif
 </x-filament-panels::page>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const tabsElement = document.getElementById('default-tab');
+
+    const tabElements = [
+        {
+            id: 'profile',
+            triggerEl: document.querySelector('#profile-tab'),
+            targetEl: document.querySelector('#profile'),
+        },
+        {
+            id: 'fees',
+            triggerEl: document.querySelector('#fees-tab'),
+            targetEl: document.querySelector('#fees'),
+        },
+    ];
+
+    const options = {
+        defaultTabId: 'profile',
+        activeClasses: 'text-blue-600 border-b-2 border-blue-600',
+        inactiveClasses: 'hover:text-gray-600 border-transparent',
+    };
+
+    const tabs = new Tabs(tabsElement, tabElements, options);
+
+    // Read ?tab=... from the URL
+    const url = new URL(window.location.href);
+    const targetTabParam = url.searchParams.get('tab'); // e.g. "settings"
+
+    console.log({ targetTabParam, tabs })
+
+    // If we have a tab param, show it
+    if (targetTabParam) {
+            // We assume each tab's ID is something like "fees-tab"
+            // so we append "-tab" to the param
+            tabs.show(`${targetTabParam}`);
+    }
+});
+</script>
