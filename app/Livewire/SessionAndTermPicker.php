@@ -102,19 +102,24 @@ class SessionAndTermPicker extends Component
             return;
         }
 
-        $this->currentSession = session()->has('currentSession') ? session()->get('currentSession') : Session::active(auth()->user()->school_id);
+        if (session()->has('currentSession')) {
+            $this->currentSession = session()->get('currentSession');
+        } else {
+            $this->currentSession = Session::active(auth()->user()->school_id);
+        }
 
         if (!$this->currentSession) {
             $this->currentSession = Session::active(auth()->user()->school_id);
         }
 
-        $this->currentTerm = session()->has('currentTerm') ? session()->get('currentTerm') : $this->currentSession->terms()->where('active', true)->first();
-
-        if (!$this->currentTerm) {
+        if (session()->has('currentTerm')) {
+            $this->currentTerm = session()->get('currentTerm');
+        } else if (!is_null($this->currentSession)) {
+            $this->currentTerm =  $this->currentSession->terms()->where('active', true)->first();
+        } else {
             $this->currentTerm = Term::where('school_id', auth()->user()->school_id)
-                                        ->where('active', true)
-                                        ->where('session_id', $this->currentSession->id)
-                                        ->first();
+                                    ->where('active', true)
+                                    ->first();
         }
 
         $this->setSessionAndTermMapping();

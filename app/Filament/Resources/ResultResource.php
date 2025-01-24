@@ -31,6 +31,7 @@ class ResultResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+
     public static function form(Form $form): Form
     {
         return $form
@@ -147,6 +148,15 @@ class ResultResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    /**
+    * If `canAccess()` returns false, users won't see or access this resource.
+    */
+    public static function canAccess(): bool
+    {
+        // Only show to elementary school teachers
+        return auth()->check() && !auth()->user()->isHighSchool();
     }
 
     public static function getRelations(): array

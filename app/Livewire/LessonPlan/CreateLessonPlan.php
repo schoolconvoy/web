@@ -101,10 +101,9 @@ class CreateLessonPlan extends Component implements HasForms
                     Select::make('duration')
                         ->required()
                         ->options([
-                            '30 minutes' => '30 minutes',
-                            '1 hour' => '1 hour',
-                            '2 hours' => '2 hours',
-                            '3 hours' => '3 hours',
+                            '40 minutes' => '40 minutes',
+                            '80 minutes' => '80 minutes',
+                            '120 minutes' => '120 minutes'
                         ])
                         ->searchable()
                         ->helperText('Enter the duration of the lesson plan'),

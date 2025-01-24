@@ -15,6 +15,9 @@ class CreateFee extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        // We don't necessarily want to store the classes in the fee table
+        unset($data['classes']);
+
         return static::getModel()::create($data);
     }
 }

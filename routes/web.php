@@ -41,3 +41,5 @@ Route::get('/payment/callback', [PaymentController::class, 'handleGatewayCallbac
  * Public routes
  */
 Route::get('/admission', [PublicController::class, 'index'])->name('admission.index');
+
+Route::get('/{user_id}/generate-scoresheet', [App\Http\Controllers\PDFController::class, 'generateScoresheet']);
