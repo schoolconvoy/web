@@ -158,4 +158,13 @@ class BulkResultsEntry extends Page
             'sessions' => Session::all(),
         ];
     }
+
+    /**
+    * If `canAccess()` returns false, users won't see or access this resource.
+    */
+    public static function canAccess(): bool
+    {
+        // Only show to high school teachers
+        return auth()->check() && auth()->user()->isHighSchool();
+    }
 }
