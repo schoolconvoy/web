@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class FeeResource extends FeeBase
 {
@@ -35,51 +36,48 @@ class FeeResource extends FeeBase
         return $table
             ->query(
                 Fee::query()
-                    ->select('fees.*', 'classes.name as class_name', 'classes.id as class_id')
-                    ->join('fee_student', 'fee_student.fee_id', '=', 'fees.id')
+                    // Join to pivot table linking fees and students:
+                    ->join('fee_student', 'fees.id', '=', 'fee_student.fee_id')
+                    // Join to the students table (often "users"):
                     ->join('users', 'fee_student.student_id', '=', 'users.id')
+                    // Join to the classes table:
                     ->join('classes', 'users.class_id', '=', 'classes.id')
-                    ->groupBy('fees.id')
-                    ->orderBy('classes.level_id', 'asc')
+                    ->select(
+                        'fees.id',
+                        'classes.id AS class_id',
+                        'classes.name AS class_name',
+                        DB::raw('SUM(fees.amount) AS total_fee'),
+                        DB::raw('COUNT(DISTINCT fee_student.student_id) AS total_students')
+                    )
+                    ->groupBy('classes.id', 'classes.name')
             )
             ->columns([
-                TextColumn::make('name')
-                        ->searchable(),
-                TextColumn::make('amount')
-                            ->numeric(2)
-                            ->money('NGN'),
-                TextColumn::make('class_name'),
-                TextColumn::make('students_count')
-                                ->counts('students')
-                                ->label('Students'),
-
-            ])
-            ->defaultGroup(
-                'class_name'
-            )
-            ->filters([
-                SelectFilter::make('class_id')
-							->options(
-								fn () => \App\Models\Level::all()->pluck('name', 'id')
-							)
-							->label('Level')
-            ])
-            ->headerActions([
-                Tables\Actions\Action::make('pay_with_Paystack')
-                                        ->action(function () {
-                                            return redirect(route('pay'));
-                                        })
-                                        ->visible(auth()->user()->hasRole(User::$PARENT_ROLE))
+                TextColumn::make('class_name')->sortable(),
+                TextColumn::make('total_fee')->numeric(2)->money('NGN'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('View Class Fee')
+                    ->url(
+                        fn (Fee $fee): string =>
+                            route('filament.admin.resources.fees.view-class', [
+                                'record' => $fee->class_id
+                            ])
+                        ),
             ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ])
-            ;
+            ->filters([
+                SelectFilter::make('class_id')
+                    ->options(
+                        User::query()
+                            ->whereNotNull('class_id')
+                            ->with('class')
+                            ->orderBy('class_id')
+                            ->get()
+                            ->pluck('class.name', 'class.id')
+                    )
+                    ->label('Class')
+                    ->default(null),
+            ]);
     }
 
     public static function getRelations(): array
@@ -95,6 +93,7 @@ class FeeResource extends FeeBase
             'index' => Pages\ListFees::route('/'),
             'create' => Pages\CreateFee::route('/create'),
             'view' => Pages\ViewFee::route('/{record}'),
+            'view-class' => Pages\ViewClassFee::route('/class/{record}'),
             'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
     }

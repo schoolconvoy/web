@@ -23,6 +23,8 @@ class EditFee extends EditRecord
 
     public function handleRecordUpdate(Model $record, array $data): Model
     {
+        unset($data['classes']);
+
         $record->update($data);
 
         return $record;
