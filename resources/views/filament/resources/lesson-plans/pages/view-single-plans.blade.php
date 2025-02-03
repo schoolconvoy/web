@@ -46,6 +46,11 @@
             <span>{{ $this->plan->objectives }}</span>
         </div>
 
+        <div class="bg-white mx-auto flex flex-col overflow-hidden px-6 py-8 rounded-lg shadow-sm w-full">
+            <span class="font-semibold text-sm">Methodology</span>
+            <span>{{ $this->plan->methodology }}</span>
+        </div>
+
         <!---- Lesson Plan Content Download --->
         <div class="flex flex-row justify-between">
             <x-filament::button
