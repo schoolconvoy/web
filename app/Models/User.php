@@ -347,14 +347,45 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         return $this->notify(new UserRegistered($notificationUrl, $user));
     }
 
+    // A student can have many fees (each fee may be discounted)
     public function fees()
     {
-        return $this->belongsToMany(Fee::class, 'fee_student', 'student_id', 'fee_id');
+        return $this->belongsToMany(Fee::class, 'discount_student_fee', 'student_id', 'fee_id')
+                    ->using(DiscountStudentFee::class)
+                    ->withPivot('discount_id')
+                    ->withTimestamps();
     }
 
+    // A student can have many discounts (each discount applies to a particular fee)
     public function discounts()
     {
-        return $this->belongsToMany(Discount::class, 'discount_student', 'student_id', 'discount_id');
+        return $this->belongsToMany(Discount::class, 'discount_student_fee', 'student_id', 'discount_id')
+                    ->withPivot('fee_id')
+                    ->withTimestamps();
+    }
+
+    public static function getOverallAmountWithDiscounts(User $user)
+    {
+        // Get all fees for this user, including the discount associated with each fee
+        $fees = $user->fees;
+
+        Log::alert("fees for student: " . print_r($fees, true));
+
+        // Apply discount to each fee
+        $discountedAmounts = $fees->map(function ($fee) {
+            // $discount = $fee->discounts->where('end_date', '>=', now())->first();
+            // Discounts are attached to users and their specific fees
+            $discount = Discount::where('end_date', '>=', now())
+                                ->whereHas('students', function ($query) use ($fee) {
+                                    $query->where('student_id', $fee->pivot->student_id);
+                                })
+                                ->first();
+            $discountedPercentage = $discount->percentage ?? 0;
+            $discountedAmount = $fee->amount - ($fee->amount * $discountedPercentage / 100);
+            return $discountedAmount;
+        });
+
+        return $discountedAmounts->sum();
     }
 
     public function scopeHighSchool($query)

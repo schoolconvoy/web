@@ -28,19 +28,26 @@
             <li class="mr-2" role="presentation">
                 <button class="inline-block p-4 border-b-2 rounded-t-lg" id="profile-tab" data-tabs-target="#profile" type="button" role="tab" aria-controls="profile" aria-selected="false">Profile</button>
             </li>
+            {{-- Fees are not visible to teachers --}}
+            @role('Admin|super-admin|Elementary School Principal|High School Principal|Accountant')
             <li class="mr-2" role="presentation">
                 <button class="inline-block p-4 border-b-2 rounded-t-lg" id="fees-tab" data-tabs-target="#fees" type="button" role="tab" aria-controls="fees" aria-selected="false">Fees</button>
             </li>
+            @endrole
         </ul>
     </div>
     <div id="default-tab-content">
+        {{-- Profile --}}
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="profile" role="tabpanel" aria-labelledby="profile-tab">
             {{ $this->infolist }}
         </div>
+        {{-- Fees --}}
+        @role('Admin|super-admin|Elementary School Principal|High School Principal|Accountant')
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="fees" role="tabpanel" aria-labelledby="fees-tab">
             <!-- insert table here -->
             {{ $this->table }}
         </div>
+        @endrole
     </div>
 
 
