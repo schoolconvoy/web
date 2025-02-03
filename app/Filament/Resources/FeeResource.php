@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FeeResource\Pages;
+use App\Models\Classes;
 use App\Models\Fee;
 use App\Models\User;
 use Filament\Tables;
@@ -35,49 +36,22 @@ class FeeResource extends FeeBase
     {
         return $table
             ->query(
-                Fee::query()
-                    // Join to pivot table linking fees and students:
-                    ->join('fee_student', 'fees.id', '=', 'fee_student.fee_id')
-                    // Join to the students table (often "users"):
-                    ->join('users', 'fee_student.student_id', '=', 'users.id')
-                    // Join to the classes table:
-                    ->join('classes', 'users.class_id', '=', 'classes.id')
-                    ->select(
-                        'fees.id',
-                        'classes.id AS class_id',
-                        'classes.name AS class_name',
-                        DB::raw('SUM(fees.amount) AS total_fee'),
-                        DB::raw('COUNT(DISTINCT fee_student.student_id) AS total_students')
-                    )
-                    ->groupBy('classes.id', 'classes.name')
+                Classes::query()
             )
             ->columns([
-                TextColumn::make('class_name')->sortable(),
-                TextColumn::make('total_fee')->numeric(2)->money('NGN'),
+                TextColumn::make('name')->sortable(),
+				TextColumn::make('level.shortname')->sortable(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->label('View Class Fee')
                     ->url(
-                        fn (Fee $fee): string =>
+                        fn (Classes $class): string =>
                             route('filament.admin.resources.fees.view-class', [
-                                'record' => $fee->class_id
+                                'record' => $class->id
                             ])
                         ),
-            ])
-            ->filters([
-                SelectFilter::make('class_id')
-                    ->options(
-                        User::query()
-                            ->whereNotNull('class_id')
-                            ->with('class')
-                            ->orderBy('class_id')
-                            ->get()
-                            ->pluck('class.name', 'class.id')
-                    )
-                    ->label('Class')
-                    ->default(null),
-            ]);
+				]);
     }
 
     public static function getRelations(): array

@@ -30,6 +30,11 @@ class ViewClassFee extends ViewRecord implements HasTable
 
     protected static string $model = Classes::class;
 
+    public function getTitle(): string
+    {
+        return "Viewing fees for " . $this->record->level->shortname ;
+    }
+
     public function getRecord(): Model
     {
         return $this->record;
@@ -37,21 +42,20 @@ class ViewClassFee extends ViewRecord implements HasTable
 
     public function getQuery(): Builder
     {
-        return $this->record->users()
-            ->select(
-                'users.firstname',
-                'users.lastname',
-                'classes.name as class_name',
-                DB::raw('SUM(fees.amount) as total_fee'),
-                'users.id as user_id',
-                'classes.id',
-                'fees.id as fee_id'
-            )
-            ->leftJoin('fee_student', 'users.id', '=', 'fee_student.student_id')
-            ->leftJoin('fees', 'fee_student.fee_id', '=', 'fees.id')
-            ->join('classes', 'users.class_id', '=', 'classes.id')
-            ->groupBy('users.id', 'users.firstname', 'users.lastname', 'classes.name')
-            ->getQuery();
+        return $this->record
+                    ->users()
+                    ->select(
+                        'users.id',
+                        'users.firstname',
+                        'users.lastname',
+                        'classes.name as class_name',
+                        DB::raw('SUM(fees.amount) as total_fee')
+                    )
+                    ->leftJoin('discount_student_fee as dsf', 'users.id', '=', 'dsf.student_id')
+                    ->leftJoin('fees', 'dsf.fee_id', '=', 'fees.id')
+                    ->join('classes', 'users.class_id', '=', 'classes.id')
+                    ->groupBy('users.id', 'users.firstname', 'users.lastname', 'classes.name')
+                    ->getQuery();
     }
 
     public function table(Table $table): Table
@@ -59,12 +63,16 @@ class ViewClassFee extends ViewRecord implements HasTable
         return $table
             ->query($this->getQuery())
             ->columns([
-                TextColumn::make('class_name'),
-                TextColumn::make('firstname')->searchable(),
-                TextColumn::make('lastname')->searchable(),
+                TextColumn::make('firstname')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('lastname')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('total_fee')
                     ->numeric(2)
                     ->default(0)
+                    ->sortable()
                     ->money('NGN'),
             ])
             ->actions([
@@ -73,7 +81,7 @@ class ViewClassFee extends ViewRecord implements HasTable
                     ->url(
                         fn (User $user): string =>
                             route('filament.admin.resources.students.view', [
-                                'record' => $user->user_id
+                                'record' => $user->id
                             ]) . '?tab=fees'
                         ),
             ]);

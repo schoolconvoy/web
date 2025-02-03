@@ -13,7 +13,7 @@ class Fee extends BaseModel
 {
     use HasFactory;
 
-    protected $appends = ['final_amount'];
+    // protected $appends = ['final_amount'];
 
     public function category()
     {
@@ -25,27 +25,48 @@ class Fee extends BaseModel
         return $this->belongsToMany(Fee::class, 'fee_payments');
     }
 
+    // A fee can belong to many students.
     public function students()
     {
-        return $this->belongsToMany(User::class, 'fee_student', 'fee_id', 'student_id')
+        return $this->belongsToMany(User::class, 'discount_student_fee', 'fee_id', 'student_id')
+                    ->using(DiscountStudentFee::class)
+                    ->withPivot('discount_id')
                     ->withTimestamps();
     }
 
-    public function discounts()
+    /**
+     * Calculates the total amount of the fee, given a discount percentage.
+     */
+    public function getTotal($percentageDiscount)
     {
-        return $this->belongsToMany(Discount::class, 'discount_fee');
+        return $this->amount - ($this->amount * $percentageDiscount / 100);
     }
 
-    public function getFinalAmountAttribute()
+    // public function getFinalAmountAttribute()
+    // {
+    //     // Calculate the fee with the associated discount
+    //     $discount = $this->discounts->where('end_date', '>=', now())->first();
+
+    //     $discountedPercentage = $discount->percentage ?? 0;
+
+    //     $discountedAmount = $this->amount - ($this->amount * $discountedPercentage / 100);
+
+    //     return $discountedAmount;
+    // }
+
+    public static function getOverallAmountWithDiscounts($user)
     {
-        // Calculate the fee with the associated discount
-        $discount = $this->discounts->where('end_date', '>=', now())->first();
+        // Get all fees for this user, including the discount associated with each fee
+        $fees = $user->fees;
+        // Apply discount to each fee
+        $discountedAmounts = $fees->map(function ($fee) {
+            $discount = $fee->discounts->where('end_date', '>=', now())->first();
+            $discountedPercentage = $discount->percentage ?? 0;
+            $discountedAmount = $fee->amount - ($fee->amount * $discountedPercentage / 100);
+            return $discountedAmount;
+        });
 
-        $discountedPercentage = $discount->percentage ?? 0;
-
-        $discountedAmount = $this->amount - ($this->amount * $discountedPercentage / 100);
-
-        return $discountedAmount;
+        return $discountedAmounts->sum();
     }
 
     public function reminders()

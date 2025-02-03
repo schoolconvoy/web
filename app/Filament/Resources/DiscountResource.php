@@ -37,19 +37,21 @@ class DiscountResource extends Resource
                 DatePicker::make('end_date')
                     ->required()
                     ->helperText('Leave empty if discount has no end date'),
-                Select::make('fees')
+                Select::make('fee_id')
                     ->relationship('fees', 'name')
-                    ->multiple()
                     ->required()
                     ->searchable()
+                    ->preload()
                     ->placeholder('Select fees'),
-                Select::make('students')
-                    ->relationship('students', 'lastname')
-                    ->multiple()
-                    ->searchable()
+                Select::make('student_id')
+                    // ->relationship('students', 'lastname')
+                    ->relationship('students')
                     ->required()
                     ->placeholder('Select students')
-                    ->helperText('Search with lastname'),
+                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname}")
+                    ->searchable(['firstname', 'lastname'])
+                    ->helperText('Search with student name')
+                    ->preload()
             ]);
     }
 
@@ -81,7 +83,7 @@ class DiscountResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
         ];
     }
 

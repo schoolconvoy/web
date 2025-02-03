@@ -113,6 +113,10 @@ class CreateLessonPlan extends Component implements HasForms
                     ->rows(3)
                     ->maxLength(255)
                     ->helperText('Enter the objectives of the lesson plan. Max. 255 characters'),
+                Textarea::make('methodology')
+                    ->rows(3)
+                    ->maxLength(255)
+                    ->helperText('Enter the methodology of the lesson plan. Max. 255 characters'),
             ])
             ->statePath('createData')
             ->model(LessonPlan::class);
