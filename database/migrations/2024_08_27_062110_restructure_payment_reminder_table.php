@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('payment_reminders', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('fee_id');
-        });
+        // Schema::table('payment_reminders', function (Blueprint $table) {
+        //     $table->dropConstrainedForeignId('fee_id');
+        // });
 
         Schema::create('payment_reminder_fees', function (Blueprint $table) {
             $table->id();
