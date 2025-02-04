@@ -15,12 +15,12 @@ return new class extends Migration
         //     $table->dropConstrainedForeignId('fee_id');
         // });
 
-        Schema::create('payment_reminder_fees', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('fee_id')->constrained();
-            $table->foreignId('payment_reminder_id')->constrained();
-            $table->timestamps();
-        });
+        // Schema::create('payment_reminder_fees', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('fee_id')->constrained();
+        //     $table->foreignId('payment_reminder_id')->constrained();
+        //     $table->timestamps();
+        // });
     }
 
     /**
