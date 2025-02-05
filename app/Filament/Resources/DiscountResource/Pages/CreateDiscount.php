@@ -26,10 +26,16 @@ class CreateDiscount extends CreateRecord
 
         $discount = static::getModel()::create($data);
 
-        // Find the fee id and student id and attach them to the discount
-        DiscountStudentFee::where('fee_id', $fee_id)
-            ->where('student_id', $student_id)
-            ->update(['discount_id' => $discount->id]);
+        // Since any fee might be selected and it may not already have been attached to the student
+        DiscountStudentFee::firstOrCreate(
+            [
+                'fee_id' => $fee_id,
+                'student_id' => $student_id,
+            ],
+            [
+                'discount_id' => $discount->id,
+            ]
+        );
 
         return $discount;
     }

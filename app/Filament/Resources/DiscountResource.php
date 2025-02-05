@@ -17,6 +17,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Models\User;
+use App\Models\Fee;
 
 class DiscountResource extends Resource
 {
@@ -35,17 +37,19 @@ class DiscountResource extends Resource
                     ->required()
                     ->maxValue(90),
                 DatePicker::make('end_date')
-                    ->required()
                     ->helperText('Leave empty if discount has no end date'),
                 Select::make('fee_id')
+                    ->label('Fee')
+                    // ->options(fn () => Fee::all()->pluck('name', 'id'))
                     ->relationship('fees', 'name')
                     ->required()
                     ->searchable()
                     ->preload()
                     ->placeholder('Select fees'),
                 Select::make('student_id')
-                    // ->relationship('students', 'lastname')
-                    ->relationship('students')
+                    ->label('Student')
+                    ->options(fn () => User::studentsDropdown())
+                    ->relationship('students', 'firstname', modifyQueryUsing: fn ($query) => $query->orderBy('firstname'))
                     ->required()
                     ->placeholder('Select students')
                     ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname}")
@@ -63,6 +67,10 @@ class DiscountResource extends Resource
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('percentage'),
+                TextColumn::make('students.id')
+                    ->formatStateUsing(fn ($state) => User::find($state)->fullname)
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('fees.name')
                     ->searchable()
                     ->sortable(),
@@ -72,6 +80,15 @@ class DiscountResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label('View student fees')
+                    ->url(
+                        fn (Discount $record): string =>
+                            route('filament.admin.resources.students.view', [
+                                'record' => $record->students->first()->id
+                            ]) . '?tab=fees'
+                        )
+                    ->visible(fn (Discount $record): bool => $record->students->count() > 0),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
