@@ -26,6 +26,8 @@ class DiscountResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    protected static ?string $navigationGroup = 'Finance';
+
     public static function form(Form $form): Form
     {
         return $form
@@ -40,22 +42,38 @@ class DiscountResource extends Resource
                     ->helperText('Leave empty if discount has no end date'),
                 Select::make('fee_id')
                     ->label('Fee')
-                    // ->options(fn () => Fee::all()->pluck('name', 'id'))
-                    ->relationship('fees', 'name')
+                    ->relationship(
+                        'fees',
+                        'name',
+                        fn ($query) => $query->with('category')->orderBy('fee_category')
+                    )
+                    ->getOptionLabelFromRecordUsing(fn ($record) =>
+                        "{$record->name} - NGN " . number_format($record->amount, 2) . " ({$record->category->name})"
+                    )
                     ->required()
-                    ->searchable()
+                    ->searchable(['name', 'category.name'])
                     ->preload()
-                    ->placeholder('Select fees'),
+                    ->placeholder('Select fees')
+                    ->helperText('The amount shown is the full fee amount before any discounts.')
+                    ,
                 Select::make('student_id')
                     ->label('Student')
-                    ->options(fn () => User::studentsDropdown())
-                    ->relationship('students', 'firstname', modifyQueryUsing: fn ($query) => $query->orderBy('firstname'))
+                    ->relationship(
+                        'students',
+                        'firstname',
+                        fn ($query) => $query->role(User::$STUDENT_ROLE)
+                            ->with('class')
+                            ->orderBy('firstname')
+                    )
+                    ->getOptionLabelFromRecordUsing(function (Model $record) {
+                        $className = $record->class ? $record->class->name : 'No Class';
+                        return "{$record->firstname} {$record->lastname} ({$record->admission_no}) - {$className}";
+                    })
                     ->required()
                     ->placeholder('Select students')
-                    ->getOptionLabelFromRecordUsing(fn (Model $record) => "{$record->firstname} {$record->lastname}")
-                    ->searchable(['firstname', 'lastname'])
-                    ->helperText('Search with student name')
-                    ->preload()
+                    ->searchable(['firstname', 'lastname', 'admission_no'])
+                    ->helperText('Search by name or admission number')
+                    ->preload(),
             ]);
     }
 

@@ -1,7 +1,17 @@
 <x-filament-panels::page>
     <!-- Tab links -->
-    <div class="h-20 w-20 rounded-full overflow-hidden">
-        <img src="{{ $record->picture ? asset('/storage/'. $record->picture) : null }}" alt="{{ $record->firstname }}">
+    <div class="h-20 w-20 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+        @if($record->picture)
+            <img
+                src="{{ asset('/storage/'. $record->picture) }}"
+                alt="{{ $record->firstname }}'s profile picture"
+                class="h-full w-full object-cover"
+            >
+        @else
+            <div class="text-gray-400 text-2xl font-bold">
+                {{ strtoupper(substr($record->firstname, 0, 1) . substr($record->lastname, 0, 1)) }}
+            </div>
+        @endif
     </div>
     <div class="flex gap-3 items-center py-3">
         <div class="flex flex-row gap-x-2.5">
@@ -44,12 +54,14 @@
         {{-- Fees --}}
         @role('Admin|super-admin|Elementary School Principal|High School Principal|Accountant')
         <div class="p-4 rounded-lg bg-gray-50 dark:bg-gray-800" id="fees" role="tabpanel" aria-labelledby="fees-tab">
-            <!-- insert table here -->
-            {{ $this->table }}
+            <x-filament::section>
+                <div class="space-y-6">
+                    {{ $this->table }}
+                </div>
+            </x-filament::section>
         </div>
         @endrole
     </div>
-
 
     @if (count($relationManagers = $this->getRelationManagers()))
         <x-filament-panels::resources.relation-managers

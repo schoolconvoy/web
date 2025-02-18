@@ -20,6 +20,7 @@ class FeeBase extends Resource
     protected static ?string $model = Fee::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static ?string $navigationGroup = 'Finance';
 
     public static function form(Form $form): Form
     {

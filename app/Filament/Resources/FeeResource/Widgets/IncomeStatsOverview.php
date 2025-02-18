@@ -10,6 +10,7 @@ use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class IncomeStatsOverview extends BaseWidget
 {
@@ -32,126 +33,93 @@ class IncomeStatsOverview extends BaseWidget
         ];
     }
 
-    protected static function getTrend($query)
-    {
-        $data = Trend::query($query)
-                ->between(
-                    start: now()->subYear(),
-                    end: now()->endOfYear(),
-                )
-                ->perMonth()
-                ->sum('amount');
-
-        return $data;
-    }
-
     protected function getStats(): array
     {
-        // For the purpose of using the trend chart, we will keep this query simple.
-        // More complete query can be seen below
-        $expected_query = Fee::whereHas('students')
-                        ->where('deadline', '>=', now()->toDate())
-                        ->orWhere('deadline', null);
+        // Calculate total payments received (with trend)
+        $paymentsData = Trend::query(
+            Payment::query()
+                ->where('paid', true)
+        )
+        ->between(
+            start: now()->startOfYear(),
+            end: now(),
+        )
+        ->perMonth()
+        ->sum('amount');
 
-        $expected = Trend::query($expected_query)
-                        ->between(
-                            start: now()->subYear(),
-                            end: now()->endOfYear(),
-                        )
-                        ->perMonth()
-                        ->sum('amount');
+        // Calculate total unpaid fees (with trend)
+        $unpaidFeesQuery = Fee::query()
+            ->whereHas('students')
+            ->where('deadline', '<=', now())
+            ->whereDoesntHave('payments');
 
-        // Expected fees are fees that have not been paid
-        // and those that have not reached their deadline or don't have one
-        $expected_sum = Fee::whereHas('students')
-                            ->where('deadline', '>=', now()->toDate())
-                            ->orWhere('deadline', null)
-                            ->get()
-                            ->map(function ($fee) {
-                                // Multiply the fee by the amount of students it was assigned to
-                                return $fee->final_amount * $fee->students->count();
-                            })
-                            ->sum();
+        $unpaidData = Trend::query($unpaidFeesQuery)
+            ->between(
+                start: now()->startOfYear(),
+                end: now(),
+            )
+            ->perMonth()
+            ->sum('amount');
 
-        // If any expected payment has been made, we will subtract it from the expected sum
-        $paid_expected_sum = Payment::whereHas('fees', function ($query) {
-                                            $query->whereHas('students')
-                                                ->where('deadline', '>=', now()->toDate())
-                                                ->orWhere('deadline', null);
-                                        })
-                                        ->sum('amount');
+        // Calculate expected upcoming fees (with trend)
+        $expectedFeesQuery = Fee::query()
+            ->whereHas('students')
+            ->where(function($query) {
+                $query->where('deadline', '>', now())
+                    ->orWhereNull('deadline');
+            })
+            ->whereDoesntHave('payments');
 
-        $expected_sum -= $paid_expected_sum;
+        $expectedData = Trend::query($expectedFeesQuery)
+            ->between(
+                start: now()->startOfYear(),
+                end: now(),
+            )
+            ->perMonth()
+            ->sum('amount');
 
-        $paid = Fee::whereHas('payments');
-        $paid = Trend::query($paid)
-                        ->between(
-                            start: now()->subYear(),
-                            end: now()->endOfYear(),
-                        )
-                        ->perMonth()
-                        ->sum('amount');
+        // Calculate total sums
+        $totalPayments = Payment::where('paid', true)->sum('amount');
 
-        // Fees that have passed their deadline and have not been paid
-        $unpaid = Fee::whereDoesntHave('payments')
-                    ->where('deadline', '<=', now()->toDate());
-        $unpaid = Trend::query($unpaid)
-                        ->between(
-                            start: now()->subYear(),
-                            end: now()->endOfYear(),
-                        )
-                        ->perMonth()
-                        ->sum('amount');
+        // Calculate total unpaid fees
+        $totalUnpaid = Fee::whereHas('students')
+            ->where('deadline', '<=', now())
+            ->whereDoesntHave('payments')
+            ->get()
+            ->sum(function ($fee) {
+                return $fee->getTotal($fee->discount_percentage) * $fee->students->count();
+            });
 
-        $unpaid_sum = Fee::whereHas('students')
-                        ->where('deadline', '<=', now()->toDate())
-                        ->get()
-                        ->map(function ($fee) {
-                            // Multiply the fee by the amount of students it was assigned to
-                            return $fee->final_amount * $fee->students->count();
-                        })
-                        ->sum();
+        // Calculate total expected fees
+        $totalExpected = Fee::whereHas('students')
+            ->where(function($query) {
+                $query->where('deadline', '>', now())
+                    ->orWhereNull('deadline');
+            })
+            ->whereDoesntHave('payments')
+            ->get()
+            ->sum(function ($fee) {
+                return $fee->getTotal($fee->discount_percentage) * $fee->students->count();
+            });
 
         return [
-            Stat::make(
-                'Total fees receieved',
-                '₦' . number_format(Payment::sum('amount'), 2, '.', ',')
-            )
-                ->description('Total amount of fees paid.')
-                ->icon('heroicon-m-currency-dollar')
+            Stat::make('Total Fees Received', '₦' . number_format($totalPayments, 2))
+                ->description('Total amount of successful payments')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success')
-                ->chart(
-                    $paid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
-                )
-            ,
-            Stat::make(
-                'Unpaid fees',
-                '₦' . number_format($unpaid_sum, 2, '.', ',')
-            )
-                ->color('danger')
-                ->description('Total amount due as at today.')
-                ->icon('heroicon-m-currency-dollar')
-                ->chart(
-                    $unpaid->map(fn (TrendValue $value) => $value->aggregate)->toArray()
-                ),
+                ->chart($paymentsData->map(fn (TrendValue $value) => $value->aggregate ?? 0)->toArray()),
 
-            Stat::make(
-                'Expected fees',
-                '₦' .
-                number_format(
-                    // TODO: Revisit when the final_amount attribute is fixed
-                    $expected_sum,
-                    2,
-                    '.',
-                    ','
-                )
-            )
-                ->description('Total amount of fees due before the end of term.')
-                ->icon('heroicon-m-currency-dollar')
-                ->color('success')
-                ->chart(
-                    $expected->map(fn (TrendValue $value) => $value->aggregate)->toArray()
-                )
+            Stat::make('Overdue Fees', '₦' . number_format($totalUnpaid, 2))
+                ->description('Total amount of unpaid fees past deadline')
+                ->descriptionIcon('heroicon-m-exclamation-circle')
+                ->color('danger')
+                ->chart($unpaidData->map(fn (TrendValue $value) => $value->aggregate ?? 0)->toArray()),
+
+            Stat::make('Expected Fees', '₦' . number_format($totalExpected, 2))
+                ->description('Upcoming fees not yet due')
+                ->descriptionIcon('heroicon-m-calendar')
+                ->color('info')
+                ->chart($expectedData->map(fn (TrendValue $value) => $value->aggregate ?? 0)->toArray()),
         ];
     }
 }

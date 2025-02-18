@@ -12,40 +12,63 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Cache;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\Summarizers\Summarizer;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class FeeResource extends FeeBase
 {
     public static function table(Table $table): Table
     {
-        return $table
-            ->query(function () {
-                $ward = Cache::get('ward', 0);
+        $ward = User::find(Cache::get('ward'));
 
-                return User::find($ward)->fees()->whereDoesntHave('payments') ?? Fee::where('id', 0);
+        return $table
+            ->query(function () use ($ward) {
+                return $ward->fees()
+                    ->whereDoesntHave('payments')
+                    ->whereDoesntHave('waivers', function ($query) {
+                        $query->where(function($q) {
+                            $q->whereNull('end_date')
+                                ->orWhere('end_date', '>=', now());
+                        });
+                    });
             })
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('amount')
-                            ->numeric()
-                            ->money('NGN'),
-                // TextColumn::make('discount.percentage')
-                //             ->numeric()
-                //             ->money('NGN'),
-                TextColumn::make('category.name'),
+                    ->numeric()
+                    ->money('NGN')
+                    ->description(fn (Fee $record) =>
+                        $record->getTotal($record->discount_percentage) !== $record->amount
+                            ? 'Discounted: NGN ' . number_format($record->getTotal($record->discount_percentage), 2)
+                            : ''
+                    ),
+                TextColumn::make('category.name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('deadline')
+                    ->date('M j, Y')
+                    ->sortable()
+                    ->color(fn (Fee $record) =>
+                        $record->deadline && $record->deadline <= now()
+                            ? 'danger'
+                            : 'success'
+                    ),
             ])
-            // Group summary is wrong at the moment
-            ->defaultGroup(
-                'category.name',
-            )
+            ->defaultGroup('category.name')
             ->filters([
                 //
             ])
             ->headerActions([
                 Tables\Actions\Action::make('pay_with_Paystack')
-                                        ->action(function () {
-                                            return redirect(route('pay'));
-                                        })
+                    ->label('Pay Now')
+                    ->icon('heroicon-m-banknotes')
+                    ->color('success')
+                    ->visible(fn () => User::getOverallAmountWithDiscounts($ward) > 0)
+                    ->action(function () {
+                        return redirect(route('pay'));
+                    })
             ]);
     }
 
@@ -60,8 +83,6 @@ class FeeResource extends FeeBase
     {
         return [
             'index' => Pages\ListFees::route('/'),
-            'create' => Pages\CreateFee::route('/create'),
-            'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
     }
 

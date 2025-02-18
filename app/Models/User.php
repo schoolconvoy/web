@@ -364,6 +364,16 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                     ->withTimestamps();
     }
 
+    public function scholarships()
+    {
+        return $this->hasMany(Scholarship::class, 'student_id');
+    }
+
+    public function waivers()
+    {
+        return $this->hasMany(Waiver::class, 'student_id');
+    }
+
     public static function getOverallAmountWithDiscounts(User $user)
     {
         // Get all fees for this user, including the discount associated with each fee
@@ -372,7 +382,7 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         Log::alert("fees for student: " . print_r($fees, true));
 
         // Apply discount to each fee
-        $discountedAmounts = $fees->map(function ($fee) {
+        $discountedAmounts = $fees->map(function ($fee) use ($user) {
             // $discount = $fee->discounts->where('end_date', '>=', now())->first();
             // Discounts are attached to users and their specific fees
             $discount = Discount::where('end_date', '>=', now())
@@ -382,10 +392,32 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
                                 ->first();
             $discountedPercentage = $discount->percentage ?? 0;
             $discountedAmount = $fee->amount - ($fee->amount * $discountedPercentage / 100);
-            return $discountedAmount;
+
+            // Check if this fee is waived
+            $isWaived = $user->waivers()
+                ->where(function($query) {
+                    $query->whereNull('end_date')
+                        ->orWhere('end_date', '>=', now());
+                })
+                ->whereHas('fees', function($query) use ($fee) {
+                    $query->where('fees.id', $fee->id);
+                })
+                ->exists();
+
+            return $isWaived ? 0 : $discountedAmount;
         });
 
-        return $discountedAmounts->sum();
+        $totalBeforeScholarship = $discountedAmounts->sum();
+
+        // Apply any active scholarships
+        $activeScholarships = $user->scholarships()
+                                  ->where(function($query) {
+                                      $query->whereNull('end_date')
+                                           ->orWhere('end_date', '>=', now());
+                                  })
+                                  ->sum('amount');
+
+        return max(0, $totalBeforeScholarship - $activeScholarships);
     }
 
     public function scopeHighSchool($query)
@@ -411,26 +443,31 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public function isHighSchool()
     {
-        $role = $this->roles[0]->name;
+        return $this->determineIfHighSchool();
+    }
 
-        if ($role === User::$TEACHER_ROLE && $this->teacher_class)
-        {
-            return in_array($this->teacher_class->name, User::$HIGH_SCHOOL_CLASSES);
-        }
-
-        if($role === User::$ELEM_PRINCIPAL_ROLE)
-        {
+    public function determineIfHighSchool()
+    {
+        if (!$this->roles || $this->roles->isEmpty()) {
             return false;
         }
 
-        if ($role === User::$HIGH_PRINCIPAL_ROLE)
-        {
+        $role = $this->roles[0]->name;
+
+        if ($role === self::$TEACHER_ROLE && $this->teacher_class) {
+            return in_array($this->teacher_class->name, self::$HIGH_SCHOOL_CLASSES);
+        }
+
+        if ($role === self::$ELEM_PRINCIPAL_ROLE) {
+            return false;
+        }
+
+        if ($role === self::$HIGH_PRINCIPAL_ROLE) {
             return true;
         }
 
-        if ($this->class)
-        {
-            return in_array($this->class->name, User::$HIGH_SCHOOL_CLASSES);
+        if ($this->class) {
+            return in_array($this->class->name, self::$HIGH_SCHOOL_CLASSES);
         }
 
         return true;
@@ -450,7 +487,12 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
     public static function getUserLevel()
     {
-        $isHighSchool = auth()->user()->isHighSchool();
+        $user = auth()->user();
+        if (!$user) {
+            return [];
+        }
+
+        $isHighSchool = $user->determineIfHighSchool();
 
         if ($isHighSchool) {
             return Level::where('order', '>=', 12)->pluck('name', 'id')->toArray();

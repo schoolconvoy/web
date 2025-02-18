@@ -28,53 +28,39 @@ class FeeStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
+        $ward = User::find(Cache::get('ward'));
+        $totalAmount = User::getOverallAmountWithDiscounts($ward);
+        $paidAmount = $ward->payments()->sum('amount');
+        $pendingAmount = max(0, $totalAmount - $paidAmount);
+
         return [
             Stat::make(
-                    'Total fees paid',
-                    'NGN' . number_format(
-                            User::find(Cache::get('ward'))
-                            ->fees()
-                            ->whereHas('payments')
-                            ->get()
-                            ->sum('final_amount'),
-                    2, '.', ',')
+                    'Total fees (after discounts & waivers)',
+                    'NGN ' . number_format($totalAmount, 2, '.', ',')
                 )
-                ->description('Total amount of fees.')
-                ->icon('heroicon-m-currency-dollar')
-                ->color('primary'),
+                ->description('Total amount after applying discounts, waivers and scholarships.')
+                ->icon('heroicon-m-calculator')
+                ->color('success'),
             Stat::make(
-                    'Fees pending',
-                    'NGN' . number_format(
-                        User::find(Cache::get('ward'))
-                            ->fees()
-                            ->whereDoesntHave('payments')
-                            ->get()
-                            ->sum('final_amount'),
-                    2, '.', ',')
+                    'Amount paid',
+                    'NGN ' . number_format($paidAmount, 2, '.', ',')
                 )
-                ->description('Total amount of fees.')
-                ->icon('heroicon-m-currency-dollar')
-                ->color('primary'),
+                ->description('Total amount paid so far.')
+                ->icon('heroicon-m-banknotes')
+                ->color('success'),
             Stat::make(
-                    'Fees overdue',
-                    'NGN' . number_format(User::find(Cache::get('ward'))
-                    ->fees()
-                    ->whereDoesntHave('payments')
-                    ->whereDate('deadline', '<=', now()->toDate())
-                    ->get()
-                    ->sum('final_amount'), 2, '.', ',')
+                    'Amount pending',
+                    'NGN ' . number_format($pendingAmount, 2, '.', ',')
                 )
-                ->description('Total amount of fees.')
-                ->icon('heroicon-m-currency-dollar')
+                ->description('Amount remaining to be paid.')
+                ->icon('heroicon-m-clock')
+                ->color($pendingAmount > 0 ? 'warning' : 'success')
                 ->chart(
-                    User::find(Cache::get('ward'))
-                        ->fees()
-                        ->whereDate('deadline', '<=', now()->toDate())
-                        ->whereDoesntHave('payments')
-                        ->pluck('amount')
-                        ->toArray()
-                )
-                ->color('primary'),
+                    [
+                        $paidAmount,
+                        $pendingAmount
+                    ]
+                ),
         ];
     }
 }
