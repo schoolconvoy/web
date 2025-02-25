@@ -73,7 +73,8 @@ class StaffResource extends Resource
                 TextColumn::make('lastname')
                     ->searchable(),
                 TextColumn::make('dob')
-                    ->dateTime('Y-m-d'),
+                    ->date('d/m/Y')
+                    ->sortable(),
                 TextColumn::make('email'),
                 TextColumn::make('phone'),
                 TextColumn::make('status')
