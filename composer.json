@@ -24,6 +24,7 @@
         "opcodesio/log-viewer": "^3.8",
         "saade/filament-fullcalendar": "^3.0",
         "spatie/laravel-db-snapshots": "^2.7",
+        "spatie/laravel-multitenancy": "^3.2",
         "stechstudio/filament-impersonate": "^3.14",
         "unicodeveloper/laravel-paystack": "^1.1",
         "z3d0x/filament-logger": "^0.7.2"
