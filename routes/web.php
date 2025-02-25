@@ -43,3 +43,16 @@ Route::get('/payment/callback', [PaymentController::class, 'handleGatewayCallbac
 Route::get('/admission', [PublicController::class, 'index'])->name('admission.index');
 
 Route::get('/{user_id}/generate-scoresheet', [App\Http\Controllers\PDFController::class, 'generateScoresheet']);
+
+/**
+ * Subscription routes
+ */
+Route::prefix('subscriptions')->name('subscriptions.')->group(function () {
+    Route::get('/', [App\Http\Controllers\SubscriptionController::class, 'index'])->name('index');
+    Route::get('/plans/{plan}', [App\Http\Controllers\SubscriptionController::class, 'showSubscriptionForm'])->name('show-subscription-form');
+    Route::post('/plans/{plan}/subscribe', [App\Http\Controllers\SubscriptionController::class, 'subscribe'])->name('subscribe');
+    Route::get('/{subscription}', [App\Http\Controllers\SubscriptionController::class, 'show'])->name('show');
+    Route::post('/{subscription}/cancel', [App\Http\Controllers\SubscriptionController::class, 'cancel'])->name('cancel');
+    Route::get('/plans/{plan}/change', [App\Http\Controllers\SubscriptionController::class, 'showChangePlanForm'])->name('show-change-plan-form');
+    Route::post('/plans/{plan}/change', [App\Http\Controllers\SubscriptionController::class, 'changePlan'])->name('change-plan');
+});
