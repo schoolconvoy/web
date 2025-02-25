@@ -47,8 +47,9 @@ class StaffResource extends Resource
                 TextInput::make('firstname'),
                 TextInput::make('lastname'),
                 DatePicker::make('dob')
-                        ->format('Y-m-d')
-                        ->label('Date of birth'),
+                    ->displayFormat('d/m/Y')
+                    ->format('Y-m-d')
+                    ->label('Date of birth'),
                 TextInput::make('email'),
                 Select::make('roles')
                     ->label('Assign role')
