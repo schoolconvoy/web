@@ -22,11 +22,12 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Events\StudentPromoted;
+use App\Models\Traits\BelongsToTenant;
 
 #[ScopedBy([SchoolScope::class])]
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes, BelongsToTenant;
 
     public static string $TEACHER_ROLE = 'Teacher';
     public static string $STUDENT_ROLE = 'Student';
@@ -608,5 +609,13 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
             User::$SUPER_ADMIN_ROLE,
             User::$ADMIN_ROLE
         ]);
+    }
+
+    /**
+     * Get the tenant that owns the user.
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }
