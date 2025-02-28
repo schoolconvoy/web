@@ -34,6 +34,7 @@ use App\Http\Middleware\RedirectToPanel;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use App\Models\User;
+use App\Filament\Widgets\SubscriptionStatusWidget;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -42,6 +43,7 @@ class AdminPanelProvider extends PanelProvider
         $widgets = [
             // AttendanceOverview::class,
             PopulationStatsOverview::class,
+            SubscriptionStatusWidget::class,
         ];
 
         return $panel
