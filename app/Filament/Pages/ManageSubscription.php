@@ -89,11 +89,6 @@ class ManageSubscription extends Page
         }
     }
 
-    public function getHeader(): ?View
-    {
-        return null;
-    }
-
     protected function getHeaderWidgets(): array
     {
         return [];
