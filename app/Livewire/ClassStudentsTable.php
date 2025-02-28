@@ -24,6 +24,8 @@ use Filament\Tables\Actions\Action as TableAction;
 use App\Livewire\IRelationalEntityTable;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
+use Filament\Forms\Components\Select as FormsSelect;
+use App\Models\ClassRoom;
 
 class ClassStudentsTable extends IRelationalEntityTable
 {
@@ -71,8 +73,28 @@ class ClassStudentsTable extends IRelationalEntityTable
                                 ->body($record->lastname . ' ' . $record->firstname . ' has been promoted to ' . $nextClassName)
                                 ->success()
                                 ->send();
-                        })
+                        }),
+                    TableAction::make('change_class')
+                        ->icon('heroicon-o-arrow-right-circle')
+                        ->form([
+                            FormsSelect::make('new_class_id')
+                                ->label('New Class')
+                                ->options(function () {
+                                    return Classes::query()
+                                        ->where('school_id', auth()->user()->school_id)
+                                        ->pluck('name', 'id');
+                                })
+                                ->required()
+                        ])
+                        ->action(function (User $record, array $data) {
+                            $record->class_id = $data['new_class_id'];
+                            $record->save();
 
+                            Notification::make()
+                                ->title('Student moved to new class successfully')
+                                ->success()
+                                ->send();
+                        })
                 ]),
             ])
             ->headerActions([
