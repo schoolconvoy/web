@@ -11,10 +11,12 @@ use Filament\Forms\Form;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Contracts\View\View;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class ManageSubscription extends Page
 {
+    use InteractsWithForms;
+
     protected static ?string $navigationIcon = 'heroicon-o-credit-card';
 
     protected static string $view = 'filament.pages.manage-subscription';
@@ -25,16 +27,21 @@ class ManageSubscription extends Page
 
     protected static ?int $navigationSort = 1;
 
-    protected static ?string $slug = 'subscription';
+    protected static ?string $slug = 'manage-subscription';
 
     public ?array $data = [];
+
+    public $plan_id;
+
+    public function getSubheading(): ?string
+    {
+        return 'Manage your subscription plan and billing settings';
+    }
 
     public function mount(): void
     {
         $tenant = Tenant::find(Auth::user()->school_id);
-        $this->form->fill([
-            'plan_id' => $tenant->plan_id ?? null,
-        ]);
+        $this->plan_id = $tenant->plan_id ?? null;
     }
 
     public function form(Form $form): Form
@@ -70,9 +77,6 @@ class ManageSubscription extends Page
         try {
             $tenant->plan_id = $planId;
             $tenant->save();
-
-            // Here you would typically integrate with your payment gateway
-            // For now, we'll just show a success message
 
             Notification::make()
                 ->title('Plan Updated')
