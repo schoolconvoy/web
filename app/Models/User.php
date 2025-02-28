@@ -23,11 +23,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Events\StudentPromoted;
 use App\Models\Traits\BelongsToTenant;
+use App\Traits\HasSubscriptionLimits;
 
 #[ScopedBy([SchoolScope::class])]
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes, BelongsToTenant;
+    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes, BelongsToTenant, HasSubscriptionLimits;
 
     public static string $TEACHER_ROLE = 'Teacher';
     public static string $STUDENT_ROLE = 'Student';
@@ -528,6 +529,16 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
 
             Log::debug('Model updated with: session: ' . $model->session_id . ' term ' . $model->term_id . ' school_id: ' . $model->school_id);
         });
+
+        static::creating(function ($user) {
+            if ($user->role === 'student' && $user->exceedsStudentLimit()) {
+                throw new \Exception('You have reached the maximum number of students allowed in your subscription plan.');
+            }
+
+            if ($user->role === 'teacher' && $user->exceedsTeacherLimit()) {
+                throw new \Exception('You have reached the maximum number of teachers allowed in your subscription plan.');
+            }
+        });
     }
 
     public function promotions()
@@ -616,6 +627,6 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
      */
     public function tenant(): BelongsTo
     {
-        return $this->belongsTo(Tenant::class);
+        return $this->belongsTo(Tenant::class, 'school_id');
     }
 }

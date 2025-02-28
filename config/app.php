@@ -173,6 +173,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         // App\Providers\TelescopeServiceProvider::class,
         Unicodeveloper\Paystack\PaystackServiceProvider::class,
+        App\Providers\SubscriptionServiceProvider::class,
     ])->toArray(),
 
     /*

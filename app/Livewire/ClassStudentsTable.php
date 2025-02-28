@@ -24,6 +24,7 @@ use Filament\Tables\Actions\Action as TableAction;
 use App\Livewire\IRelationalEntityTable;
 use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
+use App\Models\Tenant;
 
 class ClassStudentsTable extends IRelationalEntityTable
 {
@@ -144,6 +145,25 @@ class ClassStudentsTable extends IRelationalEntityTable
     public function saveStudents()
     {
         $class = Classes::find($this->classId);
+        $tenant = Tenant::find(auth()->user()->school_id);
+
+        if (!$tenant || !$tenant->subscription || !$tenant->subscription->isActive()) {
+            Notification::make()
+                ->title('Subscription Required')
+                ->body('Please subscribe to a plan to add students to classes.')
+                ->danger()
+                ->send();
+            return;
+        }
+
+        if ($tenant->exceedsStudentLimit()) {
+            Notification::make()
+                ->title('Student Limit Reached')
+                ->body('You have reached the maximum number of students allowed in your subscription plan.')
+                ->danger()
+                ->send();
+            return;
+        }
 
         foreach($this->students as $student)
         {
@@ -156,6 +176,12 @@ class ClassStudentsTable extends IRelationalEntityTable
 
         // close the modal
         $this->dispatch('close-modal', id: 'add-students');
+
+        Notification::make()
+            ->title('Students Added')
+            ->body('Students have been successfully added to the class.')
+            ->success()
+            ->send();
     }
 
     public function mount($classId = null, $students = [])
