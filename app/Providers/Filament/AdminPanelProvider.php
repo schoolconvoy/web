@@ -35,6 +35,7 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use App\Models\User;
 use App\Filament\Widgets\SubscriptionStatusWidget;
+use App\Filament\Pages\ManageSubscription;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -76,6 +77,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                ManageSubscription::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets($widgets)

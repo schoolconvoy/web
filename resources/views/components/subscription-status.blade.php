@@ -3,7 +3,7 @@
         <div class="text-center">
             <h3 class="text-lg font-semibold text-red-600 dark:text-red-400">No Active Subscription</h3>
             <p class="mt-2 text-gray-600 dark:text-gray-400">Please subscribe to a plan to continue using all features.</p>
-            <a href="{{ route('filament.admin.pages.subscription') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150">
+            <a href="{{ route('filament.admin.pages.manage-subscription') }}" class="mt-4 inline-flex items-center px-4 py-2 bg-primary-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition ease-in-out duration-150">
                 View Plans
             </a>
         </div>
@@ -65,7 +65,7 @@
             @endif
 
             <div class="flex justify-end">
-                <a href="{{ route('filament.admin.pages.subscription') }}" class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
+                <a href="{{ route('filament.admin.pages.manage-subscription') }}" class="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
                     Manage Subscription →
                 </a>
             </div>

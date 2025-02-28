@@ -21,13 +21,13 @@ class CheckSubscription
 
             // If no tenant or no plan, redirect to subscription page
             if (!$tenant || !$tenant->plan) {
-                return redirect()->route('filament.admin.pages.subscription')
+                return redirect()->route('filament.admin.pages.manage-subscription')
                     ->with('warning', 'Please subscribe to a plan to continue using the platform.');
             }
 
             // Check if subscription is active
             if (!$tenant->subscription || !$tenant->subscription->isActive()) {
-                return redirect()->route('filament.admin.pages.subscription')
+                return redirect()->route('filament.admin.pages.manage-subscription')
                     ->with('warning', 'Your subscription has expired. Please renew to continue using the platform.');
             }
         }
