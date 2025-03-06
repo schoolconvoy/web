@@ -167,6 +167,15 @@ class StaffResource extends Resource
         ];
     }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$SUPER_ADMIN_ROLE,
+            // User::$HUMAN_RESOURCE_ROLE
+        ]);
+    }
+
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()

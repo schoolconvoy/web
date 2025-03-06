@@ -13,7 +13,7 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Button;
-
+use App\Models\User;
 class Configuration extends Page implements HasForms
 {
     use InteractsWithForms;
@@ -22,4 +22,14 @@ class Configuration extends Page implements HasForms
 
     protected static ?string $navigationGroup = 'Settings';
     protected static ?string $navigationIcon = 'heroicon-o-cog';
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE,
+            User::$SUPER_ADMIN_ROLE
+        ]);
+    }
 }

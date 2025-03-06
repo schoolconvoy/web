@@ -238,7 +238,13 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn () => auth()->user()->hasAnyRole([
+                        User::$ADMIN_ROLE,
+                        User::$HIGH_PRINCIPAL_ROLE,
+                        User::$ELEM_PRINCIPAL_ROLE,
+                        User::$SUPER_ADMIN_ROLE
+                    ])),
                 Impersonate::make('Impersonate')
                     ->redirectTo(route('filament.student.pages.dashboard'))
                     ->grouped()
@@ -248,7 +254,13 @@ class StudentResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->visible(fn () => auth()->user()->hasAnyRole([
+                            User::$ADMIN_ROLE,
+                            User::$HIGH_PRINCIPAL_ROLE,
+                            User::$ELEM_PRINCIPAL_ROLE,
+                            User::$SUPER_ADMIN_ROLE
+                        ])),
                     BulkAction::make('promote_students')
                         ->label('Promote students')
                         ->requiresConfirmation()

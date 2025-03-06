@@ -22,11 +22,12 @@ use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use App\Events\StudentPromoted;
+use Spatie\Permission\Traits\HasRoles;
 
 #[ScopedBy([SchoolScope::class])]
 class User extends Authenticatable implements FilamentUser, HasName, CanResetPassword
 {
-    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, HasSuperAdmin, SoftDeletes, HasRoles;
 
     public static string $TEACHER_ROLE = 'Teacher';
     public static string $STUDENT_ROLE = 'Student';

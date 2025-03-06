@@ -16,6 +16,7 @@ use Spatie\Activitylog\Models\Activity as ActivityModel;
 use Z3d0X\FilamentLogger\Resources\ActivityResource as FilamentActivityResource;
 use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 use Carbon\Carbon;
+use App\Models\User;
 
 class ActivityResource extends FilamentActivityResource
 {
@@ -164,5 +165,13 @@ class ActivityResource extends FilamentActivityResource
                         return $query;
                     }),
             ]);
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$SUPER_ADMIN_ROLE
+        ]);
     }
 }
