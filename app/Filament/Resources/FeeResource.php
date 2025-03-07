@@ -71,4 +71,13 @@ class FeeResource extends FeeBase
             'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
     }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$SUPER_ADMIN_ROLE,
+            User::$ACCOUNTANT_ROLE
+        ]);
+    }
 }
