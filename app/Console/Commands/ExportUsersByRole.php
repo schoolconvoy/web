@@ -52,8 +52,6 @@ class ExportUsersByRole extends Command
                 $user->email,
                 $user->fullname,
                 $role,
-                // If "password" is hashed in DB, you'll only see the hash here.
-                // If you truly store it in plain text (not recommended), it will appear.
                 $plain_password
             ]);
         }
