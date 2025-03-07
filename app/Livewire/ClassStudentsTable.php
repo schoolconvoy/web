@@ -167,6 +167,26 @@ class ClassStudentsTable extends IRelationalEntityTable
     {
         $class = Classes::find($this->classId);
 
+        if (!$class) {
+            Notification::make()
+                ->title('Class not found')
+                ->body('The class you are trying to add students to does not exist')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
+        if (empty($this->students)) {
+            Notification::make()
+                ->title('No students selected')
+                ->body('Please select at least one student to add to the class')
+                ->danger()
+                ->send();
+
+            return;
+        }
+
         foreach($this->students as $student)
         {
             $oldClass = Classes::find($student->class_id) ?? new Classes();
