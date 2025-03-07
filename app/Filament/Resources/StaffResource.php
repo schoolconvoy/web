@@ -101,7 +101,7 @@ class StaffResource extends Resource
                         ->label('Login as'),
                     DeleteAction::make()
                         ->requiresConfirmation()
-                        ->hidden(fn() => !auth()->user()->can('super-admin')),
+                        ->hidden(fn() => !self::canAccess()),
                 ]),
             ])
             ->bulkActions([
