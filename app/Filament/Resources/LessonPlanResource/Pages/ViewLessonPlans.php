@@ -5,11 +5,11 @@ namespace App\Filament\Resources\LessonPlanResource\Pages;
 use App\Filament\Resources\LessonPlanResource;
 use App\Models\LessonPlan;
 use App\Models\Week;
+use App\Models\User;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class ViewLessonPlans extends ViewRecord
@@ -51,21 +51,65 @@ class ViewLessonPlans extends ViewRecord
                                         ->where('teacher_id', auth()->id())
                                         ->with('teacher')
                                         ->get();
-
             return;
         }
 
-        // A hack to get all lesson plans when no status is provided. || Comparing string with int, therefore loose comparison
-        if ($lastFragment === 'view' || $lastFragment == $this->record->id) {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->orderBy('created_at', 'desc')->with('teacher')->get();
+        $user = auth()->user();
+        $isAdmin = $user->hasAnyRole([
+            User::$ADMIN_ROLE,
+            User::$SUPER_ADMIN_ROLE,
+            User::$HIGH_PRINCIPAL_ROLE,
+            User::$ELEM_PRINCIPAL_ROLE
+        ]);
 
-            return;
-        }
+        // For admins/principals, show all lesson plans
+        if ($isAdmin) {
+            if ($lastFragment === 'view' || $lastFragment == $this->record->id) {
+                $this->lessonPlans = Week::find($this->record->id)
+                                        ->lessonPlans()
+                                        ->orderBy('created_at', 'desc')
+                                        ->with('teacher')
+                                        ->get();
+                return;
+            }
 
-        if ($lastFragment != $this->record->id) {
-            $this->lessonPlans = Week::find($this->record->id)->lessonPlans()->with('teacher')->orderBy('created_at', 'desc')->where('status', $lastFragment)->get();
+            if ($lastFragment != $this->record->id) {
+                $this->lessonPlans = Week::find($this->record->id)
+                                        ->lessonPlans()
+                                        ->with('teacher')
+                                        ->orderBy('created_at', 'desc')
+                                        ->where('status', $lastFragment)
+                                        ->get();
+                return;
+            }
+        } else {
+            // For regular teachers, only show their own lesson plans and approved ones
+            if ($lastFragment === 'view' || $lastFragment == $this->record->id) {
+                $this->lessonPlans = Week::find($this->record->id)
+                                        ->lessonPlans()
+                                        ->where(function($query) {
+                                            $query->where('teacher_id', auth()->id())
+                                                  ->orWhere('status', LessonPlan::APPROVED);
+                                        })
+                                        ->orderBy('created_at', 'desc')
+                                        ->with('teacher')
+                                        ->get();
+                return;
+            }
 
-            return;
+            if ($lastFragment != $this->record->id) {
+                $this->lessonPlans = Week::find($this->record->id)
+                                        ->lessonPlans()
+                                        ->where(function($query) {
+                                            $query->where('teacher_id', auth()->id())
+                                                  ->orWhere('status', LessonPlan::APPROVED);
+                                        })
+                                        ->where('status', $lastFragment)
+                                        ->orderBy('created_at', 'desc')
+                                        ->with('teacher')
+                                        ->get();
+                return;
+            }
         }
     }
 
