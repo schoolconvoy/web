@@ -31,7 +31,7 @@
         <div x-show="tab === 'all_weeks'">
             <div class="grid grid-cols-2 gap-4">
                 @foreach ($weeks as $week)
-                    <livewire:week-item :week="$week" :key="'all_weeks_' . $week->id" :lesson-plans-count="$week->lessonPlans->count()" type="view" />
+                    <livewire:week-item :week="$week" :key="'all_weeks_' . $week->id" :lesson-plans-count="0" type="view" />
                 @endforeach
             </div>
         </div>
@@ -40,7 +40,7 @@
     <div x-show="tab === 'awaiting_review'">
         <div class="grid grid-cols-2 gap-4">
             @foreach ($weeks as $week)
-                @livewire('week-item', ['week' => $week, 'lessonPlansCount' => $week->lessonPlans->where('status', \App\Models\LessonPlan::AWAITING_REVIEW)->count(), 'type' => 'pending'], key($week->id))
+                <livewire:week-item :week="$week" :key="'pending_' . $week->id" :lesson-plans-count="0" type="pending" />
             @endforeach
         </div>
     </div>
@@ -48,7 +48,7 @@
     <div x-show="tab === 'approved_lesson_plans'">
         <div class="grid grid-cols-2 gap-4">
             @foreach ($weeks as $week)
-                @livewire('week-item', ['week' => $week, 'lessonPlansCount' => $week->lessonPlans->where('status', \App\Models\LessonPlan::APPROVED)->count(), 'type' => 'approved'], key($week->id))
+                <livewire:week-item :week="$week" :key="'approved_' . $week->id" :lesson-plans-count="0" type="approved" />
             @endforeach
         </div>
     </div>
@@ -56,7 +56,7 @@
     <div x-show="tab === 'my_lesson_plans'">
         <div class="grid grid-cols-2 gap-4">
             @foreach ($weeks as $week)
-                @livewire('week-item', ['week' => $week, 'lessonPlansCount' => $week->lessonPlans->where('teacher_id', auth()->id())->count(), 'type' => 'mine'], key($week->id))
+                <livewire:week-item :week="$week" :key="'mine_' . $week->id" :lesson-plans-count="0" type="mine" />
             @endforeach
         </div>
     </div>
