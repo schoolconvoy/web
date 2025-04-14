@@ -73,4 +73,10 @@ class Fee extends BaseModel
     {
         return $this->hasMany(PaymentReminder::class);
     }
+
+    public function waivers()
+    {
+        return $this->belongsToMany(Waiver::class, 'waiver_fees')
+                    ->withTimestamps();
+    }
 }

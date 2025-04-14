@@ -5,6 +5,7 @@ namespace App\Providers\Filament;
 use App\Filament\Pages\Auth\EditProfile;
 use App\Filament\Pages\Auth\Login;
 use App\Filament\Pages\Auth\Register;
+use App\Filament\Parent\Pages\ViewWardResults;
 use App\Filament\Parent\Resources\FeeResource\Widgets\FeeStatsOverview;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -43,6 +44,7 @@ class ParentPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Parent/Pages'), for: 'App\\Filament\\Parent\\Pages')
             ->pages([
                 Pages\Dashboard::class,
+                ViewWardResults::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Parent/Widgets'), for: 'App\\Filament\\Parent\\Widgets')
             ->widgets([
@@ -53,10 +55,6 @@ class ParentPanelProvider extends PanelProvider
                     ->url('#')
                     ->sort(10)
                     ->icon('heroicon-o-newspaper'),
-                NavigationItem::make('Results')
-                    ->url('#')
-                    ->sort(10)
-                    ->icon('heroicon-c-table-cells'),
                 NavigationItem::make('Academic Calendar')
                     ->url('#')
                     ->sort(10)

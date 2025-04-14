@@ -19,16 +19,51 @@ class FeeResource extends FeeBase
 {
     public static function table(Table $table): Table
     {
-        $ward = User::find(Cache::get('ward'));
+        $wardId = Cache::get('ward');
+
+        if (!$wardId) {
+            return $table
+                ->query(function () {
+                    return Fee::where('id', 0); // Return empty query
+                })
+                ->columns([
+                    TextColumn::make('name')
+                        ->searchable()
+                        ->sortable(),
+                ])
+                ->emptyStateHeading('No ward selected')
+                ->emptyStateDescription('Please use the dropdown menu in the top right corner to select a ward to view their fees.')
+                ->emptyStateIcon('heroicon-o-user-group');
+        }
+
+        $ward = User::find($wardId);
+
+        if (!$ward) {
+            return $table
+                ->query(function () {
+                    return Fee::where('id', 0); // Return empty query
+                })
+                ->columns([
+                    TextColumn::make('name')
+                        ->searchable()
+                        ->sortable(),
+                ])
+                ->emptyStateHeading('No ward selected')
+                ->emptyStateDescription('Please use the dropdown menu in the top right corner to select a ward to view their fees.')
+                ->emptyStateIcon('heroicon-o-user-group');
+        }
 
         return $table
             ->query(function () use ($ward) {
                 return $ward->fees()
                     ->whereDoesntHave('payments')
-                    ->whereDoesntHave('waivers', function ($query) {
+                    ->whereDoesntHave('students.waivers', function ($query) {
                         $query->where(function($q) {
                             $q->whereNull('end_date')
                                 ->orWhere('end_date', '>=', now());
+                        })
+                        ->whereHas('fees', function($q) {
+                            $q->whereColumn('fees.id', 'waiver_fees.fee_id');
                         });
                     });
             })
