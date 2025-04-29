@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Fee;
 use App\Models\Waiver;
-
+use Filament\Notifications\Notification;
 class PaymentController extends Controller
 {
     public function redirectToGateway()
@@ -27,14 +27,29 @@ class PaymentController extends Controller
             $ward = User::find($wardId);
 
             // Fetch the (unpaid) school fees of the current ward in the cache
-            $amount = $ward->fees()->whereDoesntHave('payments')->get()->sum('final_amount');
+            $fees = $ward->fees()->whereDoesntHave('payments')->get();
+            Log::debug("Actual fee for ward: " . print_r($fees->sum('amount'), true));
+
+            // Calculate total amount including discounts
+            $amount = $fees->sum(function($fee) use ($ward) {
+                $discount = $ward->discounts()->where('fee_id', $fee->id)->first();
+                $discountedPercentage = $discount->percentage ?? 0;
+                return $fee->amount - ($fee->amount * $discountedPercentage / 100);
+            });
+
+            Log::debug("Discounted amount due for ward: " . print_r($amount, true));
+
             $parent = $ward->parent;
 
             // No more fees to pay
             if ($amount === 0)
             {
                 Log::debug("No amount due for ward: " . print_r($ward->id, true) . " and parent: " . print_r($parent[0]->id, true));
-                return Redirect::back()->with('message', ['msg'=>'No amount due', 'type'=>'error']);
+                // Show a filament notification
+                return Notification::make()
+                    ->title('No amount due')
+                    ->body('No amount due for ' . $ward->name)
+                    ->send();
             }
 
             // Convert to kobo and add paystack charges (1.5% + 100 naira)

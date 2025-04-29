@@ -380,8 +380,6 @@ class User extends Authenticatable implements FilamentUser, HasName, CanResetPas
         // Get all fees for this user, including the discount associated with each fee
         $fees = $user->fees;
 
-        Log::alert("fees for student: " . print_r($fees, true));
-
         // Apply discount to each fee
         $discountedAmounts = $fees->map(function ($fee) use ($user) {
             // $discount = $fee->discounts->where('end_date', '>=', now())->first();
