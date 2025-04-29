@@ -45,13 +45,11 @@ class PaymentController extends Controller
             if ($amount === 0)
             {
                 Log::debug("No amount due for ward: " . print_r($ward->id, true) . " and parent: " . print_r($parent[0]->id, true));
-                // Show a filament notification and redirect
-                Notification::make()
-                    ->title('No amount due')
-                    ->body('No amount due for ' . $ward->full_name)
-                    ->send();
-
-                return Redirect::back();
+                return Redirect::back()->with('message', [
+                    'title' => 'No amount due',
+                    'body' => 'No amount due for ' . $ward->full_name,
+                    'type' => 'info'
+                ]);
             }
 
             // Convert to kobo and add paystack charges (1.5% + 100 naira)
@@ -75,9 +73,11 @@ class PaymentController extends Controller
             return paystack()->getAuthorizationUrl($data)->redirectNow();
         }catch(\Exception $e) {
             Log::debug('[PAYSTACK ERR] ' . print_r([
-                'msg'=>'The paystack token has expired. Please refresh the page and try again.',
+                'msg'=>$e->getMessage(),
                 'type'=>'error',
-                'error' => print_r($e->getMessage(), true)
+                'error' => print_r($e->getMessage(), true),
+                'trace' => print_r($e->getTrace(), true),
+                'line' => $e->getLine()
             ], true));
 
             return Redirect::back()->withMessage(['msg'=>'The paystack token has expired. Please refresh the page and try again.', 'type'=>'error']);
