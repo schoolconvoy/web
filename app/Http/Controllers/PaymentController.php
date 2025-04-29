@@ -45,11 +45,13 @@ class PaymentController extends Controller
             if ($amount === 0)
             {
                 Log::debug("No amount due for ward: " . print_r($ward->id, true) . " and parent: " . print_r($parent[0]->id, true));
-                // Show a filament notification
-                return Notification::make()
+                // Show a filament notification and redirect
+                Notification::make()
                     ->title('No amount due')
-                    ->body('No amount due for ' . $ward->name)
+                    ->body('No amount due for ' . $ward->full_name)
                     ->send();
+
+                return Redirect::back();
             }
 
             // Convert to kobo and add paystack charges (1.5% + 100 naira)
